@@ -8,12 +8,12 @@ inherit linux-info linux-mod
 
 DESCRIPTION="Kernel module for Realtek 8111/8168 PCI-E NICs"
 HOMEPAGE="http://www.realtek.com.tw"
-SRC_URI="http://funtoo.whissi.de/distfiles/${P}.tar.bz2"
+SRC_URI="http://funtoo.whissi.de/distfiles/${PN}/${P}.tar.bz2"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="amd64 x86"
 IUSE=""
-RESTRICT=""
+RESTRICT="mirror"
 DEPEND="sys-kernel/module-rebuild
 	virtual/linux-sources"
 RDEPEND=""
