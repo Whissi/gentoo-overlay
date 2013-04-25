@@ -7,7 +7,7 @@ inherit eutils
 
 
 if [[ ${PV} == 9999* ]] ; then
-	EGIT_REPO_URI="git://github.com/Whissi/update-ipset.git
+	EGIT_REPO_URI="git://github.com/Whissi/${PN}.git
 		https://github.com/Whissi/${PN}.git"
 	inherit git-2
 	SRC_URI=""
