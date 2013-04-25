@@ -26,6 +26,7 @@ IUSE=""
 
 DEPEND=""
 RDEPEND=">=app-shells/bash-4.2_p37
+	>=net-misc/curl-7.26.0
 	>=sys-apps/findutils-4.4.2
 	>=sys-apps/coreutils-8.5
 	>=sys-apps/util-linux-2.21"
