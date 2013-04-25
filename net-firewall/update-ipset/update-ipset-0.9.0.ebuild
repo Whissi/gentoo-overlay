@@ -13,7 +13,6 @@ if [[ ${PV} == 9999* ]] ; then
 	SRC_URI=""
 	KEYWORDS=""
 else
-	set -x
 	SRC_URI="https://github.com/Whissi/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~alpha amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc x86"
 fi
