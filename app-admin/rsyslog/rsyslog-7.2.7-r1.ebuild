@@ -49,6 +49,7 @@ DOCS=(AUTHORS ChangeLog doc/rsyslog-example.conf)
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-7.2.5-json-c-pkgconfig.patch
+	"${FILESDIR}"/${PN}-7.2.7-json-c-pkgconfig2.patch
 
 	# Fix runtime UUID/JSON libs linking
 	"${FILESDIR}"/6-stable/${PN}-6.6.0-fix-runtime.patch	)
@@ -56,7 +57,6 @@ PATCHES=(
 src_prepare() {
 	# Don't force '-g' CFLAG
 	sed -e 's/CFLAGS="\(.*\) -g"/CFLAGS="\1"/g' -i configure.ac || die
-	sed -e 's/PKG_CHECK_MODULES(\[JSON_C\], \[json\])/PKG_CHECK_MODULES(\[JSON_C\], \[json-c\])/' -i configure.ac || die
 
 	autotools-utils_src_prepare
 }

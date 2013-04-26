@@ -1,0 +1,13 @@
+--- a/configure.ac	2013-04-17 09:56:55.000000000 +0200
++++ b/configure.ac	2013-04-26 21:02:38.851024889 +0200
+@@ -34,7 +34,9 @@
+ # modules we require
+ PKG_CHECK_MODULES(LIBESTR, libestr >= 0.1.5)
+ PKG_CHECK_MODULES(LIBEE, libee >= 0.4.0)
+-PKG_CHECK_MODULES([JSON_C], [json])
++PKG_CHECK_MODULES([JSON_C], [json],, [
++    PKG_CHECK_MODULES([JSON_C], [json-c])
++])
+ 
+ case "${host}" in
+   *-*-linux*)
