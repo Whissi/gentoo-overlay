@@ -41,7 +41,7 @@ src_install() {
 
 	cd "${WORKDIR}/${P}"
 	DESTDIR="${D}" ./install.sh "${FILESDIR}"/shorewallrc_new || die "install.sh failed"
-	newinitd "${FILESDIR}/shorewall-lite" shorewall-lite
+	newinitd "${FILESDIR}"/${PN}.initd ${PN}
 	systemd_newunit "${FILESDIR}"/shorewall-lite.systemd 'shorewall-lite.service' || die
 
 	dodoc changelog.txt releasenotes.txt
