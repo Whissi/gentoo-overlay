@@ -1,0 +1,9 @@
+# ChangeLog for sys-boot/gnu-efi
+# Copyright 1999-2013 Gentoo Foundation; Distributed under the GPL v2
+
+*gnu-efi-3.0u (21 Jun 2013)
+
+  21 Jun 2013; Thomas D. <whissi@whissi.de> +gnu-efi-3.0u.ebuild:
+  Version bump and update to EAPI=5.
+  Currently, all patches are merged by upstream, so no need to apply any
+  custom patches at the moment.
