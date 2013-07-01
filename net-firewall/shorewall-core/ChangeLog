@@ -1,6 +1,11 @@
 # ChangeLog for net-firewall/shorewall-core
 # Copyright 1999-2013 Gentoo Foundation; Distributed under the GPL v2
 
+*shorewall-core-4.5.18 (01 Jul 2013)
+
+  01 Jul 2013; Thomas D. <whissi@whissi.de>
+  +shorewall-core-4.5.18.ebuild: Version bump
+
 *shorewall-core-4.5.17.1 (18 Jun 2013)
 
   18 Jun 2013; Thomas D. <whissi@whissi.de>
