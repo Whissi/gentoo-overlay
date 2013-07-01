@@ -6,20 +6,28 @@
 extra_commands="check clear"
 extra_started_commands="refresh reset"
 
-checkconfig() {
-	if [ ! -d /var/lock/subsys ] ; then
-		checkpath -d -m 755 /var/lock/subsys
-	fi
-}
-
 depend() {
 	need net
 	provide firewall
 	after ulogd
 }
 
+status() {
+	local _retval
+	/sbin/shorewall status >/dev/null
+	_retval=$?
+	if [ ${_retval} = '0' ]; then
+		einfo 'status: started'
+		mark_service_started "${SVCNAME}"
+		return 0
+	else
+		einfo 'status: stopped'	
+		mark_service_stopped "${SVCNAME}"
+		return 3
+	fi
+}
+
 start() {
-    checkconfig
 	ebegin "Starting shorewall"
 	/sbin/shorewall -f start 1>/dev/null
 	eend $? 
@@ -32,7 +40,6 @@ stop() {
 }
 
 restart() {
-    checkconfig
 	# shorewall comes with its own control script that includes a
 	# restart function, so refrain from calling svc_stop/svc_start
 	# here.  Note that this comment is required to fix bug 55576;

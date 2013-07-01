@@ -28,6 +28,11 @@ DEPEND=">=net-firewall/iptables-1.2.4
 	=net-firewall/shorewall-core-${PV}"
 RDEPEND="${DEPEND}"
 
+src_prepare() {
+	epatch "${FILESDIR}"/shorewall.conf-SUBSYSLOCK.patch
+	epatch_user
+}
+
 src_configure() {
 	:;
 }
@@ -50,5 +55,4 @@ src_install() {
 		cd "${WORKDIR}/${MY_P_DOCS}"
 		dohtml -r *
 	fi
-	dodir /var/lock/subsys
 }

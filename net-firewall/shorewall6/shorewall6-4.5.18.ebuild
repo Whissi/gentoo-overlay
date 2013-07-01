@@ -35,6 +35,11 @@ pkg_pretend() {
 	fi
 }
 
+src_prepare() {
+	epatch "${FILESDIR}"/shorewall6.conf-SUBSYSLOCK.patch
+	epatch_user
+}
+
 src_configure() {
 	:;
 }
@@ -57,5 +62,4 @@ src_install() {
 		cd "${WORKDIR}/${MY_P_DOCS}"
 		dohtml -r *
 	fi
-	dodir /var/lock/subsys
 }
