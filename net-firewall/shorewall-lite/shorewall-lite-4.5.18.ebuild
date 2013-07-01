@@ -28,6 +28,10 @@ RDEPEND="net-firewall/iptables
 	sys-apps/iproute2
 	=net-firewall/shorewall-core-${PV}"
 
+src_prepare() {
+	epatch_user
+}
+
 src_configure() {
 	:;
 }

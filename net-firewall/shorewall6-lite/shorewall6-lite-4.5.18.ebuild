@@ -33,6 +33,10 @@ pkg_pretend() {
 	fi
 }
 
+src_prepare() {
+	epatch_user
+}
+
 src_configure() {
 	:;
 }
