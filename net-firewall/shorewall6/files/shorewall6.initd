@@ -28,7 +28,6 @@ status() {
 }
 
 start() {
-    checkconfig
 	ebegin "Starting shorewall6"
 	/sbin/shorewall6 -f start 1>/dev/null
 	eend $? 
@@ -41,7 +40,6 @@ stop() {
 }
 
 restart() {
-    checkconfig
 	# shorewall comes with its own control script that includes a
 	# restart function, so refrain from calling svc_stop/svc_start
 	# here.  Note that this comment is required to fix bug 55576;
