@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/net-dns/pdns-recursor/pdns-recursor-3.5.1.ebuild,v 1.1 2013/05/04 20:54:57 swegener Exp $
 
-EAPI="4"
+EAPI="5"
 
 inherit toolchain-funcs flag-o-matic eutils
 
@@ -27,6 +27,7 @@ pkg_setup() {
 
 src_prepare() {
 	epatch "${FILESDIR}"/${PN}-3.1.7.2-error-message.patch
+	epatch_user
 
 	sed -i -e s:/var/run/:/var/lib/powerdns: "${S}"/config.h || die
 }
@@ -51,10 +52,12 @@ src_install() {
 
 	insinto /etc/powerdns
 	doins "${FILESDIR}"/recursor.conf
+	
+	insinto /etc/rsyslog.d
+	newins "${FILESDIR}"/pdns-recursor.rsyslog pdns-recursor.conf
 
-	doinitd "${FILESDIR}"/precursor
-
-	# Pretty ugly, uh?
-	dodir /var/lib/powerdns/var/lib
-	dosym ../.. /var/lib/powerdns/var/lib/powerdns
+	newinitd "${FILESDIR}"/pdns-recursor.initd ${PN}
+	
+	keepdir "/var/lib/powerdns"
+	keepdir "/var/lib/powerdns/dev"
 }
