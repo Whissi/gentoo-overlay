@@ -36,7 +36,7 @@ IUSE="doc"
 DEPEND="=net-firewall/shorewall-core-${PV}"
 RDEPEND="
 	${DEPEND}
-	>=net-firewall/iptables-1.3.3
+	>=net-firewall/iptables-1.4.20
 	sys-apps/iproute2[-minimal]
 "
 

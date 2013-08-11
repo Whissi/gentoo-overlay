@@ -38,7 +38,7 @@ IUSE="doc"
 DEPEND="=net-firewall/shorewall-${PV}"
 RDEPEND="
 	${DEPEND}
-	>=net-firewall/iptables-1.4.1.1[ipv6]
+	>=net-firewall/iptables-1.4.20[ipv6]
 	sys-apps/iproute2[-minimal]
 	dev-perl/Socket6
 "
