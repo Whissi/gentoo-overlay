@@ -4,7 +4,7 @@
 
 EAPI="5"
 
-inherit eutils versionator
+inherit eutils prefix versionator
 
 MY_URL_PREFIX=
 case ${P} in
@@ -48,6 +48,9 @@ DOCS=( changelog.txt releasenotes.txt )
 S=${WORKDIR}/${PN}-${MY_PV}
 
 src_prepare() {
+	cp "${FILESDIR}"/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
+	eprefixify "${S}"/shorewallrc.gentoo
+
 	epatch_user
 }
 
@@ -56,6 +59,6 @@ src_configure() {
 }
 
 src_install() {
-	DESTDIR="${D}" ./install.sh "${FILESDIR}"/shorewallrc_new || die "install.sh failed"
+	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
 	default
 }

@@ -4,7 +4,7 @@
 
 EAPI="4"
 
-inherit eutils versionator
+inherit eutils prefix versionator
 
 # Select version (stable, RC, Beta):
 MY_PV_TREE=$(get_version_component_range 1-2)   # for devel versions use "development/$(get_version_component_range 1-2)"
@@ -31,11 +31,16 @@ RDEPEND="${DEPEND}"
 
 DOCS=( changelog.txt releasenotes.txt )
 
+src_prepare() {
+	cp "${FILESDIR}"/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
+	eprefixify "${S}"/shorewallrc.gentoo
+}
+
 src_configure() {
 	:;
 }
 
 src_install() {
-	DESTDIR="${D}" ./install.sh "${FILESDIR}"/shorewallrc_new || die "install.sh failed"
+	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
 	default
 }

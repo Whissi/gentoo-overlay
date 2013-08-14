@@ -4,7 +4,7 @@
 
 EAPI="4"
 
-inherit systemd versionator
+inherit eutils prefix systemd versionator
 
 # Select version (stable, RC, Beta):
 MY_PV_TREE=$(get_version_component_range 1-2)   # for devel versions use "development/$(get_version_component_range 1-2)"
@@ -28,6 +28,13 @@ RDEPEND="net-firewall/iptables
 	sys-apps/iproute2
 	=net-firewall/shorewall-core-${PV}"
 
+src_prepare() {
+	cp "${FILESDIR}"/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
+	eprefixify "${S}"/shorewallrc.gentoo
+	
+	cp "${FILESDIR}"/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
+}
+
 src_configure() {
 	:;
 }
@@ -40,8 +47,7 @@ src_install() {
 	keepdir /var/lib/shorewall-lite
 
 	cd "${WORKDIR}/${P}"
-	DESTDIR="${D}" ./install.sh "${FILESDIR}"/shorewallrc_new || die "install.sh failed"
-	newinitd "${FILESDIR}"/${PN}.initd ${PN}
+	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
 	systemd_newunit "${FILESDIR}"/shorewall-lite.systemd 'shorewall-lite.service' || die
 
 	dodoc changelog.txt releasenotes.txt

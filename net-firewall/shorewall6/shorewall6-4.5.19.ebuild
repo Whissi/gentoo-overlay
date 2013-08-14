@@ -4,7 +4,7 @@
 
 EAPI="5"
 
-inherit linux-info systemd versionator
+inherit eutils linux-info prefix systemd versionator
 
 MY_URL_PREFIX=
 case ${P} in
@@ -58,6 +58,11 @@ pkg_pretend() {
 }
 
 src_prepare() {
+	cp "${FILESDIR}"/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
+	eprefixify "${S}"/shorewallrc.gentoo
+	
+	cp "${FILESDIR}"/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
+	
 	epatch "${FILESDIR}"/shorewall6.conf-SUBSYSLOCK.patch
 	epatch_user
 }
@@ -73,8 +78,7 @@ src_compile() {
 src_install() {
 	keepdir /var/lib/${PN}
 
-	DESTDIR="${D}" ./install.sh "${FILESDIR}"/shorewallrc_new || die "install.sh failed"
-	newinitd "${FILESDIR}"/${PN}.initd ${PN}
+	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
 	systemd_newunit "${FILESDIR}"/${PN}.systemd ${PN}.service
 
 	dodoc changelog.txt releasenotes.txt

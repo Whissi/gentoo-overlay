@@ -4,7 +4,7 @@
 
 EAPI="4"
 
-inherit linux-info systemd versionator
+inherit eutils linux-info prefix systemd versionator
 
 # Select version (stable, RC, Beta):
 MY_PV_TREE=$(get_version_component_range 1-2)   # for devel versions use "development/$(get_version_component_range 1-2)"
@@ -34,6 +34,13 @@ pkg_pretend() {
 	fi
 }
 
+src_prepare() {
+	cp "${FILESDIR}"/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
+	eprefixify "${S}"/shorewallrc.gentoo
+	
+	cp "${FILESDIR}"/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
+}
+
 src_configure() {
 	:;
 }
@@ -46,8 +53,7 @@ src_install() {
 	keepdir /var/lib/${PN}
 
 	cd "${WORKDIR}/${P}"
-	DESTDIR="${D}" ./install.sh "${FILESDIR}"/shorewallrc_new || die "install.sh failed"
-	newinitd "${FILESDIR}"/${PN}.initd ${PN}
+	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
 	systemd_newunit "${FILESDIR}"/shorewall6-lite.systemd 'shorewall6-lite.service' || die
 
 	dodoc changelog.txt releasenotes.txt
