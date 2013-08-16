@@ -7,7 +7,7 @@ SHOREWALLRC_FILE="@GENTOO_PORTAGE_EPREFIX@/usr/share/shorewall/shorewallrc"
 CONFIG_FILE="@GENTOO_PORTAGE_EPREFIX@/etc/conf.d/${SVCNAME}"
 
 description="Puts Shorewall in a safe state at boot time"
-description+=" prior to bringing up the network."
+description="${description} prior to bringing up the network."
 
 required_files="$SHOREWALLRC_FILE"
 
@@ -77,13 +77,13 @@ check_firewall_script() {
 
 is_allowed_to_be_executed() {
 	# This is not a real service. shorewall-init is an intermediate
-	# script to put your Shorewall-based firewall into into a safe
-	# state at boot time prior to bringing up the network.
+	# script to put your Shorewall-based firewall into a safe state
+	# at boot time prior to bringing up the network.
 	# Please read /usr/share/doc/shorewall-init-*/README.gentoo.gz
 	# for more information.
 	# When your system is up, there is no need to call shorewall-init.
-	# Please call shorewall{,6,-lite,6-lite} directly. That the reason
-	# why we are preventing start, stop or restart here.
+	# Please call shorewall{,6,-lite,6-lite} directly. That's the
+	# reason why we are preventing start, stop or restart here.
 	
 	local PRODUCT=
 	
