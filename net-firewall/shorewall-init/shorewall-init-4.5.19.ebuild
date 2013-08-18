@@ -50,12 +50,12 @@ src_compile() {
 }
 
 src_install() {
-	newinitd "${FILESDIR}"/${PN}.initd ${PN}
-	newconfd "${FILESDIR}"/${PN}.confd ${PN}
+	newinitd "${FILESDIR}"/${PV}/${PN}.initd ${PN}
+	newconfd "${FILESDIR}"/${PV}/${PN}.confd ${PN}
 	
 	eprefixify "${D}"/etc/init.d/${PN}
 
-	dodoc "${FILESDIR}"/README.Gentoo.txt
+	dodoc "${FILESDIR}"/${PV}/README.Gentoo.txt
 }
 
 pkg_postinst() {

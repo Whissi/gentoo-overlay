@@ -48,7 +48,7 @@ DOCS=( changelog.txt releasenotes.txt )
 S=${WORKDIR}/${PN}-${MY_PV}
 
 src_prepare() {
-	cp "${FILESDIR}"/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
+	cp "${FILESDIR}"/${PV}/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
 	eprefixify "${S}"/shorewallrc.gentoo
 
 	epatch_user

@@ -29,12 +29,12 @@ DEPEND=">=net-firewall/iptables-1.2.4
 RDEPEND="${DEPEND}"
 
 src_prepare() {
-	cp "${FILESDIR}"/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
+	cp "${FILESDIR}"/${PV}/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
 	eprefixify "${S}"/shorewallrc.gentoo
 	
-	cp "${FILESDIR}"/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
+	cp "${FILESDIR}"/${PV}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
 
-	epatch "${FILESDIR}"/shorewall.conf-SUBSYSLOCK.patch
+	epatch "${FILESDIR}"/${PV}/shorewall.conf-SUBSYSLOCK.patch
 	epatch_user
 }
 
@@ -51,7 +51,7 @@ src_install() {
 
 	cd "${WORKDIR}/${P}"
 	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
-	systemd_newunit "${FILESDIR}"/shorewall.systemd 'shorewall.service' || die
+	systemd_newunit "${FILESDIR}"/${PV}/shorewall.systemd 'shorewall.service' || die
 
 	dodoc changelog.txt releasenotes.txt
 	if use doc; then

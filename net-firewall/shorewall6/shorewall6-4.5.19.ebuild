@@ -58,12 +58,12 @@ pkg_pretend() {
 }
 
 src_prepare() {
-	cp "${FILESDIR}"/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
+	cp "${FILESDIR}"/${PV}/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
 	eprefixify "${S}"/shorewallrc.gentoo
 	
-	cp "${FILESDIR}"/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
+	cp "${FILESDIR}"/${PV}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
 	
-	epatch "${FILESDIR}"/shorewall6.conf-SUBSYSLOCK.patch
+	epatch "${FILESDIR}"/${PV}/shorewall6.conf-SUBSYSLOCK.patch
 	epatch_user
 }
 
@@ -79,7 +79,7 @@ src_install() {
 	keepdir /var/lib/${PN}
 
 	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
-	systemd_newunit "${FILESDIR}"/${PN}.systemd ${PN}.service
+	systemd_newunit "${FILESDIR}"/${PV}/${PN}.systemd ${PN}.service
 
 	dodoc changelog.txt releasenotes.txt
 	if use doc; then
