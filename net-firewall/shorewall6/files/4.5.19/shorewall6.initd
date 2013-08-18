@@ -4,7 +4,7 @@
 # $Header: /var/cvsroot/gentoo-x86/net-firewall/shorewall6/files/shorewall6.initd,v 1.3 2012/10/21 12:56:33 constanze Exp $
 
 description='The Shoreline Firewall 6, more commonly known as "Shorewall6", is'
-description+=" a high-level tool for configuring Netfilter."
+description="${description} a high-level tool for configuring Netfilter."
 
 extra_commands="check clear"
 extra_started_commands="refresh reset"
@@ -12,10 +12,11 @@ extra_started_commands="refresh reset"
 description_check="Checks if the configuration will compile or not."
 
 description_clear="Clear will remove all rules and chains installed by"
-description_clear+=" Shorewall6. The firewall is then wide open and unprotected."
+description_clear="${description_clear} Shorewall6. The firewall is then"
+description_clear="${description_clear} wide open and unprotected."
 
 description_refresh="The mangle table will be refreshed along with the"
-description_refresh+=" blacklist chain (if any)."
+description_refresh="${description_refresh} blacklist chain (if any)."
 
 description_reset="All the packet and byte counters in the firewall are reset."
 
@@ -61,7 +62,7 @@ restart() {
 	ebegin "Restarting shorewall6"
 	/sbin/shorewall6 status 1>/dev/null
 	if [ $? != 0 ] ; then
-	    svc_start
+		svc_start
 	else
 		/sbin/shorewall6 ${OPTIONS} restart ${RESTARTOPTIONS} 1>/dev/null
 	fi
