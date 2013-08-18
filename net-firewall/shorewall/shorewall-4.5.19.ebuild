@@ -4,7 +4,7 @@
 
 EAPI="5"
 
-inherit eutils linux-info prefix versionator
+inherit eutils linux-info prefix systemd versionator
 
 MY_URL_PREFIX=
 case ${P} in
@@ -83,6 +83,7 @@ src_install() {
 	keepdir /var/lib/${PN}
 
 	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
+	systemd_newunit "${FILESDIR}"/${PV}/${PN}.systemd ${PN}.service
 	
 	# Currently, install.sh from upstream is broken and will always
 	# default.debian so have to do it on our own:
