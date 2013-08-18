@@ -61,9 +61,10 @@ pkg_pretend() {
 }
 
 src_prepare() {
-	cp "${FILESDIR}"/${PV}/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
+	cp "${FILESDIR}"/${PV}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
 	eprefixify "${S}"/shorewallrc.gentoo
 	
+	cp "${FILESDIR}"/${PV}/${PN}.confd "${S}"/default.gentoo.sh || die "Copying shorewall.confd failed"
 	cp "${FILESDIR}"/${PV}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
 
 	epatch "${FILESDIR}"/${PV}/shorewall.conf-SUBSYSLOCK.patch
@@ -82,7 +83,11 @@ src_install() {
 	keepdir /var/lib/${PN}
 
 	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
-
+	
+	# Currently, install.sh from upstream is broken and will always
+	# default.debian so have to do it on our own:
+	newconfd "${FILESDIR}"/${PV}/${PN}.confd ${PN}
+	
 	dodoc changelog.txt releasenotes.txt
 	if use doc; then
 		dodoc -r Samples
