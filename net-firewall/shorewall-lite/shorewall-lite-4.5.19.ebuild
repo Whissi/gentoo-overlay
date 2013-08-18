@@ -86,3 +86,24 @@ src_install() {
 		dohtml -r *
 	fi
 }
+
+pkg_postinst() {
+	if [[ -z "${REPLACING_VERSIONS}" ]]; then
+		# This is a new installation
+		elog "Before you can use ${PN}, you need to provide a configuration, which you can"
+		elog "create using ${CATEGORY}/shorewall (the full version, including the compiler)."
+		elog ""
+		elog "To activate ${PN} on system start, please add ${PN} to your default runlevel:"
+		elog ""
+		elog "  # rc-update add ${PN} default"
+	fi
+	
+	if ! has_version ${CATEGORY}/shorewall-init; then
+		elog ""
+		elog "Starting with shorewall-lite-4.5.19, Gentoo also offers ${CATEGORY}/shorewall-init,"
+		elog "which we recommend to install, to protect your firewall at system boot."
+		elog ""
+		elog "To read more about shorewall-init, please visit"
+		elog "  http://www.shorewall.net/Shorewall-init.html"
+	fi
+}

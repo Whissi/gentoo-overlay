@@ -65,7 +65,7 @@ pkg_postinst() {
 		elog ""
 		elog "  ${EPREFIX}/etc/conf.d/${PN}"
 		elog ""
-		elog "To use ${PN}. please add ${PN} to your boot runlevel:"
+		elog "To use ${PN}, please add ${PN} to your boot runlevel:"
 		elog ""
 		elog "  # rc-update add ${PN} boot"
 		elog ""
