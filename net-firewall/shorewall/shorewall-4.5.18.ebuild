@@ -51,7 +51,7 @@ src_install() {
 
 	cd "${WORKDIR}/${P}"
 	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
-	systemd_newunit "${FILESDIR}"/${PV}/shorewall.systemd 'shorewall.service' || die
+	systemd_newunit "${FILESDIR}"/${PV}/shorewall.systemd 'shorewall.service'
 
 	dodoc changelog.txt releasenotes.txt
 	if use doc; then

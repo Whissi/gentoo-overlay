@@ -73,7 +73,7 @@ src_install() {
 	keepdir /var/lib/${PN}
 
 	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
-	systemd_newunit "${FILESDIR}"/${PV}/shorewall-lite.systemd ${PN}.service || die
+	systemd_newunit "${FILESDIR}"/${PV}/shorewall-lite.systemd ${PN}.service
 
 	dodoc changelog.txt releasenotes.txt
 	if use doc; then
