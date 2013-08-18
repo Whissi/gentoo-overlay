@@ -57,7 +57,7 @@ src_prepare() {
 	cp "${FILESDIR}"/${PV}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
 	eprefixify "${S}"/shorewallrc.gentoo
 	
-	cp "${FILESDIR}"/${PV}/${PN}.confd "${S}"/default.gentoo.sh || die "Copying shorewall.confd failed"
+	cp "${FILESDIR}"/${PV}/${PN}.confd "${S}"/default.gentoo || die "Copying shorewall.confd failed"
 	cp "${FILESDIR}"/${PV}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
 	
 	epatch_user
