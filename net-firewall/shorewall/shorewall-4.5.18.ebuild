@@ -1,5 +1,6 @@
 # Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
+# $Header: $
 
 EAPI="5"
 
@@ -31,7 +32,7 @@ RDEPEND="${DEPEND}"
 src_prepare() {
 	cp "${FILESDIR}"/${PV}/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
 	eprefixify "${S}"/shorewallrc.gentoo
-	
+
 	cp "${FILESDIR}"/${PV}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
 
 	epatch "${FILESDIR}"/${PV}/shorewall.conf-SUBSYSLOCK.patch

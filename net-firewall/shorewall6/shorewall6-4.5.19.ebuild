@@ -21,9 +21,8 @@ MY_P_DOCS=shorewall-docs-html-${MY_PV}
 
 MY_MAJORMINOR=$(get_version_component_range 1-2)
 
-DESCRIPTION='The Shoreline Firewall, more commonly known as "Shorewall", is'
-DESCRIPTION+=' a high-level tool for configuring Netfilter. This package is'
-DESCRIPTION+=' for IPv6 support.'
+DESCRIPTION='The Shoreline Firewall, commonly known as Shorewall,'
+DESCRIPTION+=' IPv6 component.'
 HOMEPAGE="http://www.shorewall.net/"
 SRC_URI="
 	http://www1.shorewall.net/pub/shorewall/${MY_URL_PREFIX}${MY_MAJORMINOR}/shorewall-${MY_PV}/${MY_P}.tar.bz2
@@ -47,23 +46,23 @@ S=${WORKDIR}/${MY_P}
 
 pkg_pretend() {
 	local CONFIG_CHECK="~NF_CONNTRACK ~NF_CONNTRACK_IPV6"
-	
+
 	local WARNING_CONNTRACK="Without NF_CONNTRACK support, you will be unable"
 	local WARNING_CONNTRACK+=" to run ${PN} on the local system."
-	
+
 	local WARNING_CONNTRACK_IPV6="Without NF_CONNTRACK_IPV6 support, you will"
 	local WARNING_CONNTRACK_IPV6+=" be unable to run ${PN} on the local system."
-	
+
 	check_extra_config
 }
 
 src_prepare() {
 	cp "${FILESDIR}"/${PV}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
 	eprefixify "${S}"/shorewallrc.gentoo
-	
+
 	cp "${FILESDIR}"/${PV}/${PN}.confd "${S}"/default.gentoo || die "Copying shorewall.confd failed"
 	cp "${FILESDIR}"/${PV}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
-	
+
 	epatch "${FILESDIR}"/${PV}/shorewall6.conf-SUBSYSLOCK.patch
 	epatch_user
 }
@@ -81,7 +80,7 @@ src_install() {
 
 	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
 	systemd_newunit "${FILESDIR}"/${PV}/${PN}.systemd ${PN}.service
-	
+
 	# Currently, install.sh from upstream is broken and will always
 	# default.debian so have to do it on our own:
 	newconfd "${FILESDIR}"/${PV}/${PN}.confd ${PN}
@@ -105,7 +104,7 @@ pkg_postinst() {
 		elog ""
 		elog "  # rc-update add ${PN} default"
 	fi
-	
+
 	if ! has_version ${CATEGORY}/shorewall-init; then
 		elog ""
 		elog "Starting with shorewall6-4.5.19, Gentoo also offers ${CATEGORY}/shorewall-init,"

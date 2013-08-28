@@ -52,7 +52,7 @@ src_compile() {
 src_install() {
 	newinitd "${FILESDIR}"/${PV}/${PN}.initd ${PN}
 	newconfd "${FILESDIR}"/${PV}/${PN}.confd ${PN}
-	
+
 	eprefixify "${D}"/etc/init.d/${PN}
 
 	dodoc "${FILESDIR}"/${PV}/README.Gentoo.txt

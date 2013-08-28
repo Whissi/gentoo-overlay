@@ -21,7 +21,7 @@ MY_P_DOCS=shorewall-docs-html-${MY_PV}
 
 MY_MAJORMINOR=$(get_version_component_range 1-2)
 
-DESCRIPTION='The Shoreline Firewall, more commonly known as "Shorewall", is'
+DESCRIPTION='The Shoreline Firewall, commonly known as Shorewall, is'
 DESCRIPTION+=' a high-level tool for configuring Netfilter.'
 HOMEPAGE="http://www.shorewall.net/"
 SRC_URI="
@@ -50,20 +50,20 @@ S=${WORKDIR}/${MY_P}
 
 pkg_pretend() {
 	local CONFIG_CHECK="~NF_CONNTRACK ~NF_CONNTRACK_IPV4"
-	
+
 	local WARNING_CONNTRACK="Without NF_CONNTRACK support, you will be unable"
 	local WARNING_CONNTRACK+=" to run ${PN} on the local system."
-	
+
 	local WARNING_CONNTRACK_IPV4="Without NF_CONNTRACK_IPV4 support, you will"
 	local WARNING_CONNTRACK_IPV4+=" be unable to run ${PN} on the local system."
-	
+
 	check_extra_config
 }
 
 src_prepare() {
 	cp "${FILESDIR}"/${PV}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
 	eprefixify "${S}"/shorewallrc.gentoo
-	
+
 	cp "${FILESDIR}"/${PV}/${PN}.confd "${S}"/default.gentoo || die "Copying shorewall.confd failed"
 	cp "${FILESDIR}"/${PV}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
 
@@ -84,11 +84,11 @@ src_install() {
 
 	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
 	systemd_newunit "${FILESDIR}"/${PV}/${PN}.systemd ${PN}.service
-	
+
 	# Currently, install.sh from upstream is broken and will always
 	# default.debian so have to do it on our own:
 	newconfd "${FILESDIR}"/${PV}/${PN}.confd ${PN}
-	
+
 	dodoc changelog.txt releasenotes.txt
 	if use doc; then
 		dodoc -r Samples
@@ -108,7 +108,7 @@ pkg_postinst() {
 		elog ""
 		elog "  # rc-update add ${PN} default"
 	fi
-	
+
 	if ! has_version ${CATEGORY}/shorewall-init; then
 		elog ""
 		elog "Starting with shorewall-4.5.19, Gentoo also offers ${CATEGORY}/shorewall-init,"
