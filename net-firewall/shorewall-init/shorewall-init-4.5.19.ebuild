@@ -22,7 +22,7 @@ MY_MAJORMINOR=$(get_version_component_range 1-2)
 
 DESCRIPTION="Component to secure a Shorewall-protected system at boot time prior to bringing up the network."
 HOMEPAGE="http://www.shorewall.net/"
-SRC_URI="http://www.shorewall.net/pub/shorewall/${MY_URL_PREFIX}${MY_MAJORMINOR}/shorewall-${MY_PV}/${MY_P}.tar.bz2"
+SRC_URI="http://www1.shorewall.net/pub/shorewall/${MY_URL_PREFIX}${MY_MAJORMINOR}/shorewall-${MY_PV}/${MY_P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"

@@ -25,8 +25,8 @@ DESCRIPTION='The Shoreline Firewall, more commonly known as "Shorewall", is'
 DESCRIPTION+=' a high-level tool for configuring Netfilter.'
 HOMEPAGE="http://www.shorewall.net/"
 SRC_URI="
-	http://www.shorewall.net/pub/shorewall/${MY_URL_PREFIX}${MY_MAJORMINOR}/shorewall-${MY_PV}/${MY_P}.tar.bz2
-	doc? ( http://www.shorewall.net/pub/shorewall/${MY_URL_PREFIX}${MY_MAJORMINOR}/shorewall-${MY_PV}/${MY_P_DOCS}.tar.bz2 )
+	http://www1.shorewall.net/pub/shorewall/${MY_URL_PREFIX}${MY_MAJORMINOR}/shorewall-${MY_PV}/${MY_P}.tar.bz2
+	doc? ( http://www1.shorewall.net/pub/shorewall/${MY_URL_PREFIX}${MY_MAJORMINOR}/shorewall-${MY_PV}/${MY_P_DOCS}.tar.bz2 )
 "
 
 LICENSE="GPL-2"
