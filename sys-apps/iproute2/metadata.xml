@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<herd>base-system</herd>
+	<maintainer>
+		<email>whissi@whissi.de</email>
+		<name>Thomas D. (Whissi)</name>
+	</maintainer>
+	<use>
+		<flag name='berkdb'>build programs that use berkdb (just arpd)</flag>
+		<flag name='iptables'>include support for iptables filtering</flag>
+	</use>
+</pkgmetadata>
