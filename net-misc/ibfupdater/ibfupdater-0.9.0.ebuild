@@ -1,10 +1,10 @@
-# Copyright 2013 Thomas D.
-# Distributed under the terms of the GNU General Public License v3 (or later)
+# Copyright 1999-2013 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
 
-EAPI="4"
+EAPI="5"
 
 inherit eutils
-
 
 if [[ ${PV} == 9999* ]] ; then
 	EGIT_REPO_URI="git://github.com/Whissi/${PN}.git
@@ -14,7 +14,7 @@ if [[ ${PV} == 9999* ]] ; then
 	KEYWORDS=""
 else
 	SRC_URI="https://github.com/Whissi/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~alpha amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc x86"
+	KEYWORDS="~alpha amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc x86"
 fi
 
 DESCRIPTION="Intelligent background file updater utility"
@@ -38,13 +38,13 @@ src_prepare() {
 		git log > "${S}"/ChangeLog || die
 		popd >/dev/null || die
 	fi
-	
+
 	epatch_user
 }
 
 src_install() {
 	dobin "${S}"/ibfupdater || die "dobin ibfupdater"
-	
+
 	if [[ ${PV} == 9999* ]] ; then
 		dodoc ChangeLog || die "dodoc"
 	fi
