@@ -14,6 +14,7 @@ if [[ ${PV} == 9999* ]] ; then
 	KEYWORDS=""
 else
 	SRC_URI="https://github.com/Whissi/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+	RESTRICT="mirror"
 	KEYWORDS="~alpha amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc x86"
 fi
 
