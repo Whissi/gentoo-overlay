@@ -1,6 +1,14 @@
 # ChangeLog for net-firewall/shorewall6
 # Copyright 1999-2013 Gentoo Foundation; Distributed under the GPL v2
 
+*shorewall6-4.5.18-r1 (30 Aug 2013)
+
+  30 Aug 2013; Thomas D. <whissi@whissi.de> +shorewall6-4.5.18-r1.ebuild,
+  +files/4.5.18-r1/shorewall6.conf-SUBSYSLOCK.patch,
+  +files/4.5.18-r1/shorewall6.initd, +files/4.5.18-r1/shorewall6.systemd,
+  +files/4.5.18-r1/shorewallrc_new:
+  New revision to fix bug 459316 in the stable release.
+
 *shorewall6-4.5.19 (25 Jul 2013)
 
   25 Jul 2013; Thomas D. <whissi@whissi.de> +shorewall6-4.5.19.ebuild,
