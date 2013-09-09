@@ -1,6 +1,6 @@
---- install.sh.old	2013-09-09 15:02:45.394910480 +0200
-+++ install.sh	2013-09-09 15:08:33.573458437 +0200
-@@ -204,95 +204,111 @@
+--- install.sh.old	2013-09-09 19:30:05.155138074 +0200
++++ install.sh	2013-09-09 19:30:38.302377733 +0200
+@@ -204,46 +204,52 @@
  [ -n "${INITFILE}" ] && require INITSOURCE && require INITDIR
  
  if [ -z "$BUILD" ]; then
@@ -90,43 +90,7 @@
  fi
  
  case $BUILD in
--    cygwin*)
--	OWNER=$(id -un)
--	GROUP=$(id -gn)
--	;;
--    apple)
--	[ -z "$OWNER" ] && OWNER=root
--	[ -z "$GROUP" ] && GROUP=wheel
--	INSTALLD=
--	T=
--	;;
--    *)
--	[ -z "$OWNER" ] && OWNER=root
--	[ -z "$GROUP" ] && GROUP=root
--	;;
-+	apple)
-+		[ -z "$OWNER" ] && OWNER=root
-+		[ -z "$GROUP" ] && GROUP=wheel
-+		INSTALLD=
-+		T=
-+		;;
-+	cygwin*)
-+		OWNER=$(id -un)
-+		GROUP=$(id -gn)
-+		;;
-+	gentoo)
-+		# $T was already set by portage, so we need to unset $T
-+		T=
-+		
-+		[ -z "$OWNER" ] && OWNER=root
-+		[ -z "$GROUP" ] && GROUP=root
-+		;;
-+	*)
-+		[ -z "$OWNER" ] && OWNER=root
-+		[ -z "$GROUP" ] && GROUP=root
-+		;;
- esac
- 
+@@ -266,33 +272,36 @@
  OWNERSHIP="-o $OWNER -g $GROUP"
  
  case "$HOST" in
@@ -190,7 +154,7 @@
  esac
  
  if [ $PRODUCT = shorewall ]; then
-@@ -485,23 +501,26 @@
+@@ -485,23 +494,26 @@
  run_install $OWNERSHIP -m 0644 $PRODUCT.conf.annotated ${DESTDIR}${SHAREDIR}/$PRODUCT/configfiles/
  
  if [ ! -f ${DESTDIR}${CONFDIR}/$PRODUCT/$PRODUCT.conf ]; then
