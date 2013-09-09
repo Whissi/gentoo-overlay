@@ -1,0 +1,235 @@
+--- install.sh.old	2013-09-09 15:02:45.394910480 +0200
++++ install.sh	2013-09-09 15:08:33.573458437 +0200
+@@ -204,95 +204,111 @@
+ [ -n "${INITFILE}" ] && require INITSOURCE && require INITDIR
+ 
+ if [ -z "$BUILD" ]; then
+-    case $(uname) in
+-	cygwin*)
+-	    BUILD=cygwin
+-	    ;;
+-	Darwin)
+-	    BUILD=apple
+-	    ;;
+-	*)
+-	    if [ -f /etc/os-release ]; then
+-		eval $(cat /etc/os-release | grep ^ID)
+-
+-		case $ID in
+-		    fedora)
+-			BUILD=redhat
+-			;;
+-		    debian)
+-			BUILD=debian
++	case $(uname) in
++		cygwin*)
++			BUILD=cygwin
+ 			;;
+-		    opensuse)
+-			BUILD=suse
++		Darwin)
++			BUILD=apple
+ 			;;
+-		    *)
+-			BUILD="$ID"
++		*)
++			if [ -f /etc/os-release ]; then
++				eval $(cat /etc/os-release | grep ^ID)
++				
++				case $ID in
++					debian)
++						BUILD=debian
++						;;
++					fedora)
++						BUILD=redhat
++						;;
++					gentoo)
++						BUILD=gentoo
++						;;
++					opensuse)
++						BUILD=suse
++						;;
++					*)
++						BUILD="$ID"
++						;;
++				esac
++			
++			elif [ -f /etc/arch-release ]; then
++				BUILD=archlinux
++			elif [ -f /etc/debian_version ]; then
++				BUILD=debian
++			elif [ -f /etc/gentoo-release ]; then
++				BUILD=gentoo
++			elif [ -f /etc/redhat-release ]; then
++				BUILD=redhat
++			elif [ -f /etc/slackware-version ]; then
++				BUILD=slackware
++			elif [ -f /etc/SuSE-release ]; then
++				BUILD=suse
++			else
++				BUILD=linux
++			fi
+ 			;;
+-		esac
+-	    elif [ -f /etc/debian_version ]; then
+-		BUILD=debian
+-	    elif [ -f /etc/redhat-release ]; then
+-		BUILD=redhat
+-	    elif [ -f /etc/slackware-version ] ; then
+-		BUILD=slackware
+-	    elif [ -f /etc/SuSE-release ]; then
+-		BUILD=suse
+-	    elif [ -f /etc/arch-release ] ; then
+-		BUILD=archlinux
+-	    else
+-		BUILD=linux
+-	    fi
+-	    ;;
+-    esac
++	esac
+ fi
+ 
+ case $BUILD in
+-    cygwin*)
+-	OWNER=$(id -un)
+-	GROUP=$(id -gn)
+-	;;
+-    apple)
+-	[ -z "$OWNER" ] && OWNER=root
+-	[ -z "$GROUP" ] && GROUP=wheel
+-	INSTALLD=
+-	T=
+-	;;
+-    *)
+-	[ -z "$OWNER" ] && OWNER=root
+-	[ -z "$GROUP" ] && GROUP=root
+-	;;
++	apple)
++		[ -z "$OWNER" ] && OWNER=root
++		[ -z "$GROUP" ] && GROUP=wheel
++		INSTALLD=
++		T=
++		;;
++	cygwin*)
++		OWNER=$(id -un)
++		GROUP=$(id -gn)
++		;;
++	gentoo)
++		# $T was already set by portage, so we need to unset $T
++		T=
++		
++		[ -z "$OWNER" ] && OWNER=root
++		[ -z "$GROUP" ] && GROUP=root
++		;;
++	*)
++		[ -z "$OWNER" ] && OWNER=root
++		[ -z "$GROUP" ] && GROUP=root
++		;;
+ esac
+ 
+ OWNERSHIP="-o $OWNER -g $GROUP"
+ 
+ case "$HOST" in
+-    cygwin)
+-	echo "Installing Cygwin-specific configuration..."
+-	;;
+-    apple)
+-	echo "Installing Mac-specific configuration...";
+-	;;
+-    debian)
+-	echo "Installing Debian-specific configuration..."
+-	;;
+-    redhat)
+-	echo "Installing Redhat/Fedora-specific configuration..."
+-	;;
+-    suse)
+-	echo "Installing SuSE-specific configuration...";
+-	;;
+-    slackware)
+-	echo "Installing Slackware-specific configuration..."
+-	;;
+-    archlinux)
+-	echo "Installing ArchLinux-specific configuration..."
+-	;;
+-    linux)
+-	;;
+-    *)
+-	echo "ERROR: Unknown HOST \"$HOST\"" >&2
+-	exit 1;
+-	;;
++	apple)
++		echo "Installing Mac-specific configuration...";
++		;;
++	archlinux)
++		echo "Installing ArchLinux-specific configuration..."
++		;;
++	cygwin)
++		echo "Installing Cygwin-specific configuration..."
++		;;
++	debian)
++		echo "Installing Debian-specific configuration..."
++		;;
++	gentoo)
++		echo "Installing Gentoo-specific configuration..."
++		;;
++	redhat)
++		echo "Installing Redhat/Fedora-specific configuration..."
++		;;
++	slackware)
++		echo "Installing Slackware-specific configuration..."
++		;;
++	suse)
++		echo "Installing SuSE-specific configuration...";
++		;;
++	linux)
++		;;
++	*)
++		echo "ERROR: Unknown HOST \"$HOST\"" >&2
++		exit 1;
++		;;
+ esac
+ 
+ if [ $PRODUCT = shorewall ]; then
+@@ -485,23 +501,26 @@
+ run_install $OWNERSHIP -m 0644 $PRODUCT.conf.annotated ${DESTDIR}${SHAREDIR}/$PRODUCT/configfiles/
+ 
+ if [ ! -f ${DESTDIR}${CONFDIR}/$PRODUCT/$PRODUCT.conf ]; then
+-    run_install $OWNERSHIP -m 0644 ${PRODUCT}.conf${suffix} ${DESTDIR}${CONFDIR}/$PRODUCT/$PRODUCT.conf
+-
+-    if [ "$SHAREDIR" != /usr/share -o "$CONFDIR" != /etc ]; then
+-	if [ $PRODUCT = shorewall ]; then
+-	    perl -p -w -i -e "s|^CONFIG_PATH=.*|CONFIG_PATH=${CONFDIR}/shorewall:${SHAREDIR}/shorewall|;" ${DESTDIR}${CONFDIR}/$PRODUCT/$PRODUCT.conf
+-	else
+-	    perl -p -w -i -e "s|^CONFIG_PATH=.*|CONFIG_PATH=${CONFDIR}/shorewall:${SHAREDIR}/shorewall6:${SHAREDIR}/shorewall|;" ${DESTDIR}${CONFDIR}/$PRODUCT/$PRODUCT.conf
++	run_install $OWNERSHIP -m 0644 ${PRODUCT}.conf${suffix} ${DESTDIR}${CONFDIR}/$PRODUCT/$PRODUCT.conf
++	
++	if [ "$SHAREDIR" != /usr/share -o "$CONFDIR" != /etc ]; then
++		if [ $PRODUCT = shorewall ]; then
++			perl -p -w -i -e "s|^CONFIG_PATH=.*|CONFIG_PATH=${CONFDIR}/shorewall:${SHAREDIR}/shorewall|;" ${DESTDIR}${CONFDIR}/$PRODUCT/$PRODUCT.conf
++		else
++			perl -p -w -i -e "s|^CONFIG_PATH=.*|CONFIG_PATH=${CONFDIR}/shorewall:${SHAREDIR}/shorewall6:${SHAREDIR}/shorewall|;" ${DESTDIR}${CONFDIR}/$PRODUCT/$PRODUCT.conf
++		fi
+ 	fi
+-    fi
+-
+-    if [ $HOST = archlinux ] ; then
+-	sed -e 's!LOGFILE=/var/log/messages!LOGFILE=/var/log/messages.log!' -i ${DESTDIR}${CONFDIR}/$PRODUCT/$PRODUCT.conf
+-    elif [ $HOST = debian ]; then
+-	perl -p -w -i -e 's|^STARTUP_ENABLED=.*|STARTUP_ENABLED=Yes|;' ${DESTDIR}${CONFDIR}/$PRODUCT/$PRODUCT.conf${suffix}
+-    fi
+-
+-    echo "Config file installed as ${DESTDIR}${CONFDIR}/$PRODUCT/$PRODUCT.conf"
++	
++	if [ $HOST = archlinux ]; then
++		sed -e 's!LOGFILE=/var/log/messages!LOGFILE=/var/log/messages.log!' -i ${DESTDIR}${CONFDIR}/$PRODUCT/$PRODUCT.conf
++	elif [ $HOST = debian ]; then
++		perl -p -w -i -e 's|^STARTUP_ENABLED=.*|STARTUP_ENABLED=Yes|;' ${DESTDIR}${CONFDIR}/$PRODUCT/$PRODUCT.conf${suffix}
++	elif [ $HOST = gentoo ]; then
++		# Adjust SUBSYSLOCK path (see https://bugs.gentoo.org/show_bug.cgi?id=459316)
++		perl -p -w -i -e "s|^SUBSYSLOCK=.*|SUBSYSLOCK=/run/lock/$PRODUCT|;" ${DESTDIR}${CONFDIR}/$PRODUCT/$PRODUCT.conf${suffix}
++	fi
++	
++	echo "Config file installed as ${DESTDIR}${CONFDIR}/$PRODUCT/$PRODUCT.conf"
+ fi
+ 
+ #

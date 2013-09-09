@@ -1,0 +1,17 @@
+#
+#	The Shoreline Firewall (Shorewall) Packet Filtering Firewall - V4.5
+#
+[Unit]
+Description=shorewall-init
+Documentation=http://www.shorewall.net/Shorewall-init.html
+Before=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+EnvironmentFile=/etc/conf.d/shorewall-init
+ExecStart=/sbin/shorewall-init $OPTIONS start
+ExecStop=/sbin/shorewall-init $OPTIONS stop
+
+[Install]
+WantedBy=multi-user.target

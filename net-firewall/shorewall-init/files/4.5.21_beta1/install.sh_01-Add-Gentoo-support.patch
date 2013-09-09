@@ -1,0 +1,343 @@
+--- install.sh.old	2013-09-09 17:20:34.062519915 +0200
++++ install.sh	2013-09-09 17:21:54.885090125 +0200
+@@ -174,61 +174,67 @@
+ PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/local/sbin
+ 
+ if [ -z "$BUILD" ]; then
+-    case $(uname) in
+-	cygwin*)
+-	    BUILD=cygwin
+-	    ;;
+-	Darwin)
+-	    BUILD=apple
+-	    ;;
+-	*)
+-	    if [ -f /etc/os-release ]; then
+-		eval $(cat /etc/os-release | grep ^ID)
+-
+-		case $ID in
+-		    fedora)
+-			BUILD=redhat
++	case $(uname) in
++		cygwin*)
++			BUILD=cygwin
+ 			;;
+-		    debian)
+-			BUILD=debian
++		Darwin)
++			BUILD=apple
+ 			;;
+-		    opensuse)
+-			BUILD=suse
++		*)
++			if [ -f /etc/os-release ]; then
++				eval $(cat /etc/os-release | grep ^ID)
++				
++				case $ID in
++					debian)
++						BUILD=debian
++						;;
++					fedora)
++						BUILD=redhat
++						;;
++					gentoo)
++						BUILD=gentoo
++						;;
++					opensuse)
++						BUILD=suse
++						;;
++					*)
++						BUILD="$ID"
++						;;
++				esac
++			
++			elif [ -f /etc/arch-release ]; then
++				BUILD=archlinux
++			elif [ -f /etc/debian_version ]; then
++				BUILD=debian
++			elif [ -f /etc/gentoo-release ]; then
++				BUILD=gentoo
++			elif [ -f /etc/redhat-release ]; then
++				BUILD=redhat
++			elif [ -f /etc/slackware-version ]; then
++				BUILD=slackware
++			elif [ -f /etc/SuSE-release ]; then
++				BUILD=suse
++			else
++				BUILD=linux
++			fi
+ 			;;
+-		    *)
+-			BUILD="$ID"
+-			;;
+-		esac
+-	    elif [ -f /etc/debian_version ]; then
+-		BUILD=debian
+-	    elif [ -f /etc/redhat-release ]; then
+-		BUILD=redhat
+-	    elif [ -f /etc/SuSE-release ]; then
+-		BUILD=suse
+-	    elif [ -f /etc/slackware-version ] ; then
+-		BUILD=slackware
+-	    elif [ -f /etc/arch-release ] ; then
+-		BUILD=archlinux
+-	    else
+-		BUILD=linux
+-	    fi
+-	    ;;
+-    esac
++	esac
+ fi
+ 
+ [ -n "$OWNER" ] || OWNER=$(id -un)
+ [ -n "$GROUP" ] || GROUP=$(id -gn)
+ 
+ case $BUILD in
+-    apple)
+-	T=
+-	;;
+-    debian|redhat|suse|slackware|archlinux)
+-	;;
+-    *)
+-	[ -n "$BUILD" ] && echo "ERROR: Unknown BUILD environment ($BUILD)" >&2 || echo "ERROR: Unknown BUILD environment"
+-	exit 1
+-	;;
++	apple|gentoo)
++		T=
++		;;
++	archlinux|debian|redhat|slackware|suse)
++		;;
++	*)
++		[ -n "$BUILD" ] && echo "ERROR: Unknown BUILD environment ($BUILD)" >&2 || echo "ERROR: Unknown BUILD environment"
++		exit 1
++		;;
+ esac
+ 
+ OWNERSHIP="-o $OWNER -g $GROUP"
+@@ -236,30 +242,33 @@
+ [ -n "$HOST" ] || HOST=$BUILD
+ 
+ case "$HOST" in
+-    debian)
+-	echo "Installing Debian-specific configuration..."
+-	;;
+-    redhat)
+-	echo "Installing Redhat/Fedora-specific configuration..."
+-	;;
+-    slackware)
+-	echo "Shorewall-init is currently not supported on Slackware" >&2
+-	exit 1
+-	;;
+-    archlinux)
+-	echo "Shorewall-init is currently not supported on Arch Linux" >&2
+-	exit 1
+-	;;
+-    suse)
+-	echo "Installing SuSE-specific configuration..."
+-	;;
+-    linux)
+-	echo "ERROR: Shorewall-init is not supported on this system" >&2
+-	;;
+-    *)
+-	echo "ERROR: Unsupported HOST distribution: \"$HOST\"" >&2
+-	exit 1;
+-	;;
++	archlinux)
++		echo "Shorewall-init is currently not supported on Arch Linux" >&2
++		exit 1
++		;;
++	debian)
++		echo "Installing Debian-specific configuration..."
++		;;
++	gentoo)
++		echo "Installing Gentoo-specific configuration..."
++		;;
++	redhat)
++		echo "Installing Redhat/Fedora-specific configuration..."
++		;;
++	slackware)
++		echo "Shorewall-init is currently not supported on Slackware" >&2
++		exit 1
++		;;
++	suse)
++		echo "Installing SuSE-specific configuration..."
++		;;
++	linux)
++		echo "ERROR: Shorewall-init is not supported on this system" >&2
++		;;
++	*)
++		echo "ERROR: Unsupported HOST distribution: \"$HOST\"" >&2
++		exit 1;
++		;;
+ esac
+ 
+ [ -z "$TARGET" ] && TARGET=$HOST
+@@ -349,39 +358,44 @@
+ fi
+ 
+ if [ $HOST = debian ]; then
+-    if [ -n "${DESTDIR}" ]; then
+-	mkdir -p ${DESTDIR}/etc/network/if-up.d/
+-	mkdir -p ${DESTDIR}/etc/network/if-down.d/
+-    fi
+-
+-    if [ ! -f ${DESTDIR}/etc/default/shorewall-init ]; then
+ 	if [ -n "${DESTDIR}" ]; then
+-	    mkdir ${DESTDIR}/etc/default
++		mkdir -p ${DESTDIR}/etc/network/if-up.d/
++		mkdir -p ${DESTDIR}/etc/network/if-down.d/
+ 	fi
+-
+-	install_file sysconfig ${DESTDIR}/etc/default/shorewall-init 0644
+-    fi
+-
+-    IFUPDOWN=ifupdown.debian.sh
++	
++	if [ ! -f ${DESTDIR}/etc/default/shorewall-init ]; then
++		if [ -n "${DESTDIR}" ]; then
++			mkdir ${DESTDIR}/etc/default
++		fi
++		
++		install_file sysconfig ${DESTDIR}/etc/default/shorewall-init 0644
++	fi
++	
++	IFUPDOWN=ifupdown.debian.sh
+ else
+-    if [ -n "$DESTDIR" ]; then
+-	mkdir -p ${DESTDIR}${SYSCONFDIR}
++	if [ -n "$DESTDIR" ]; then
++		mkdir -p ${DESTDIR}${SYSCONFDIR}
+ 
+-	if [ -z "$RPM" ]; then
+-	    if [ $HOST = suse ]; then
+-		mkdir -p ${DESTDIR}/etc/sysconfig/network/if-up.d
+-		mkdir -p ${DESTDIR}${SYSCONFDIR}/network/if-down.d
+-	    else
+-		mkdir -p ${DESTDIR}/etc/NetworkManager/dispatcher.d
+-	    fi
++		if [ -z "$RPM" ]; then
++			if [ $HOST = suse ]; then
++				mkdir -p ${DESTDIR}/etc/sysconfig/network/if-up.d
++				mkdir -p ${DESTDIR}${SYSCONFDIR}/network/if-down.d
++			elif [ $HOST = gentoo ]; then
++				# Gentoo does not support if-{up,down}.d
++				# Please read the README file from Gentoo for more information
++				return
++			else
++				mkdir -p ${DESTDIR}/etc/NetworkManager/dispatcher.d
++			fi
++		fi
+ 	fi
+-    fi
+-
+-    if [ -d ${DESTDIR}${SYSCONFDIR} -a ! -f ${DESTDIR}${SYSCONFDIR}/shorewall-init ]; then
+-	install_file sysconfig ${DESTDIR}${SYSCONFDIR}/shorewall-init 0644
+-    fi
+-
+-    [ $HOST = suse ] && IFUPDOWN=ifupdown.suse.sh || IFUPDOWN=ifupdown.fedora.sh
++	
++	if [ -n "$SYSCONFFILE" -a ! -f ${DESTDIR}${SYSCONFDIR}/${PRODUCT} ]; then
++		run_install $OWNERSHIP -m 0644 ${SYSCONFFILE} ${DESTDIR}${SYSCONFDIR}/$PRODUCT
++		echo "$SYSCONFFILE installed in ${DESTDIR}${SYSCONFDIR}/${PRODUCT}"
++	fi
++	
++	[ $HOST = suse ] && IFUPDOWN=ifupdown.suse.sh || IFUPDOWN=ifupdown.fedora.sh
+ fi
+ 
+ #
+@@ -435,52 +449,54 @@
+ esac
+ 
+ if [ -z "$DESTDIR" ]; then
+-    if [ -n "$first_install" ]; then
+-	if [ $HOST = debian ]; then
+-	    
+-	    update-rc.d shorewall-init enable
+-
+-	    echo "Shorewall Init will start automatically at boot"
+-	else
+-	    if [ -n "$SYSTEMD" ]; then
+-		if systemctl enable shorewall-init.service; then
+-		    echo "Shorewall Init will start automatically at boot"
+-		fi
+-	    elif [ -x ${SBINDIR}/insserv -o -x /usr${SBINDIR}/insserv ]; then
+-		if insserv ${INITDIR}/shorewall-init ; then
+-		    echo "Shorewall Init will start automatically at boot"
+-		else
+-		    cant_autostart
+-		fi
+-	    elif [ -x ${SBINDIR}/chkconfig -o -x /usr${SBINDIR}/chkconfig ]; then
+-		if chkconfig --add shorewall-init ; then
+-		    echo "Shorewall Init will start automatically in run levels as follows:"
+-		    chkconfig --list shorewall-init
++	if [ -n "$first_install" ]; then
++		if [ $HOST = debian ]; then
++			update-rc.d shorewall-init enable
++			echo "Shorewall Init will start automatically at boot"
++		elif [ $HOST = gentoo ]; then
++			# On Gentoo, a service must be enabled manually by the user,
++			# not by the installer
++			return
+ 		else
+-		    cant_autostart
++			if [ -n "$SYSTEMD" ]; then
++				if systemctl enable shorewall-init.service; then
++				echo "Shorewall Init will start automatically at boot"
++			fi
++			elif [ -x ${SBINDIR}/insserv -o -x /usr${SBINDIR}/insserv ]; then
++				if insserv ${INITDIR}/shorewall-init ; then
++					echo "Shorewall Init will start automatically at boot"
++				else
++					cant_autostart
++				fi
++			elif [ -x ${SBINDIR}/chkconfig -o -x /usr${SBINDIR}/chkconfig ]; then
++				if chkconfig --add shorewall-init ; then
++					echo "Shorewall Init will start automatically in run levels as follows:"
++					chkconfig --list shorewall-init
++				else
++					cant_autostart
++				fi
++			elif [ -x ${SBINDIR}/rc-update ]; then
++				if rc-update add shorewall-init default; then
++					echo "Shorewall Init will start automatically at boot"
++				else
++					cant_autostart
++				fi
++			else
++				cant_autostart
++			fi
+ 		fi
+-	    elif [ -x ${SBINDIR}/rc-update ]; then
+-		if rc-update add shorewall-init default; then
+-		    echo "Shorewall Init will start automatically at boot"
+-		else
+-		    cant_autostart
+-		fi
+-	    else
+-		cant_autostart
+-	    fi
+ 	fi
+-    fi
+ else
+-    if [ -n "$first_install" ]; then
+-	if [ $HOST = debian ]; then
+-	    if [ -n "${DESTDIR}" ]; then
+-		mkdir -p ${DESTDIR}/etc/rcS.d
+-	    fi
+-
+-	    ln -sf ../init.d/shorewall-init ${DESTDIR}${CONFDIR}/rcS.d/S38shorewall-init
+-	    echo "Shorewall Init will start automatically at boot"
++	if [ -n "$first_install" ]; then
++		if [ $HOST = debian ]; then
++			if [ -n "${DESTDIR}" ]; then
++				mkdir -p ${DESTDIR}/etc/rcS.d
++			fi
++			
++			ln -sf ../init.d/shorewall-init ${DESTDIR}${CONFDIR}/rcS.d/S38shorewall-init
++			echo "Shorewall Init will start automatically at boot"
++		fi
+ 	fi
+-    fi
+ fi
+ 
+ [ -z "${DESTDIR}" ] && [ ! -f ~/.shorewallrc ] && cp ${SHAREDIR}/shorewall/shorewallrc .
