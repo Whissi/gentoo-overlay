@@ -52,12 +52,12 @@ src_install() {
 
 	insinto /etc/powerdns
 	doins "${FILESDIR}"/recursor.conf
-	
+
 	insinto /etc/rsyslog.d
 	newins "${FILESDIR}"/pdns-recursor.rsyslog pdns-recursor.conf
 
 	newinitd "${FILESDIR}"/pdns-recursor.initd ${PN}
-	
+
 	keepdir "/var/lib/powerdns"
 	keepdir "/var/lib/powerdns/dev"
 }
