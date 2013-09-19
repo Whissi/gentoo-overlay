@@ -1,6 +1,15 @@
 # ChangeLog for net-firewall/shorewall-lite
 # Copyright 1999-2013 Gentoo Foundation; Distributed under the GPL v2
 
+*shorewall-lite-4.5.21_beta3 (19 Sep 2013)
+
+  19 Sep 2013; Thomas D. <whissi@whissi.de>
+  +shorewall-lite-4.5.21_beta3.ebuild,
+  +files/4.5.21_beta3/shorewall-lite.confd,
+  +files/4.5.21_beta3/shorewall-lite.initd,
+  +files/4.5.21_beta3/shorewall-lite.systemd, +files/4.5.21_beta3/shorewallrc:
+  Version bump.
+
 *shorewall-lite-4.5.21_beta1 (09 Sep 2013)
 
   09 Sep 2013; Thomas D. <whissi@whissi.de>
