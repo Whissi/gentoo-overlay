@@ -26,14 +26,14 @@ IUSE="doc"
 DEPEND=">=net-firewall/iptables-1.2.4
 	sys-apps/iproute2[-minimal]
 	dev-lang/perl
-	=net-firewall/shorewall-core-${PV}"
+	=net-firewall/shorewall-core-${PVR}"
 RDEPEND="${DEPEND}"
 
 src_prepare() {
-	cp "${FILESDIR}"/${PV}/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
+	cp "${FILESDIR}"/${PVR}/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
 	eprefixify "${S}"/shorewallrc.gentoo
 
-	cp "${FILESDIR}"/${PV}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
+	cp "${FILESDIR}"/${PVR}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
 }
 
 src_configure() {
@@ -49,7 +49,7 @@ src_install() {
 
 	cd "${WORKDIR}/${P}"
 	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
-	systemd_newunit "${FILESDIR}"/${PV}/shorewall.systemd 'shorewall.service' || die
+	systemd_newunit "${FILESDIR}"/${PVR}/shorewall.systemd 'shorewall.service' || die
 
 	dodoc changelog.txt releasenotes.txt
 	if use doc; then

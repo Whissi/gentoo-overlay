@@ -34,7 +34,7 @@ SLOT="0"
 KEYWORDS="~alpha ~amd64 ~hppa ~ppc ~ppc64 ~sparc ~x86"
 IUSE="doc"
 
-DEPEND="=net-firewall/shorewall-${PV}"
+DEPEND="=net-firewall/shorewall-${PVR}"
 RDEPEND="
 	${DEPEND}
 	>=net-firewall/iptables-1.4.20[ipv6]
@@ -57,13 +57,13 @@ pkg_pretend() {
 }
 
 src_prepare() {
-	cp "${FILESDIR}"/${PV}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
+	cp "${FILESDIR}"/${PVR}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
 	eprefixify "${S}"/shorewallrc.gentoo
 
-	cp "${FILESDIR}"/${PV}/${PN}.confd "${S}"/default.gentoo || die "Copying shorewall.confd failed"
-	cp "${FILESDIR}"/${PV}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
+	cp "${FILESDIR}"/${PVR}/${PN}.confd "${S}"/default.gentoo || die "Copying shorewall.confd failed"
+	cp "${FILESDIR}"/${PVR}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
 
-	epatch "${FILESDIR}"/${PV}/shorewall6.conf-SUBSYSLOCK.patch
+	epatch "${FILESDIR}"/${PVR}/shorewall6.conf-SUBSYSLOCK.patch
 	epatch_user
 }
 
@@ -79,11 +79,11 @@ src_install() {
 	keepdir /var/lib/${PN}
 
 	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
-	systemd_newunit "${FILESDIR}"/${PV}/${PN}.systemd ${PN}.service
+	systemd_newunit "${FILESDIR}"/${PVR}/${PN}.systemd ${PN}.service
 
 	# Currently, install.sh from upstream is broken and will always
 	# default.debian so have to do it on our own:
-	newconfd "${FILESDIR}"/${PV}/${PN}.confd ${PN}
+	newconfd "${FILESDIR}"/${PVR}/${PN}.confd ${PN}
 
 	dodoc changelog.txt releasenotes.txt
 	if use doc; then

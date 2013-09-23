@@ -37,7 +37,7 @@ IUSE="doc"
 DEPEND="
 	>=dev-lang/perl-5.10
 	virtual/perl-Digest-SHA
-	=net-firewall/shorewall-core-${PV}
+	=net-firewall/shorewall-core-${PVR}
 "
 RDEPEND="
 	${DEPEND}
@@ -61,13 +61,13 @@ pkg_pretend() {
 }
 
 src_prepare() {
-	cp "${FILESDIR}"/${PV}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
+	cp "${FILESDIR}"/${PVR}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
 	eprefixify "${S}"/shorewallrc.gentoo
 
-	cp "${FILESDIR}"/${PV}/${PN}.confd "${S}"/default.gentoo || die "Copying shorewall.confd failed"
-	cp "${FILESDIR}"/${PV}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
+	cp "${FILESDIR}"/${PVR}/${PN}.confd "${S}"/default.gentoo || die "Copying shorewall.confd failed"
+	cp "${FILESDIR}"/${PVR}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
 
-	epatch "${FILESDIR}"/${PV}/shorewall.conf-SUBSYSLOCK.patch
+	epatch "${FILESDIR}"/${PVR}/shorewall.conf-SUBSYSLOCK.patch
 	epatch_user
 }
 
@@ -83,11 +83,11 @@ src_install() {
 	keepdir /var/lib/${PN}
 
 	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
-	systemd_newunit "${FILESDIR}"/${PV}/${PN}.systemd ${PN}.service
+	systemd_newunit "${FILESDIR}"/${PVR}/${PN}.systemd ${PN}.service
 
 	# Currently, install.sh from upstream is broken and will always
 	# default.debian so have to do it on our own:
-	newconfd "${FILESDIR}"/${PV}/${PN}.confd ${PN}
+	newconfd "${FILESDIR}"/${PVR}/${PN}.confd ${PN}
 
 	dodoc changelog.txt releasenotes.txt
 	if use doc; then

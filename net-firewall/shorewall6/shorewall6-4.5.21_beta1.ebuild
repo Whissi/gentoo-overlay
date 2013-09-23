@@ -34,7 +34,7 @@ SLOT="0"
 KEYWORDS="~alpha ~amd64 ~hppa ~ppc ~ppc64 ~sparc ~x86"
 IUSE="doc"
 
-DEPEND="=net-firewall/shorewall-${PV}"
+DEPEND="=net-firewall/shorewall-${PVR}"
 RDEPEND="
 	${DEPEND}
 	>=net-firewall/iptables-1.4.20[ipv6]
@@ -57,14 +57,14 @@ pkg_pretend() {
 }
 
 src_prepare() {
-	cp "${FILESDIR}"/${PV}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc failed"
+	cp "${FILESDIR}"/${PVR}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc failed"
 	eprefixify "${S}"/shorewallrc.gentoo
 
-	cp "${FILESDIR}"/${PV}/${PN}.confd "${S}"/default.gentoo || die "Copying ${PN}.confd failed"
-	cp "${FILESDIR}"/${PV}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying ${PN}.initd failed"
-	cp "${FILESDIR}"/${PV}/${PN}.systemd "${S}"/gentoo.service || die "Copying ${PN}.systemd failed"
+	cp "${FILESDIR}"/${PVR}/${PN}.confd "${S}"/default.gentoo || die "Copying ${PN}.confd failed"
+	cp "${FILESDIR}"/${PVR}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying ${PN}.initd failed"
+	cp "${FILESDIR}"/${PVR}/${PN}.systemd "${S}"/gentoo.service || die "Copying ${PN}.systemd failed"
 
-	epatch "${FILESDIR}"/${PV}/install.sh_01-Add-Gentoo-support.patch
+	epatch "${FILESDIR}"/${PVR}/install.sh_01-Add-Gentoo-support.patch
 	epatch_user
 }
 

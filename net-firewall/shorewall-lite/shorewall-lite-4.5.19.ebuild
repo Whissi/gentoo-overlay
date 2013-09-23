@@ -1,6 +1,6 @@
 # Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-firewall/shorewall-lite/shorewall-lite-4.5.17.ebuild,v 1.1 2013/06/02 10:48:06 constanze Exp $
+# $Header: $
 
 EAPI="5"
 
@@ -33,7 +33,7 @@ SLOT="0"
 KEYWORDS="~alpha ~amd64 ~hppa ~ppc ~ppc64 ~sparc ~x86"
 IUSE="doc"
 
-DEPEND="=net-firewall/shorewall-core-${PV}"
+DEPEND="=net-firewall/shorewall-core-${PVR}"
 RDEPEND="
 	${DEPEND}
 	>=net-firewall/iptables-1.4.20
@@ -53,11 +53,11 @@ pkg_pretend() {
 }
 
 src_prepare() {
-	cp "${FILESDIR}"/${PV}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
+	cp "${FILESDIR}"/${PVR}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
 	eprefixify "${S}"/shorewallrc.gentoo
 
-	cp "${FILESDIR}"/${PV}/${PN}.confd "${S}"/default.gentoo || die "Copying shorewall.confd failed"
-	cp "${FILESDIR}"/${PV}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
+	cp "${FILESDIR}"/${PVR}/${PN}.confd "${S}"/default.gentoo || die "Copying shorewall.confd failed"
+	cp "${FILESDIR}"/${PVR}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
 
 	epatch_user
 }
@@ -74,11 +74,11 @@ src_install() {
 	keepdir /var/lib/${PN}
 
 	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
-	systemd_newunit "${FILESDIR}"/${PV}/shorewall-lite.systemd ${PN}.service
+	systemd_newunit "${FILESDIR}"/${PVR}/shorewall-lite.systemd ${PN}.service
 
 	# Currently, install.sh from upstream is broken and will always
 	# default.debian so have to do it on our own:
-	newconfd "${FILESDIR}"/${PV}/${PN}.confd ${PN}
+	newconfd "${FILESDIR}"/${PVR}/${PN}.confd ${PN}
 
 	dodoc changelog.txt releasenotes.txt
 	if use doc; then

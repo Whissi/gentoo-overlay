@@ -32,25 +32,25 @@ IUSE=""
 DEPEND=""
 RDEPEND="
 	${DEPEND}
-	|| ( =net-firewall/shorewall-${PV} =net-firewall/shorewall6-${PV} =net-firewall/shorewall-lite-${PV} =net-firewall/shorewall6-lite-${PV} )
+	|| ( =net-firewall/shorewall-${PVR} =net-firewall/shorewall6-${PVR} =net-firewall/shorewall-lite-${PVR} =net-firewall/shorewall6-lite-${PVR} )
 "
 
 S=${WORKDIR}/${MY_P}
 
 src_prepare() {
-	cp "${FILESDIR}"/${PV}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc failed"
+	cp "${FILESDIR}"/${PVR}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc failed"
 	eprefixify "${S}"/shorewallrc.gentoo
 
-	cp "${FILESDIR}"/${PV}/${PN}.confd "${S}"/default.gentoo || die "Copying ${PN}.confd failed"
+	cp "${FILESDIR}"/${PVR}/${PN}.confd "${S}"/default.gentoo || die "Copying ${PN}.confd failed"
 
-	cp "${FILESDIR}"/${PV}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying ${PN}.initd failed"
+	cp "${FILESDIR}"/${PVR}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying ${PN}.initd failed"
 	eprefixify "${S}"/init.gentoo.sh
 
-	cp "${FILESDIR}"/${PV}/${PN}.systemd "${S}"/gentoo.service || die "Copying ${PN}.systemd failed"
+	cp "${FILESDIR}"/${PVR}/${PN}.systemd "${S}"/gentoo.service || die "Copying ${PN}.systemd failed"
 
-	epatch "${FILESDIR}"/${PV}/install.sh_01-Add-Gentoo-support.patch
-	epatch "${FILESDIR}"/${PV}/shorewall-init_01-Use-SYSCONFDIR-variable-in-error-msg.patch
-	epatch "${FILESDIR}"/${PV}/shorewall-init_02-Remove-ipset-functionality.patch
+	epatch "${FILESDIR}"/${PVR}/install.sh_01-Add-Gentoo-support.patch
+	epatch "${FILESDIR}"/${PVR}/shorewall-init_01-Use-SYSCONFDIR-variable-in-error-msg.patch
+	epatch "${FILESDIR}"/${PVR}/shorewall-init_02-Remove-ipset-functionality.patch
 	epatch_user
 }
 
@@ -82,7 +82,7 @@ src_install() {
 		rm -rf "${D}"/usr/share/shorewall-init/ifupdown
 	fi
 
-	dodoc "${FILESDIR}"/${PV}/README.Gentoo.txt
+	dodoc "${FILESDIR}"/${PVR}/README.Gentoo.txt
 }
 
 pkg_postinst() {

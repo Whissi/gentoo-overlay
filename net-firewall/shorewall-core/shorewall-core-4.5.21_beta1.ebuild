@@ -48,10 +48,10 @@ DOCS=( changelog.txt releasenotes.txt )
 S=${WORKDIR}/${PN}-${MY_PV}
 
 src_prepare() {
-	cp "${FILESDIR}"/${PV}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc failed"
+	cp "${FILESDIR}"/${PVR}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc failed"
 	eprefixify "${S}"/shorewallrc.gentoo
 
-	epatch "${FILESDIR}"/${PV}/install.sh_01-Add-Gentoo-support.patch
+	epatch "${FILESDIR}"/${PVR}/install.sh_01-Add-Gentoo-support.patch
 	epatch_user
 }
 

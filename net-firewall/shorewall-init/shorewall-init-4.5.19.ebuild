@@ -32,7 +32,7 @@ IUSE=""
 DEPEND=""
 RDEPEND="
 	${DEPEND}
-	|| ( =net-firewall/shorewall-${PV} =net-firewall/shorewall6-${PV} =net-firewall/shorewall-lite-${PV} =net-firewall/shorewall6-lite-${PV} )
+	|| ( =net-firewall/shorewall-${PVR} =net-firewall/shorewall6-${PVR} =net-firewall/shorewall-lite-${PVR} =net-firewall/shorewall6-lite-${PVR} )
 "
 
 S=${WORKDIR}/${MY_P}
@@ -50,12 +50,12 @@ src_compile() {
 }
 
 src_install() {
-	newinitd "${FILESDIR}"/${PV}/${PN}.initd ${PN}
-	newconfd "${FILESDIR}"/${PV}/${PN}.confd ${PN}
+	newinitd "${FILESDIR}"/${PVR}/${PN}.initd ${PN}
+	newconfd "${FILESDIR}"/${PVR}/${PN}.confd ${PN}
 
 	eprefixify "${D}"/etc/init.d/${PN}
 
-	dodoc "${FILESDIR}"/${PV}/README.Gentoo.txt
+	dodoc "${FILESDIR}"/${PVR}/README.Gentoo.txt
 }
 
 pkg_postinst() {

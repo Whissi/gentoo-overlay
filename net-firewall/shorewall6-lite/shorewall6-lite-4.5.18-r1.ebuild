@@ -26,7 +26,7 @@ IUSE="doc"
 
 RDEPEND=">=net-firewall/iptables-1.4.0
 	sys-apps/iproute2
-	=net-firewall/shorewall-core-${PV}"
+	=net-firewall/shorewall-core-${PVR}"
 
 pkg_pretend() {
 	if kernel_is lt 2 6 25 ; then
@@ -35,10 +35,10 @@ pkg_pretend() {
 }
 
 src_prepare() {
-	cp "${FILESDIR}"/${PV}/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
+	cp "${FILESDIR}"/${PVR}/shorewallrc_new "${S}"/shorewallrc.gentoo || die "Copying shorewallrc_new failed"
 	eprefixify "${S}"/shorewallrc.gentoo
 
-	cp "${FILESDIR}"/${PV}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
+	cp "${FILESDIR}"/${PVR}/${PN}.initd "${S}"/init.gentoo.sh || die "Copying shorewall.initd failed"
 
 	epatch_user
 }
@@ -56,7 +56,7 @@ src_install() {
 
 	cd "${WORKDIR}/${P}"
 	DESTDIR="${D}" ./install.sh shorewallrc.gentoo || die "install.sh failed"
-	systemd_newunit "${FILESDIR}"/${PV}/shorewall6-lite.systemd 'shorewall6-lite.service'
+	systemd_newunit "${FILESDIR}"/${PVR}/shorewall6-lite.systemd 'shorewall6-lite.service'
 
 	dodoc changelog.txt releasenotes.txt
 	if use doc; then
