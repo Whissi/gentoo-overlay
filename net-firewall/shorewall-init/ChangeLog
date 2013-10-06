@@ -2,6 +2,29 @@
 # Copyright 1999-2013 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  06 Oct 2013; Thomas D. <whissi@whissi.de>
+  -shorewall-init-4.5.21_beta1.ebuild, -shorewall-init-4.5.21_beta3.ebuild,
+  -shorewall-init-4.5.21_rc1.ebuild, -files/4.5.21_beta1/README.Gentoo.txt,
+  -files/4.5.21_beta1/install.sh_01-Add-Gentoo-support.patch,
+  -files/4.5.21_beta1/shorewall-init.confd,
+  -files/4.5.21_beta1/shorewall-init.initd,
+  -files/4.5.21_beta1/shorewall-init.systemd,
+  -files/4.5.21_beta1/shorewall-init_01-Use-SYSCONFDIR-variable-in-error-msg.pa
+  tch, -files/4.5.21_beta1/shorewall-init_02-Remove-ipset-functionality.patch,
+  -files/4.5.21_beta1/shorewallrc, -files/4.5.21_beta3/README.Gentoo.txt,
+  -files/4.5.21_beta3/shorewall-init.confd,
+  -files/4.5.21_beta3/shorewall-init.initd,
+  -files/4.5.21_beta3/shorewall-init.systemd,
+  -files/4.5.21_beta3/shorewall-init_01-Remove-ipset-functionality.patch,
+  -files/4.5.21_beta3/shorewallrc, -files/4.5.21_rc1/README.Gentoo.txt,
+  -files/4.5.21_rc1/install.sh-0001-Use-bin-true-instead-of-return-for-empty-if
+  -block.patch, -files/4.5.21_rc1/shorewall-init.confd,
+  -files/4.5.21_rc1/shorewall-init.initd,
+  -files/4.5.21_rc1/shorewall-init.systemd,
+  -files/4.5.21_rc1/shorewall-init_01-Remove-ipset-functionality.patch,
+  -files/4.5.21_rc1/shorewallrc:
+  Old versions removed.
+
 *shorewall-init-4.5.21 (06 Oct 2013)
 
   06 Oct 2013; Thomas D. <whissi@whissi.de> +shorewall-init-4.5.21.ebuild,
