@@ -2,6 +2,17 @@
 # Copyright 1999-2013 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*shorewall-init-4.5.21_rc1 (06 Oct 2013)
+
+  06 Oct 2013; Thomas D. <whissi@whissi.de> +shorewall-init-4.5.21_rc1.ebuild,
+  +files/4.5.21_rc1/README.Gentoo.txt, +files/4.5.21_rc1/shorewall-init.confd,
+  +files/4.5.21_rc1/shorewall-init.systemd,
+  +files/4.5.21_rc1/install.sh-0001-Use-bin-true-instead-of-return-for-empty-if
+  -block.patch, +files/4.5.21_rc1/shorewall-init.initd,
+  +files/4.5.21_rc1/shorewall-init_01-Remove-ipset-functionality.patch,
+  +files/4.5.21_rc1/shorewallrc:
+  Version bump.
+
 *shorewall-init-4.5.21_beta3 (19 Sep 2013)
 
   19 Sep 2013; Thomas D. <whissi@whissi.de>

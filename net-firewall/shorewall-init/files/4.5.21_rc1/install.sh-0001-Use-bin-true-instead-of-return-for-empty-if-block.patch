@@ -1,0 +1,40 @@
+Use '/bin/true' instead of 'return' for empty if block
+
+This patch fixes the following error I noticed while testing
+Shorewall-4.5.21-RC1:
+
+   ./install.sh: line 388: return: can only `return' from a function or sourced script
+
+This was introduced with my commit 45242811630cac816dff70a65e79116cd4b28b37,
+which added Gentoo support.
+
+Using '/bin/true' instead of 'return' fixes the problem.
+---
+ Shorewall-init/install.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Shorewall-init/install.sh b/Shorewall-init/install.sh
+index 4b659df..6c221dd 100755
+--- a/Shorewall-init/install.sh
++++ b/Shorewall-init/install.sh
+@@ -385,7 +385,7 @@ else
+ 		mkdir -p ${DESTDIR}${SYSCONFDIR}/network/if-down.d
+ 	    elif [ $HOST = gentoo ]; then
+ 		# Gentoo does not support if-{up,down}.d
+-		return
++		/bin/true
+ 	    else
+ 		mkdir -p ${DESTDIR}/etc/NetworkManager/dispatcher.d
+ 	    fi
+@@ -460,7 +460,7 @@ if [ -z "$DESTDIR" ]; then
+ 	elif [ $HOST = gentoo ]; then
+ 	    # On Gentoo, a service must be enabled manually by the user,
+ 	    # not by the installer
+-	    return
++	    /bin/true
+ 	else
+ 	    if [ -n "$SYSTEMD" ]; then
+ 		if systemctl enable shorewall-init.service; then
+-- 
+1.8.3.2
+
