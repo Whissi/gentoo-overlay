@@ -2,6 +2,13 @@
 # Copyright 1999-2013 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*shorewall-4.5.21.1 (09 Oct 2013)
+
+  09 Oct 2013; Thomas D. <whissi@whissi.de> +shorewall-4.5.21.1.ebuild,
+  +files/4.5.21.1/shorewall.confd, +files/4.5.21.1/shorewall.initd,
+  +files/4.5.21.1/shorewall.systemd, +files/4.5.21.1/shorewallrc:
+  Version bump.
+
   06 Oct 2013; Thomas D. <whissi@whissi.de> -shorewall-4.5.17.1.ebuild,
   -shorewall-4.5.18.ebuild, -shorewall-4.5.21_beta1.ebuild,
   -shorewall-4.5.21_beta3.ebuild, -shorewall-4.5.21_rc1.ebuild,
