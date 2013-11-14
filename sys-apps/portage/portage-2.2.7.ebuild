@@ -313,6 +313,7 @@ src_prepare() {
 		eerror ""
 	fi
 
+	cd "${S}" || die
 	epatch_user
 }
 
