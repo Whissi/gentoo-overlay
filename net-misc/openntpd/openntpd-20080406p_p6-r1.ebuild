@@ -54,7 +54,6 @@ src_prepare() {
 	epatch "${WORKDIR}"/debian/patches/*.patch
 	einfo "Applying Gentoo patches:"
 	epatch "${FILESDIR}/"${PVR}/*.patch
-	sed -i 's:debian:gentoo:g' ntpd.conf || die "Setting gentoo's time servers in \"ntpd.conf\" failed!"
 
 	epatch_user
 

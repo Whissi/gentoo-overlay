@@ -1,0 +1,30 @@
+--- openntpd-20080406p.ori/ntpd.conf	2013-12-12 15:28:21.848109234 +0100
++++ openntpd-20080406p/ntpd.conf	2013-12-12 15:29:11.664110682 +0100
+@@ -1,20 +1,15 @@
+-# $OpenBSD: ntpd.conf,v 1.7 2004/07/20 17:38:35 henning Exp $
+-# sample ntpd configuration file, see ntpd.conf(5)
++# /etc/ntpd.conf - OpenNTPD configuration file
++# See ntpd(1) and ntpd.conf(5) man pages for details
+ 
+ # Addresses to listen on (ntpd does not listen by default)
+ #listen on *
+ #listen on 127.0.0.1
+ #listen on ::1
+ 
+-# sync to a single server
++# Sync to a single server
+ #server ntp.example.org
+ 
+-# use a random selection of 8 public stratum 2 servers
+-# see http://twiki.ntp.org/bin/view/Servers/NTPPoolServers
+-#servers pool.ntp.org
+-
+-# Choose servers announced from Debian NTP Pool
+-servers 0.debian.pool.ntp.org
+-servers 1.debian.pool.ntp.org
+-servers 2.debian.pool.ntp.org
+-servers 3.debian.pool.ntp.org
++# Use a random selection of 8 public stratum 2 servers from the
++# Gentoo pool, see <http://support.ntp.org/bin/view/Servers/NTPPoolServers>
++servers 0.gentoo.pool.ntp.org
++servers 1.gentoo.pool.ntp.org
