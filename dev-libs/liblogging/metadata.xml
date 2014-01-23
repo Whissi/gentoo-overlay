@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<herd>proxy-maintainers</herd>
+	<maintainer>
+		<email>whissi@whissi.de</email>
+		<name>Thomas D. (Whissi)</name>
+	</maintainer>
+	<use>
+		<flag name="rfc3195">
+			Enables RFC 3195 protocol (aka syslog-reliable) support.
+			If you don't know what this is, you don't need it!
+		</flag>
+		<flag name="stdlog">
+			Enables libstdlog support (syslog replacement with multi-channel support).
+		</flag>
+	</use>
+</pkgmetadata>
