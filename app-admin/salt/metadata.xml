@@ -4,7 +4,6 @@
 	<maintainer>
 		<email>whissi@whissi.de</email>
 		<name>Thomas D.</name>
-		<description>Forker :)</description>
 	</maintainer>
 	<longdescription lang="en">
 Salt is a powerful remote execution manager that can be used to administer
