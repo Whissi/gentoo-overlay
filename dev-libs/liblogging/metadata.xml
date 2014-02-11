@@ -12,7 +12,7 @@
 			If you don't know what this is, you don't need it!
 		</flag>
 		<flag name="stdlog">
-			Enables libstdlog support (syslog replacement with multi-channel support).
+			Enables liblogging's core component (think of it as a the next version of the syslog(3) API).
 		</flag>
 	</use>
 </pkgmetadata>
