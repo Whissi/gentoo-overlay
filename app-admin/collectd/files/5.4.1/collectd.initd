@@ -11,10 +11,8 @@ COLLECTD_GROUP=${COLLECTD_GROUP:-"collectd"}
 
 command="/usr/sbin/collectd"
 command_args="-C ${COLLECTD_CONFIGFILE} -P ${COLLECTD_PIDFILE}"
-start_stop_daemon_args="--nice ${COLLECTD_NICELEVEL} --wait 1000"
+start_stop_daemon_args="--nice ${COLLECTD_NICELEVEL} --user ${COLLECTD_USER}:${COLLECTD_GROUP} --wait 1000"
 pidfile=${COLLECTD_PIDFILE}
-user=${COLLECTD_USER}
-group=${COLLECTD_GROUP}
 
 extra_commands="configtest"
 description_configtest="Run collectd's internal config check."
