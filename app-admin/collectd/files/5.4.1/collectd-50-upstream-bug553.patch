@@ -1,0 +1,71 @@
+Make sure that "PIDFile" option cannot be set when command-line option "-P" was used. (Fixes #553)
+
+The "PIDFile" value from command-line option "-P", which should take
+precedence over any "PIDFile" value from configuration files, could be
+overwritten if a configuration file contained the "PIDFile" option.
+
+We introduced a new global variable "pidfile_from_cli" which will be set
+to 1 when the command-line option "-P" was detected and the
+"global_option_set" function will only set the "PIDFile" option if
+"pidfile_from_cli" is 0.
+
+See <https://github.com/collectd/collectd/pull/553>
+---
+ src/collectd.c   | 2 ++
+ src/collectd.h   | 1 +
+ src/configfile.c | 7 +++++++
+ 3 files changed, 10 insertions(+)
+
+diff --git a/src/collectd.c b/src/collectd.c
+index d259753..6c37c61 100644
+--- a/src/collectd.c
++++ b/src/collectd.c
+@@ -41,6 +41,7 @@
+  */
+ char hostname_g[DATA_MAX_NAME_LEN];
+ cdtime_t interval_g;
++int  pidfile_from_cli = 0;
+ int  timeout_g;
+ #if HAVE_LIBKSTAT
+ kstat_ctl_t *kc;
+@@ -439,6 +440,7 @@ int main (int argc, char **argv)
+ #if COLLECT_DAEMON
+ 			case 'P':
+ 				global_option_set ("PIDFile", optarg);
++				pidfile_from_cli = 1;
+ 				break;
+ 			case 'f':
+ 				daemonize = 0;
+diff --git a/src/collectd.h b/src/collectd.h
+index 969aeda..558dc7a 100644
+--- a/src/collectd.h
++++ b/src/collectd.h
+@@ -296,6 +296,7 @@ typedef uint64_t cdtime_t;
+ 
+ extern char     hostname_g[];
+ extern cdtime_t interval_g;
++extern int      pidfile_from_cli;
+ extern int      timeout_g;
+ 
+ #endif /* COLLECTD_H */
+diff --git a/src/configfile.c b/src/configfile.c
+index 0e54f26..c5d3e36 100644
+--- a/src/configfile.c
++++ b/src/configfile.c
+@@ -891,6 +891,13 @@ int global_option_set (const char *option, const char *value)
+ 	if (i >= cf_global_options_num)
+ 		return (-1);
+ 
++	if (strcasecmp (option, "PIDFile") == 0 && pidfile_from_cli == 1)
++	{
++		DEBUG ("Configfile: Ignoring `PIDFILE' option because "
++			"command-line option `-P' take precedence.");
++		return (0);
++	}
++
+ 	sfree (cf_global_options[i].value);
+ 
+ 	if (value != NULL)
+-- 
+1.8.5.4
+

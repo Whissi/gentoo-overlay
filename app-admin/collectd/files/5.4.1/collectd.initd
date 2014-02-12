@@ -1,0 +1,69 @@
+#!/sbin/runscript
+# Copyright 1999-2014 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+COLLECTD_CONFIGFILE=${COLLECTD_CONFIGFILE:-"/etc/collectd.conf"}
+COLLECTD_PIDFILE=${COLLECTD_PIDFILE:-"/run/collectd/collectd.pid"}
+COLLECTD_NICELEVEL=${COLLECTD_NICELEVEL:-5}
+COLLECTD_USER=${COLLECTD_USER:-"collectd"}
+COLLECTD_GROUP=${COLLECTD_GROUP:-"collectd"}
+
+command="/usr/sbin/collectd"
+command_args="-C ${COLLECTD_CONFIGFILE} -P ${COLLECTD_PIDFILE}"
+start_stop_daemon_args="--nice ${COLLECTD_NICELEVEL} --wait 1000"
+pidfile=${COLLECTD_PIDFILE}
+user=${COLLECTD_USER}
+group=${COLLECTD_GROUP}
+
+extra_commands="configtest"
+description_configtest="Run collectd's internal config check."
+
+required_files=( "${COLLECTD_CONFIGFILE}" )
+
+depend() {
+	use net
+}
+
+_checkconfig() {
+	if [ $(sed '/^$\|^#/d' ${COLLECTD_CONFIGFILE} | grep --count 'LoadPlugin\w\+oracle') != 0 ] ; then
+		if [ -e /etc/env.d/50oracle-instantclient-basic ] ; then
+			. /etc/env.d/50oracle-instantclient-basic
+			export ORACLE_HOME
+			export TNS_ADMIN
+		else
+			ewarn "Unable to set Oracle environment, Oracle plugin wont work"
+		fi
+	fi
+
+	local test_command="${command} -t -C ${COLLECTD_CONFIGFILE}"
+
+	${test_command} 1>/dev/null 2>&1
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		eerror "${SVCNAME} has detected an error in your configuration:"
+		${test_command}
+	fi
+
+	return $ret
+}
+
+configtest() {
+	ebegin "Checking ${SVCNAME} configuration"
+	_checkconfig
+	eend $?
+}
+
+start_pre() {
+	if [ "${RC_CMD}" != "restart" ]; then
+		configtest || return 1
+	fi
+
+	checkpath --directory --mode 0770 --owner ${COLLECTD_USER}:${COLLECTD_GROUP} $(dirname "${COLLECTD_PIDFILE}")
+}
+
+stop_pre() {
+	if [ "${RC_CMD}" = "restart" ]; then
+		configtest || return 1
+	fi
+}
