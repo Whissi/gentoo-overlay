@@ -6,4 +6,7 @@
 		<name>Thomas D.</name>
 		<description>Primary Maintainer</description>
 	</maintainer>
+	<upstream>
+		<bugs-to>https://github.com/Whissi/update-ipset/issues</bugs-to>
+	</upstream>
 </pkgmetadata>

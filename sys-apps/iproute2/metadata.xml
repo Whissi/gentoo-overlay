@@ -5,6 +5,7 @@
 	<maintainer>
 		<email>whissi@whissi.de</email>
 		<name>Thomas D. (Whissi)</name>
+		<description>Proxied Maintainer</description>
 	</maintainer>
 	<use>
 		<flag name='berkdb'>build programs that use berkdb (just arpd)</flag>

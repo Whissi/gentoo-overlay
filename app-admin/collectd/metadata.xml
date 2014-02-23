@@ -4,8 +4,8 @@
 	<herd>proxy-maintainers</herd>
 	<longdescription>Collectd gathers statistics about the system it is running on and stores this information. Those statistics can then be used to find current performance bottlenecks (i.e. performance analysis) and predict future system load (i.e. capacity planning). Or if you just want pretty graphs of your private server and are fed up with some homegrown solution you're at the right place.</longdescription>
 	<maintainer>
-		<email>bugs@bergstroem.nu</email>
-		<name>Johan Bergström</name>
+		<email>whissi@whissi.de</email>
+		<name>Thomas D.</name>
 		<description>Proxied Maintainer</description>
 	</maintainer>
 	<use>
@@ -112,4 +112,7 @@
 		<flag name='collectd_plugins_write_mongodb'>Build the write_mongodb output plugin (sends the values collected by collectd to a MongoDB)</flag>
 		<flag name='contrib'>Install user-contributed files in the doc directory</flag>
 	</use>
+	<upstream>
+		<bugs-to>https://github.com/collectd/collectd/issues</bugs-to>
+	</upstream>
 </pkgmetadata>

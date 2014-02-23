@@ -20,6 +20,10 @@ files to define the state a server needs to be in.
 Between the remote execution system, and state management Salt addresses the
 backbone of cloud and data center management.
 	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/saltstack/salt/issues</bugs-to>
+		<remote-id type="pypi">salt</remote-id>
+	</upstream>
 	<use>
 		<flag name="openssl">Add support for using TLS via OpenSSL.</flag>
 		<flag name="libvirt">Support managing virtual machines with app-emulation/libvirt.</flag>

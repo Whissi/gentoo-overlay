@@ -6,6 +6,9 @@
 		<email>whissi@whissi.de</email>
 		<name>Thomas D. (Whissi)</name>
 	</maintainer>
+	<upstream>
+		<bugs-to>https://github.com/rsyslog/liblogging/issues</bugs-to>
+	</upstream>
 	<use>
 		<flag name="rfc3195">
 			Enables RFC 3195 protocol (aka syslog-reliable) support.

@@ -13,6 +13,7 @@
 		<flag name="zeromq">Add support for the ZeroMQ input and output plugins using <pkg>net-libs/zeromq</pkg></flag>
 	</use>
 	<upstream>
-	    <remote-id type="cpe">cpe:/a:rsyslog:rsyslog</remote-id>
+		<bugs-to>https://github.com/rsyslog/rsyslog/issues</bugs-to>
+		<remote-id type="cpe">cpe:/a:rsyslog:rsyslog</remote-id>
 	</upstream>
 </pkgmetadata>

@@ -5,6 +5,7 @@
 	<maintainer>
 		<email>whissi@whissi.de</email>
 		<name>Thomas D. (Whissi)</name>
+		<description>Proxied Maintainer</description>
 	</maintainer>
 	<longdescription>
 		Vanilla prepatch/rc sources, for people who like to have the latest kernel available

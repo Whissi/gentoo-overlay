@@ -3,6 +3,7 @@
 <pkgmetadata>
 	<herd>python</herd>
 	<upstream>
+		<bugs-to>https://github.com/msgpack/msgpack-python/issues</bugs-to>
 		<remote-id type="pypi">msgpack-python</remote-id>
 	</upstream>
 </pkgmetadata>

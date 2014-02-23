@@ -5,8 +5,12 @@
 	<maintainer>
 		<email>whissi@whissi.de</email>
 		<name>Thomas D.</name>
+		<description>Proxied Maintainer</description>
 	</maintainer>
 	<longdescription>The Layer 2 Tunneling Protocol (L2TP) daemon mantained by Xelerance Corporation.</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/xelerance/xl2tpd/issues</bugs-to>
+	</upstream>
 	<use>
 		<flag name="dnsretry">Patch for host lookup retries, activated by redial feature</flag>
 		<flag name="kernel">Enable kernel interface for PPPoL2TP</flag>
