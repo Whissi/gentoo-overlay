@@ -1,6 +1,6 @@
 # Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
+# $Header: /var/cvsroot/gentoo-x86/sys-fs/udev/udev-210.ebuild,v 1.10 2014/03/05 17:44:35 ssuominen Exp $
 
 EAPI=5
 
@@ -38,6 +38,7 @@ COMMON_DEPEND=">=sys-apps/util-linux-2.20
 	kmod? ( >=sys-apps/kmod-16 )
 	selinux? ( >=sys-libs/libselinux-2.1.9 )
 	!<sys-libs/glibc-2.11
+	!sys-apps/gentoo-systemd-integration
 	!sys-apps/systemd
 	abi_x86_32? (
 		!<=app-emulation/emul-linux-x86-baselibs-20130224-r7
@@ -177,13 +178,13 @@ src_prepare() {
 
 multilib_src_configure() {
 	tc-export CC #463846
+	export cc_cv_CFLAGS__flto=no #502950
 
 	# Keep sorted by ./configure --help and only pass --disable flags
 	# when *required* to avoid external deps or unnecessary compile
 	local econf_args
 	econf_args=(
 		ac_cv_search_cap_init=
-		ac_cv_header_sys_capability_h=yes
 		--bindir=/bin
 		--sbindir=/sbin
 		--libdir=/usr/$(get_libdir)
@@ -385,8 +386,8 @@ multilib_src_install_all() {
 pkg_preinst() {
 	local htmldir
 	for htmldir in gudev libudev; do
-		if [[ -d ${ROOT}usr/share/gtk-doc/html/${htmldir} ]]; then
-			rm -rf "${ROOT}"usr/share/gtk-doc/html/${htmldir}
+		if [[ -d ${ROOT%/}usr/share/gtk-doc/html/${htmldir} ]]; then
+			rm -rf "${ROOT%/}"usr/share/gtk-doc/html/${htmldir}
 		fi
 		if [[ -d ${D}/usr/share/doc/${PF}/html/${htmldir} ]]; then
 			dosym ../../doc/${PF}/html/${htmldir} \
@@ -396,7 +397,7 @@ pkg_preinst() {
 }
 
 pkg_postinst() {
-	mkdir -p "${ROOT}"run
+	mkdir -p "${ROOT%/}"run
 
 	local netrules="80-net-setup-link.rules"
 	local net_rules="${ROOT}"etc/udev/rules.d/${netrules}
@@ -418,8 +419,8 @@ pkg_postinst() {
 
 	# "losetup -f" is confused if there is an empty /dev/loop/, Bug #338766
 	# So try to remove it here (will only work if empty).
-	rmdir "${ROOT}"dev/loop 2>/dev/null
-	if [[ -d ${ROOT}dev/loop ]]; then
+	rmdir "${ROOT%/}"dev/loop 2>/dev/null
+	if [[ -d ${ROOT%/}dev/loop ]]; then
 		ewarn "Please make sure your remove /dev/loop,"
 		ewarn "else losetup may be confused when looking for unused devices."
 	fi
@@ -434,7 +435,7 @@ pkg_postinst() {
 		ewarn
 	fi
 
-	local fstab="${ROOT}"etc/fstab dev path fstype rest
+	local fstab="${ROOT%/}"etc/fstab dev path fstype rest
 	while read -r dev path fstype rest; do
 		if [[ ${path} == /dev && ${fstype} != devtmpfs ]]; then
 			ewarn "You need to edit your /dev line in ${fstab} to have devtmpfs"
@@ -443,7 +444,7 @@ pkg_postinst() {
 		fi
 	done < "${fstab}"
 
-	if [[ -d ${ROOT}usr/lib/udev ]]; then
+	if [[ -d ${ROOT%/}usr/lib/udev ]]; then
 		ewarn
 		ewarn "Please re-emerge all packages on your system which install"
 		ewarn "rules and helpers in /usr/lib/udev. They should now be in"
@@ -454,8 +455,8 @@ pkg_postinst() {
 		ewarn "Note that qfile can be found in app-portage/portage-utils"
 	fi
 
-	local old_cd_rules="${ROOT}"etc/udev/rules.d/70-persistent-cd.rules
-	local old_net_rules="${ROOT}"etc/udev/rules.d/70-persistent-net.rules
+	local old_cd_rules="${ROOT%/}"etc/udev/rules.d/70-persistent-cd.rules
+	local old_net_rules="${ROOT%/}"etc/udev/rules.d/70-persistent-net.rules
 	for old_rules in "${old_cd_rules}" "${old_net_rules}"; do
 		if [[ -f ${old_rules} ]]; then
 			ewarn
@@ -465,7 +466,7 @@ pkg_postinst() {
 		fi
 	done
 
-	if has_version sys-apps/biosdevname; then
+	if has_version 'sys-apps/biosdevname'; then
 		ewarn
 		ewarn "You can replace the functionality of sys-apps/biosdevname which has been"
 		ewarn "detected to be installed with the new predictable network interface names."
