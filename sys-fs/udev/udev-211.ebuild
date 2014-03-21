@@ -396,8 +396,8 @@ multilib_src_install_all() {
 pkg_preinst() {
 	local htmldir
 	for htmldir in gudev libudev; do
-		if [[ -d ${ROOT%/}usr/share/gtk-doc/html/${htmldir} ]]; then
-			rm -rf "${ROOT%/}"usr/share/gtk-doc/html/${htmldir}
+		if [[ -d "${ROOT%/}/usr/share/gtk-doc/html/${htmldir}" ]]; then
+			rm -rf "${ROOT%/}"/usr/share/gtk-doc/html/${htmldir}
 		fi
 		if [[ -d ${D}/usr/share/doc/${PF}/html/${htmldir} ]]; then
 			dosym ../../doc/${PF}/html/${htmldir} \
@@ -407,12 +407,12 @@ pkg_preinst() {
 }
 
 pkg_postinst() {
-	mkdir -p "${ROOT%/}"run
+	mkdir -p "${ROOT%/}"/run
 
 	local netrules="80-net-setup-link.rules"
-	local net_rules="${ROOT}"etc/udev/rules.d/${netrules}
+	local net_rules="${ROOT%/}"/etc/udev/rules.d/${netrules}
 	copy_net_rules() {
-		[[ -f ${net_rules} ]] || cp "${ROOT}"usr/share/doc/${PF}/gentoo/${netrules} "${net_rules}"
+		[[ -f ${net_rules} ]] || cp "${ROOT%/}"/usr/share/doc/${PF}/gentoo/${netrules} "${net_rules}"
 	}
 
 	if [[ ${REPLACING_VERSIONS} ]] && [[ ${REPLACING_VERSIONS} < 209 ]] ; then
@@ -429,8 +429,8 @@ pkg_postinst() {
 
 	# "losetup -f" is confused if there is an empty /dev/loop/, Bug #338766
 	# So try to remove it here (will only work if empty).
-	rmdir "${ROOT%/}"dev/loop 2>/dev/null
-	if [[ -d ${ROOT%/}dev/loop ]]; then
+	rmdir "${ROOT%/}"/dev/loop 2>/dev/null
+	if [[ -d "${ROOT%/}/dev/loop" ]]; then
 		ewarn "Please make sure your remove /dev/loop,"
 		ewarn "else losetup may be confused when looking for unused devices."
 	fi
@@ -445,7 +445,7 @@ pkg_postinst() {
 		ewarn
 	fi
 
-	local fstab="${ROOT%/}"etc/fstab dev path fstype rest
+	local fstab="${ROOT%/}"/etc/fstab dev path fstype rest
 	while read -r dev path fstype rest; do
 		if [[ ${path} == /dev && ${fstype} != devtmpfs ]]; then
 			ewarn "You need to edit your /dev line in ${fstab} to have devtmpfs"
@@ -454,7 +454,7 @@ pkg_postinst() {
 		fi
 	done < "${fstab}"
 
-	if [[ -d ${ROOT%/}usr/lib/udev ]]; then
+	if [[ -d "${ROOT%/}/usr/lib/udev" ]]; then
 		ewarn
 		ewarn "Please re-emerge all packages on your system which install"
 		ewarn "rules and helpers in /usr/lib/udev. They should now be in"
@@ -465,8 +465,8 @@ pkg_postinst() {
 		ewarn "Note that qfile can be found in app-portage/portage-utils"
 	fi
 
-	local old_cd_rules="${ROOT%/}"etc/udev/rules.d/70-persistent-cd.rules
-	local old_net_rules="${ROOT%/}"etc/udev/rules.d/70-persistent-net.rules
+	local old_cd_rules="${ROOT%/}"/etc/udev/rules.d/70-persistent-cd.rules
+	local old_net_rules="${ROOT%/}"/etc/udev/rules.d/70-persistent-net.rules
 	for old_rules in "${old_cd_rules}" "${old_net_rules}"; do
 		if [[ -f ${old_rules} ]]; then
 			ewarn
