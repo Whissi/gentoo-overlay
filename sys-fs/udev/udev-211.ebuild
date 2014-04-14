@@ -497,7 +497,6 @@ pkg_postinst() {
 	elog "http://wiki.gentoo.org/wiki/Udev"
 	elog "http://wiki.gentoo.org/wiki/Udev/upgrade"
 
-	
 	# Update hwdb database in case the format is changed by udev version.
 	if has_version 'sys-apps/hwids[udev]'; then
 		udevadm hwdb --update --root="${ROOT%/}"

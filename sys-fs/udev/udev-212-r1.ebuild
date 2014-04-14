@@ -1,6 +1,6 @@
 # Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
+# $Header: /var/cvsroot/gentoo-x86/sys-fs/udev/udev-212-r1.ebuild,v 1.7 2014/04/05 20:28:17 jer Exp $
 
 EAPI=5
 
@@ -10,7 +10,7 @@ if [[ ${PV} = 9999* ]]; then
 	EGIT_REPO_URI="git://anongit.freedesktop.org/systemd/systemd"
 	inherit git-2
 else
-	patchset=
+	patchset=1
 	FIXUP_PATCH="${P}-revert-systemd-messup.patch.xz"
 	SRC_URI="http://www.freedesktop.org/software/systemd/systemd-${PV}.tar.xz
 		http://dev.gentoo.org/~polynomial-c/${PN}/${FIXUP_PATCH}"
@@ -19,7 +19,7 @@ else
 			http://dev.gentoo.org/~ssuominen/${P}-patches-${patchset}.tar.xz
 			http://dev.gentoo.org/~williamh/dist/${P}-patches-${patchset}.tar.xz"
 	fi
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
 fi
 
 DESCRIPTION="Linux dynamic and persistent device naming support (aka userspace devfs)"
@@ -27,7 +27,7 @@ HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
 
 LICENSE="LGPL-2.1 MIT GPL-2"
 SLOT="0"
-IUSE="acl doc +firmware-loader gudev introspection +kmod +openrc selinux static-libs"
+IUSE="acl doc +firmware-loader gudev introspection +kmod selinux static-libs"
 
 RESTRICT="test"
 
@@ -55,7 +55,7 @@ DEPEND="${COMMON_DEPEND}
 	virtual/os-headers
 	virtual/pkgconfig
 	!<sys-devel/make-3.82-r4
-	!<sys-kernel/linux-headers-2.6.32
+	!<sys-kernel/linux-headers-3.7
 	doc? ( >=dev-util/gtk-doc-1.18 )"
 
 if [[ ${PV} = 9999* ]]; then
@@ -67,11 +67,8 @@ RDEPEND="${COMMON_DEPEND}
 	!<sys-fs/lvm2-2.02.103
 	!<sec-policy/selinux-base-2.20120725-r10"
 
-PDEPEND=">=virtual/libudev-208
-	>=virtual/udev-208
-	>=sys-apps/hwids-20140304[udev]
-	gudev? ( >=virtual/libgudev-208 )
-	openrc? ( >=sys-fs/udev-init-scripts-26 )"
+PDEPEND=">=sys-apps/hwids-20140304[udev]
+	>=sys-fs/udev-init-scripts-26"
 
 S=${WORKDIR}/systemd-${PV}
 
@@ -497,7 +494,6 @@ pkg_postinst() {
 	elog "http://wiki.gentoo.org/wiki/Udev"
 	elog "http://wiki.gentoo.org/wiki/Udev/upgrade"
 
-	
 	# Update hwdb database in case the format is changed by udev version.
 	if has_version 'sys-apps/hwids[udev]'; then
 		udevadm hwdb --update --root="${ROOT}"
