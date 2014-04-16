@@ -24,7 +24,7 @@ fi
 
 LICENSE="Apache-2.0"
 SLOT="0"
-IUSE="ldap libvirt mako mongodb mysql openssl redis test"
+IUSE="ldap libcloud libvirt mako mongodb mysql openssl redis test +timelib"
 
 RDEPEND="
 	>=dev-python/pyzmq-2.2.0[${PYTHON_USEDEP}]
@@ -36,7 +36,7 @@ RDEPEND="
 	dev-python/jinja[${PYTHON_USEDEP}]
 	dev-python/setuptools[${PYTHON_USEDEP}]
 	dev-python/markupsafe[${PYTHON_USEDEP}]
-	dev-python/libcloud[${PYTHON_USEDEP}]
+	libcloud? ( >=dev-python/libcloud-0.14.0[${PYTHON_USEDEP}] )
 	sys-apps/pciutils
 	mako? ( dev-python/mako[${PYTHON_USEDEP}] )
 	ldap? ( dev-python/python-ldap[${PYTHON_USEDEP}] )
@@ -49,6 +49,7 @@ RDEPEND="
 	mongodb? ( dev-python/pymongo[${PYTHON_USEDEP}] )
 	mysql? ( dev-python/mysql-python[${PYTHON_USEDEP}] )
 	redis? ( dev-python/redis-py[${PYTHON_USEDEP}] )
+	timelib? ( dev-python/timelib[${PYTHON_USEDEP}] )
 "
 DEPEND="
 	test? (
@@ -64,22 +65,15 @@ DEPEND="
 DOCS=(README.rst AUTHORS)
 
 src_prepare() {
-	# The unit tests for the buildout module will fail with
-	#
-	#   self.assertTrue(buildout._has_old_distribute(self.py_dis))
-	#   AssertionError: False is not true
-	#
-	# in "${S}/tests/unit/modules/zcbuildout_test.py" at line 364
-	#
-	# To prevent test from failing and because we don't need this module at all,
-	# we just remove the test...
+	epatch "${FILESDIR}"/${PVR}/10-tests-nonroot.patch
+
+	# this test fails because it trys to "pip install distribute"
 	einfo "Removing unit tests for buildout module ..."
-	rm "${S}"/tests/unit/states/zcbuildout_test.py || die
-	rm "${S}"/tests/unit/modules/zcbuildout_test.py || die
+	rm tests/unit/{modules,states}/zcbuildout_test.py
 }
 
 python_install_all() {
-	distutils-r1_python_install_all
+	USE_SETUPTOOLS=1 distutils-r1_python_install_all
 
 	for s in minion master syndic; do
 		newinitd "${FILESDIR}"/${PVR}/initd.${s} salt-${s}
@@ -95,6 +89,5 @@ python_test() {
 	# testsuite likes lots of files
 	ulimit -n 3072
 
-	# See comments in src_prepare()!
-	SHELL="/bin/bash" TMPDIR=/tmp ./tests/runtests.py --unit-tests --no-report || die
+	USE_SETUPTOOLS=1 SHELL="/bin/bash" TMPDIR=/tmp ./tests/runtests.py --unit-tests --no-report --verbose || die
 }
