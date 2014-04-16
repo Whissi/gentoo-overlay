@@ -50,6 +50,10 @@ AUTOTOOLS_IN_SOURCE_BUILD=1
 
 DOCS=(AUTHORS ChangeLog doc/rsyslog-example.conf)
 
+src_prepare() {
+	epatch "$FILESDIR"/${BRANCH}/${PN}-7.x-mmjsonparse.patch
+}
+
 src_configure() {
 	# Maintainer notes:
 	# * rfc3195 needs a library and development of that library
