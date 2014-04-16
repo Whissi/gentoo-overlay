@@ -13,9 +13,12 @@ SRC_URI="http://www.liblognorm.com/files/download/${P}.tar.gz"
 LICENSE="LGPL-2.1"
 SLOT="0/0"
 KEYWORDS="~amd64 ~arm ~hppa ~x86 ~amd64-linux"
-IUSE="debug static-libs"
+IUSE="static-libs"
 
-RDEPEND=">=dev-libs/libestr-0.1.3"
+RDEPEND="
+	>=dev-libs/libestr-0.1.3
+	>=dev-libs/libee-0.3.2
+"
 
 DEPEND="
 	${RDEPEND}
@@ -25,9 +28,7 @@ DEPEND="
 DOCS=( ChangeLog )
 
 src_configure() {
-	local myeconfargs=(
-		$(use_enable debug)
-	)
+	local myeconfargs=()
 
 	autotools-utils_src_configure
 }
