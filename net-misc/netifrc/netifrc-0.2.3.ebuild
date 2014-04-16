@@ -9,11 +9,14 @@ inherit eutils udev
 DESCRIPTION="Gentoo Network Interface Management Scripts"
 HOMEPAGE="http://www.gentoo.org/proj/en/base/openrc/"
 
+MY_P="${P}-next"
+MY_PV="${PV}-next"
+
 if [[ ${PV} == "9999" ]]; then
 	EGIT_REPO_URI="https://github.com/Whissi/${PN}.git"
 	inherit git-2
 else
-	SRC_URI="http://mirror.deutschmann.io/distfiles/${P}.tar.bz2"
+	SRC_URI="https://github.com/Whissi/netifrc/releases/download/v${PV}-next/${MY_P}.tar.bz2"
 	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~sparc-fbsd ~x86-fbsd"
 fi
 
@@ -28,7 +31,7 @@ RDEPEND="${COMMON_DEPEND}
 	>=sys-apps/openrc-0.12
 	!<sys-apps/openrc-0.12"
 
-S="${WORKDIR}/${P%_p*}"
+S="${WORKDIR}/${MY_P}"
 
 src_prepare() {
 	if [[ ${PV} == "9999" ]] ; then
@@ -37,6 +40,10 @@ src_prepare() {
 		einfo "Producing ChangeLog from Git history"
 		GIT_DIR="${S}/.git" git log >"${S}"/ChangeLog
 	fi
+
+	einfo "Setting ${PN} version to ${MY_PV} ..."
+	sed -e "s/^VERSION=.*/VERSION=\"${MY_PV}\"/" -i Makefile.inc || \
+		die "Failed to patch ${PN} version"
 
 	# Allow user patches to be applied without modifying the ebuild
 	epatch_user
