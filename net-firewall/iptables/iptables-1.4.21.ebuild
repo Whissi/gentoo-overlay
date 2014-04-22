@@ -1,6 +1,6 @@
 # Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-firewall/iptables/iptables-1.4.20.ebuild,v 1.5 2013/11/01 13:50:41 ago Exp $
+# $Header: $
 
 EAPI="5"
 
@@ -19,13 +19,11 @@ KEYWORDS="~alpha amd64 arm hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc x
 IUSE="ipv6 netlink static-libs"
 
 DEPEND="
-	${RDEPEND}
 	virtual/os-headers
 	virtual/pkgconfig
 "
 
 RDEPEND="
-	${RDEPEND}
 	netlink? ( net-libs/libnfnetlink )
 "
 
