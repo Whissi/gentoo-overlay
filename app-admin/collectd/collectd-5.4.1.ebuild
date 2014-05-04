@@ -312,7 +312,7 @@ src_install() {
 
 	fixlocalpod
 
-	find "${D}/usr/" -name "*.la" -exec rm -f {} +
+	find "${ED}/usr/" -name "*.la" -delete
 
 	# use collectd_plugins_ping && setcap cap_net_raw+ep ${D}/usr/sbin/collectd
 	# we cannot do this yet
