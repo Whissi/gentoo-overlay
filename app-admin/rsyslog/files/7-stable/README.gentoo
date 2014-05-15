@@ -1,0 +1,98 @@
+Introduction
+============
+
+Since rsyslog version 7.6 we are shipping a new default Gentoo
+configuration. See bug #501982 to learn more about what we were trying to
+achieve by rewriting the entire configuration.
+
+
+Important changes
+=================
+
+1. "/var/log/syslog" log file is now deprecated
+
+   Beginning with rsyslog-7.6, the "/var/log/syslog" log file will no
+   longer being written per default. We are considering this file as
+   deprecated/obsolet for the typical user/system.
+   The content from this log file is still availble through other
+   (dedicated) log files, see
+   
+     - /var/log/cron.log
+     - /var/log/daemon.log
+     - /var/log/mail.log
+     - /var/log/messages
+   
+   If you really need the old "/var/log/syslog" log file, all you have to
+   do is uncommenting the corresponding configuration directive in
+   "/etc/rsyslog.conf".
+   
+   If you do so, don't forget to re-enable log rotation in
+   "/etc/logrotate.d/rsyslog", too.
+
+
+2. Additional configurations must be named "*.pre.conf" or "*.post.conf"
+   
+   Beginning with rsyslog-7.6, we no longer include additional
+   configuration files from "/etc/rsyslog.d/*.conf".
+   
+   Instead we are now including any "/etc/rsyslog.d/*.pre.conf" file
+   before Gentoo's default actions. This still allows you to modify or
+   discard messages which should or shouldn't be handled later by Gentoo's
+   default actions.
+   
+   After the default Gentoo actions, we include any additional
+   "/etc/rsyslog.d/*.post.conf" configuration file.
+   
+   This should be the default naming for any additional configuration
+   files because this lowers the risk to manipulate the default log files
+   without intention.
+   
+   Examples
+   ========
+   
+   1. You setup your firewall (iptables) to log some traffic
+      (...-J LOG --log-prefix "firewall: ", see `iptables -j LOG --help`
+      for further details). Per default, these log messages will be logged
+      into "/var/log/kern.log" and "/var/log/messages" which will clutter
+      up these log files.
+      
+      To solve this problem, you would now simply create
+      "/etc/rsyslog.d/firewall.pre.conf" with the following content:
+
+        if ($programname == 'kernel') then {
+          if ($msg contains 'firewall:') then {
+            action(type="omfile"
+              File="/var/log/firewall.log"
+              FileOwner="root"
+              FileGroup="adm"
+            )
+            stop
+          }
+        }
+
+   
+   2. You configured a program to use syslog facility "local6". You want
+      to collect logs from your program in its own log file.
+      
+      To solve this problem, you would now simply create
+      "/etc/rsyslog.d/yourProgram.post.conf" with the following content:
+      
+        if ($syslogfacility-text == 'local6') then {
+          if ($programname == 'yourProgram') then {
+            action(type="omfile"
+              File="/var/log/yourProgram.log"
+              FileOwner="root"
+              FileGroup="adm"
+            )
+          }
+        }
+
+   
+   Please read the RainerScript documentation at http://www.rsyslog.com if
+   you don't understand the syntax from the examples above.
+ 
+
+3. An additional input socket in "/var/empty/dev/log" (default chroot
+   location) will be created per default
+
+   See bug #490744 for further details.

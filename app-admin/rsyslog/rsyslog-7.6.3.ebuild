@@ -30,7 +30,7 @@ RDEPEND="
 	normalize? (
 		>=dev-libs/libee-0.4.0
 		>=dev-libs/liblognorm-0.3.1:=
-		<dev-libs/liblognorm-1.0.0
+		!>=dev-libs/liblognorm-1.0.0
 	)
 	omudpspoof? ( >=net-libs/libnet-1.1.6 )
 	oracle? ( >=dev-db/oracle-instantclient-basic-10.2 )
@@ -58,7 +58,12 @@ AUTOTOOLS_IN_SOURCE_BUILD=1
 
 AUTOTOOLS_PRUNE_LIBTOOL_FILES="modules"
 
-DOCS=(AUTHORS ChangeLog doc/rsyslog-example.conf)
+DOCS=(
+	AUTHORS
+	ChangeLog
+	doc/rsyslog-example.conf
+	"${FILESDIR}"/${BRANCH}/README.gentoo
+)
 
 PATCHES=(
 	"${FILESDIR}"/${BRANCH}/${PN}-7.x-mmjsonparse.patch
@@ -177,8 +182,12 @@ src_install() {
 }
 
 pkg_postinst() {
+	local advertise_readme=0
+
 	if [[ -z "${REPLACING_VERSIONS}" ]]; then
 		# This is a new installation
+
+		advertise_readme=1
 
 		if use mysql || use postgres; then
 			echo
@@ -201,10 +210,48 @@ pkg_postinst() {
 		echo
 		elog "Since ${PN}-7.6.3 we no longer use the catch-all log target"
 		elog "\"/var/log/syslog\" due to its redundancy to the other log targets."
+
+		advertise_readme=1
+	fi
+
+	unset RSYSLOG_OLD_CONF_FILES
+	declare -a RSYSLOG_OLD_CONF_FILES
+
+	local i=0 RSYSLOG_OLD_CONF_FILE=
+	while IFS= read -r -u 3 -d $'\0' RSYSLOG_OLD_CONF_FILE; do
+		RSYSLOG_OLD_CONF_FILES[i++]="$RSYSLOG_OLD_CONF_FILE"
+	done 3< <(find "${EPREFIX}/etc/rsyslog.d" -maxdepth 1 -type f \( -iname "*.conf" ! -iname "*.pre.conf" ! -iname "*.post.conf" \) -print0 2>/dev/null)
+
+	if [[ ${#RSYSLOG_OLD_CONF_FILES[@]} -gt 0 ]]; then
+		echo ""
+		ewarn "Beginning with ${PN}-7.6.3 we changed the way we are including"
+		ewarn "additional configuration files."
+		ewarn ""
+		ewarn "You have to adapt the new naming schema for the following files:"
+		ewarn ""
+
+		RSYSLOG_OLD_CONF_FILE=
+		for RSYSLOG_OLD_CONF_FILE in "${RSYSLOG_OLD_CONF_FILES[@]}"; do
+			ewarn "  - ${RSYSLOG_OLD_CONF_FILE}"
+		done
+
+		ewarn ""
+		ewarn "To keep the old behavior, just change the suffix from \".conf\" to \".pre.conf\"."
+		ewarn "If you don't do that, these configuration files won't be included anymore."
+
+		advertise_readme=1
+	fi
+	unset i RSYSLOG_OLD_CONF_FILE RSYSLOG_OLD_CONF_FILES
+
+	if [[ ${advertise_readme} -gt 0 ]]; then
+		# We need to show the README file location
+
+		echo ""
+		elog "Please read"
 		elog ""
-		elog "You can re-enable the deprecated log file by uncommenting the"
-		elog "corresponding directive in \"/etc/rsyslog.conf\"."
-		elog "If you decide to do that, don't forget to adjust \"/etc/logrotate.d/rsyslog\", too."
+		elog "  ${EPREFIX}/usr/share/doc/${PF}/README.gentoo*"
+		elog ""
+		elog "for more details."
 	fi
 }
 
