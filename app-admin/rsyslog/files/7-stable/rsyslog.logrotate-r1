@@ -1,5 +1,5 @@
 # Uncomment the following directive if you have re-enabled
-# "/var/log/syslog" in "/etc/rsyslog.conf"
+# "/var/log/syslog" in "/etc/rsyslog.d/50-default.conf"
 #/var/log/syslog
 #{
 #	rotate 7

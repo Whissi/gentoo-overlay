@@ -158,14 +158,22 @@ src_install() {
 	use doc && HTML_DOCS=( "${S}"/doc/ )
 	autotools-utils_src_install
 
-	insinto /etc
-	newins "${FILESDIR}/${BRANCH}/${PN}.conf" ${PN}.conf
 	newconfd "${FILESDIR}/${BRANCH}/${PN}.confd-r1" ${PN}
 	newinitd "${FILESDIR}/${BRANCH}/${PN}.initd-r1" ${PN}
+
 	keepdir /var/empty/dev
 	keepdir /var/spool/${PN}
 	keepdir /etc/ssl/${PN}
 	keepdir /etc/${PN}.d
+
+	insinto /etc
+	newins "${FILESDIR}/${BRANCH}/${PN}.conf" ${PN}.conf
+
+	insinto /etc/rsyslog.d/
+	newins "${FILESDIR}/${BRANCH}/default.conf" 50-default.conf
+
+	insinto /etc/logrotate.d/
+	newins "${FILESDIR}/${BRANCH}/${PN}.logrotate-r1" ${PN}
 
 	if use mysql; then
 		insinto /usr/share/doc/${PF}/scripts/mysql
@@ -176,9 +184,6 @@ src_install() {
 		insinto /usr/share/doc/${PF}/scripts/pgsql
 		doins plugins/ompgsql/createDB.sql
 	fi
-
-	insinto /etc/logrotate.d/
-	newins "${FILESDIR}/${BRANCH}/${PN}.logrotate-r1" ${PN}
 }
 
 pkg_postinst() {
@@ -213,35 +218,6 @@ pkg_postinst() {
 
 		advertise_readme=1
 	fi
-
-	unset RSYSLOG_OLD_CONF_FILES
-	declare -a RSYSLOG_OLD_CONF_FILES
-
-	local i=0 RSYSLOG_OLD_CONF_FILE=
-	while IFS= read -r -u 3 -d $'\0' RSYSLOG_OLD_CONF_FILE; do
-		RSYSLOG_OLD_CONF_FILES[i++]="$RSYSLOG_OLD_CONF_FILE"
-	done 3< <(find "${EPREFIX}/etc/rsyslog.d" -maxdepth 1 -type f \( -iname "*.conf" ! -iname "*.pre.conf" ! -iname "*.post.conf" \) -print0 2>/dev/null)
-
-	if [[ ${#RSYSLOG_OLD_CONF_FILES[@]} -gt 0 ]]; then
-		echo ""
-		ewarn "Beginning with ${PN}-7.6.3 we changed the way we are including"
-		ewarn "additional configuration files."
-		ewarn ""
-		ewarn "You have to adapt the new naming schema for the following files:"
-		ewarn ""
-
-		RSYSLOG_OLD_CONF_FILE=
-		for RSYSLOG_OLD_CONF_FILE in "${RSYSLOG_OLD_CONF_FILES[@]}"; do
-			ewarn "  - ${RSYSLOG_OLD_CONF_FILE}"
-		done
-
-		ewarn ""
-		ewarn "To keep the old behavior, just change the suffix from \".conf\" to \".pre.conf\"."
-		ewarn "If you don't do that, these configuration files won't be included anymore."
-
-		advertise_readme=1
-	fi
-	unset i RSYSLOG_OLD_CONF_FILE RSYSLOG_OLD_CONF_FILES
 
 	if [[ ${advertise_readme} -gt 0 ]]; then
 		# We need to show the README file location

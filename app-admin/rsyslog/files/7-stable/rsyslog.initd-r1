@@ -41,7 +41,7 @@ stop_pre() {
 }
 
 stop_post() {
-	rm -f ${RSYSLOG_PIDFILE}
+	rm --force ${RSYSLOG_PIDFILE}
 }
 
 configtest() {
