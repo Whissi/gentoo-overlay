@@ -12,7 +12,7 @@ HOMEPAGE="http://www.rsyslog.com/"
 SRC_URI="http://www.rsyslog.com/files/download/${PN}/${P}.tar.gz"
 
 LICENSE="GPL-3 LGPL-3 Apache-2.0"
-KEYWORDS="~amd64 ~arm ~hppa ~x86"
+KEYWORDS="~amd64 ~x86"
 SLOT="0"
 IUSE="dbi debug doc elasticsearch +gcrypt kerberos mongodb mysql normalize omudpspoof oracle postgres rabbitmq redis relp rfc3195 rfc5424hmac snmp ssl systemd usertools zeromq"
 
@@ -170,7 +170,7 @@ src_install() {
 	newins "${FILESDIR}/${BRANCH}/${PN}.conf" ${PN}.conf
 
 	insinto /etc/rsyslog.d/
-	newins "${FILESDIR}/${BRANCH}/default.conf" 50-default.conf
+	doins "${FILESDIR}/${BRANCH}/50-default.conf"
 
 	insinto /etc/logrotate.d/
 	newins "${FILESDIR}/${BRANCH}/${PN}.logrotate-r1" ${PN}
