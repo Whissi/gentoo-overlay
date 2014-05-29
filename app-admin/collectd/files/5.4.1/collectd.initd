@@ -17,7 +17,7 @@ pidfile=${COLLECTD_PIDFILE}
 extra_commands="configtest"
 description_configtest="Run collectd's internal config check."
 
-required_files=( "${COLLECTD_CONFIGFILE}" )
+required_files="${COLLECTD_CONFIGFILE}"
 
 depend() {
 	use net

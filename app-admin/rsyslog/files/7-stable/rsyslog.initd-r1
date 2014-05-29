@@ -12,7 +12,7 @@ start_stop_daemon_args="${RSYSLOG_SSDARGS}"
 pidfile="${RSYSLOG_PIDFILE}"
 retry="${RSYSLOG_TERMTIMEOUT}"
 
-required_files=( "${RSYSLOG_CONFIGFILE}" )
+required_files="${RSYSLOG_CONFIGFILE}"
 
 description="RSYSLOG is the rocket-fast system for log processing (syslog replacement)."
 

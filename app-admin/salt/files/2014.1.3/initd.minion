@@ -22,7 +22,7 @@ name="SALT minion daemon"
 
 description="The Salt minion daemon, receives commands from a remote Salt master."
 
-required_dirs=( "${SALT_CONFIGDIR}" )
+required_dirs="${SALT_CONFIGDIR}"
 
 depend() {
 	use net
