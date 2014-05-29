@@ -12,7 +12,7 @@ if [[ ${PV} = 9999* ]]; then
 	patchset=
 else
 	patchset=1
-	FIXUP_PATCH="${P}-revert-systemd-messup.patch.xz"
+	FIXUP_PATCH="${PN}-212-revert-systemd-messup.patch.xz"
 	SRC_URI="http://www.freedesktop.org/software/systemd/systemd-${PV}.tar.xz
 		http://dev.gentoo.org/~polynomial-c/${PN}/${FIXUP_PATCH}"
 	if [[ -n "${patchset}" ]]; then
@@ -57,7 +57,7 @@ DEPEND="${COMMON_DEPEND}
 	virtual/os-headers
 	virtual/pkgconfig
 	>=sys-devel/make-3.82-r4
-	>=sys-kernel/linux-headers-3.9
+	>=sys-kernel/linux-headers-2.6.32
 	doc? ( >=dev-util/gtk-doc-1.18 )"
 
 if [[ ${PV} = 9999* ]]; then
@@ -208,6 +208,7 @@ multilib_src_configure() {
 		--disable-quotacheck
 		--disable-logind
 		--disable-polkit
+		--disable-networkd
 		--disable-myhostname
 		$(use_enable gudev)
 		--enable-split-usr
