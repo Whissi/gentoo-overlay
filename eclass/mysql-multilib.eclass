@@ -111,6 +111,7 @@ if [[ -z ${SERVER_URI} ]]; then
 		MARIA_FULL_P="${PN}-${MARIA_FULL_PV}"
 		SERVER_URI="
 		http://ftp.osuosl.org/pub/mariadb/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
+		http://ftp.osuosl.org/pub/mariadb/${MARIA_FULL_P}/source/${MARIA_FULL_P}.tar.gz
 		http://mirror.jmu.edu/pub/mariadb/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
 		http://mirrors.coreix.net/mariadb/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
 		http://mirrors.syringanetworks.net/mariadb/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
@@ -226,7 +227,6 @@ if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 	# Bug 441700 MariaDB >=5.3 include custom mytop
 	DEPEND="${DEPEND}
 		oqgraph? ( >=dev-libs/boost-1.40.0:0= )
-		sphinx? ( app-misc/sphinx:0= )
 		!minimal? ( pam? ( virtual/pam:0= ) )
 		perl? ( !dev-db/mytop )"
 	if mysql_version_is_at_least "10.0.5" ; then
@@ -576,6 +576,16 @@ mysql-multilib_pkg_postinst() {
 		elog "If you are upgrading major versions, you should run the"
 		elog "mysql_upgrade tool."
 		einfo
+
+		if [[ ${PN} == "mariadb-galera" ]] ; then
+			einfo
+			elog "Be sure to edit the my.cnf file to activate your cluster settings."
+			elog "This should be done after running \"emerge --config =${CATEGORY}/${PF}\""
+			elog "The first time the cluster is activated, you should add"
+			elog "--wsrep-new-cluster to the options in /etc/conf.d/mysql for one node."
+			elog "This option should then be removed for subsequent starts."
+			einfo
+		fi
 	fi
 }
 
@@ -641,7 +651,7 @@ mysql-multilib_pkg_config() {
 				ewarn "Attempting to use ${MY_DATADIR_s}"
 			else
 				eerror "New MY_DATADIR (${MY_DATADIR_s}) does not exist"
-				die "Configuration Failed!  Please reinstall ${CATEGORY}/${PN}"
+				die "Configuration Failed! Please reinstall ${CATEGORY}/${PN}"
 			fi
 		fi
 	fi
@@ -726,7 +736,7 @@ mysql-multilib_pkg_config() {
 
 	use prefix || options="${options} --user=mysql"
 
-	# Fix bug 446200.  Don't reference host my.cnf
+	# Fix bug 446200. Don't reference host my.cnf
 	use prefix && [[ -f "${MY_SYSCONFDIR}/my.cnf" ]] \
 		&& options="${options} '--defaults-file=${MY_SYSCONFDIR}/my.cnf'"
 
@@ -741,9 +751,9 @@ mysql-multilib_pkg_config() {
 	# Now that /var/run is a tmpfs mount point, we need to ensure it exists before using it
 	PID_DIR="${EROOT}/var/run/mysqld"
 	if [[ ! -d "${PID_DIR}" ]]; then
-		mkdir -p "${PID_DIR}"
-		chown mysql:mysql "${PID_DIR}"
-		chmod 755 "${PID_DIR}"
+		mkdir -p "${PID_DIR}" || die "Could not create pid directory"
+		chown mysql:mysql "${PID_DIR}" || die "Could not set ownership on pid directory"
+		chmod 755 "${PID_DIR}" || die "Could not set permissions on pid directory"
 	fi
 
 	pushd "${TMPDIR}" &>/dev/null
