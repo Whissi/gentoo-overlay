@@ -34,8 +34,3 @@
 # Masked because patch set is hosted on a private, unofficial
 # site (test ebuild, see https://bugs.gentoo.org/show_bug.cgi?id=501530)
 =net-dialup/ppp-2.4.6_pre
-
-# Thomas D. <whissi@whissi.de> (23 Jan 2014)
-# Mask until >=app-admin/rsyslog-8 or another application which require
-# dev-lib/liblognorm-1.0.0 becomes available to avoid warnings.
-=dev-libs/liblognorm-1.0.0
