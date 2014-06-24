@@ -1,0 +1,135 @@
+#!/sbin/runscript
+# Copyright 1999-2004 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+SEARCHD_CONFIGFILE=${SEARCHD_CONFIGFILE:-"/etc/sphinx/sphinx.conf"}
+SEARCHD_USER=${SEARCHD_USER:-root}
+SEARCHD_GROUP=${SEARCHD_GROUP:-root}
+SEARCHD_OPTS=${SEARCHD_OPTS:-}
+
+command="/usr/bin/searchd"
+command_args="${SEARCHD_OPTS} --config ${SEARCHD_CONFIGFILE}"
+name="Sphinx's search daemon"
+pidfile_basedir="/run/searchd"
+
+required_files="${SEARCHD_CONFIGFILE}"
+
+description="Sphinx's search daemon"
+
+
+depend() {
+	use logger
+}
+
+_check_service_config() {
+	if [ ${SVCNAME} != "searchd" -a ${SEARCHD_CONFIGFILE} == "/etc/sphinx/sphinx.conf" ]; then
+		eerror "Your additional searchd service instance \"${SVCNAME}\" isn't yet configured!"
+		eerror "Copy \"/etc/conf.d/searchd\" to \"/etc/conf.d/${SVCNAME}\" and set at least \"SEARCHD_CONFIGFILE\" to a different value."
+		return 1
+	fi
+
+	return 0
+}
+
+start_pre() {
+	if [ "${RC_CMD}" != "restart" ]; then
+		_check_service_config || return 1
+	fi
+
+	checkpath --directory --mode 0775 --owner ${SEARCHD_USER}:${SEARCHD_GROUP} "${pidfile_basedir}"
+
+	startup_logfile=$(/usr/bin/mktemp -t searchd.start.XXXXXXXXXX.log)
+}
+
+start() {
+	ebegin "Starting ${RC_SVCNAME}"
+
+	# searchd prints non-error messages for any configured index on startup
+	# which can be a lot.
+	# Because searchd prints error and non-error messages both to stdout we
+	# need to temporarily save the startup output so that we can show the error
+	# messages to the user when needed.
+	eval start-stop-daemon --start \
+		--exec $command \
+		--user ${SEARCHD_USER} \
+		--group ${SEARCHD_GROUP} \
+		1>${startup_logfile} \
+		-- $command_args
+
+	if eend $? "Failed to start $RC_SVCNAME"; then
+		service_set_value "command" "${command}"
+		service_set_value "cfgfile" "${SEARCHD_CONFIGFILE}"
+		return 0
+	fi
+
+	# searchd failed to start - Show the captured startup output to the user
+	# which maybe contain error messages.
+	# Also make sure that we cleanup the logfile because start_post won't
+	# be invoked on a non-successful start.
+	cat ${startup_logfile} && rm --force ${startup_logfile}
+
+	return 1
+}
+
+start_post() {
+	rm --force ${startup_logfile}
+}
+
+status() {
+	local retval=
+	local startcommand="$(service_get_value "command")"
+	local startcfgfile="$(service_get_value "cfgfile")"
+	command="${startcommand:-$command}"
+	cfgfile="${startcfgfile:-$SEARCHD_CONFIGFILE}"
+	[ -n "$command" -o -n "$cfgfile" ] || return 0
+	su ${SEARCHD_USER} --shell "/bin/sh" --command "${command} --config ${cfgfile} --status 1>/dev/null 2>&1"
+	retval=$?
+
+	if [ ${retval} -eq 0 ]; then
+		einfo "status: started"
+		mark_service_started "${SVCNAME}"
+		return 0
+	elif service_started; then
+		eerror "status: crashed"
+		return 32
+	else
+		einfo "status: stopped"
+		return 3
+	fi
+}
+
+stop_pre() {
+	if [ "${RC_CMD}" = "restart" ]; then
+		_check_service_config || return 1
+	fi
+
+	shutdown_logfile=$(/usr/bin/mktemp -t searchd.stop.XXXXXXXXXX.log)
+	chown ${SEARCHD_USER}:${SEARCHD_GROUP} ${shutdown_logfile}
+}
+
+stop() {
+	local startcommand="$(service_get_value "command")"
+	local startcfgfile="$(service_get_value "cfgfile")"
+	command="${startcommand:-$command}"
+	cfgfile="${startcfgfile:-$SEARCHD_CONFIGFILE}"
+	[ -n "$command" -o -n "$cfgfile" ] || return 0
+	ebegin "Stopping ${RC_SVCNAME}"
+	su ${SEARCHD_USER} --shell "/bin/sh" --command "${command} --config ${cfgfile} --stopwait 1>${shutdown_logfile} 2>&1"
+
+	if eend $? "Failed to stop $RC_SVCNAME"; then
+		return 0
+	fi
+
+	# searchd failed to stop - Show the captured stop output to the user
+	# which maybe contain error messages.
+	# Also make sure that we cleanup the logfile because stop_post won't
+	# be invoked on a non-successful stop.
+	cat ${shutdown_logfile} && rm --force ${shutdown_logfile}
+
+	return 1
+}
+
+stop_post() {
+	rm --force ${shutdown_logfile}
+}
