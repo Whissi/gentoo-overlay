@@ -178,6 +178,11 @@ SLOT="0"
 IUSE="+community cluster debug embedded extraengine jemalloc latin1 max-idx-128 minimal
 	+perl profiling selinux ssl systemtap static static-libs tcmalloc test"
 
+if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] && \
+	mysql_version_is_at_least "5.5" || mysql_check_version_range "5.5.38 to 5.6.11.99" ; then
+	IUSE="bindist ${IUSE}"
+fi
+
 if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]]; then
 	IUSE="${IUSE} oqgraph pam sphinx tokudb"
 	# 5.5.33 and 10.0.5 add TokuDB. Authors strongly recommend jemalloc or perfomance suffers
@@ -220,7 +225,7 @@ DEPEND="
 if [[ ${PN} == "mysql" || ${PN} == "percona-server" ]] && mysql_version_is_at_least "5.6.12" ; then
 	DEPEND="${DEPEND} dev-libs/libedit:0=[${MULTILIB_USEDEP}]"
 else
-	DEPEND="${DEPEND} >=sys-libs/readline-4.1:0=[${MULTILIB_USEDEP}]"
+	DEPEND="${DEPEND} !bindist? ( >=sys-libs/readline-4.1:0=[${MULTILIB_USEDEP}] )"
 fi
 
 if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
@@ -417,7 +422,6 @@ multilib_src_configure() {
 		-DINSTALL_SUPPORTFILESDIR=${EPREFIX}/usr/share/mysql
 		-DWITH_COMMENT="Gentoo Linux ${PF}"
 		$(cmake-utils_use_with test UNIT_TESTS)
-		-DWITH_READLINE=0
 		-DWITH_LIBEDIT=0
 		-DWITH_ZLIB=system
 		-DWITHOUT_LIBWRAP=1
@@ -428,15 +432,17 @@ multilib_src_configure() {
 
 	if [[ ${PN} == "mysql" || ${PN} == "percona-server" ]] && mysql_version_is_at_least "5.6.12" ; then
 		mycmakeargs+=( -DWITH_EDITLINE=system )
+	else
+		mycmakeargs+=(
+			-DWITH_READLINE=$(usex bindist 1 0)
+			-DNOT_FOR_DISTRIBUTION=$(usex bindist 0 1)
+			$(usex bindist -DHAVE_BFD_H=0)
+		)
 	fi
 
 
-	# Bug 412851
-	# MariaDB requires this flag to compile with GPLv3 readline linked
-	# Adds a warning about redistribution to configure
 	if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 		mycmakeargs+=(
-			-DNOT_FOR_DISTRIBUTION=1
 			-DWITH_JEMALLOC=$(usex jemalloc system)
 		)
 

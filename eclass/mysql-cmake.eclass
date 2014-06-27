@@ -301,7 +301,6 @@ mysql-cmake_src_configure() {
 		-DINSTALL_SUPPORTFILESDIR=${EPREFIX}/usr/share/mysql
 		-DWITH_COMMENT="Gentoo Linux ${PF}"
 		$(cmake-utils_use_with test UNIT_TESTS)
-		-DWITH_READLINE=0
 		-DWITH_LIBEDIT=0
 		-DWITH_ZLIB=system
 		-DWITHOUT_LIBWRAP=1
@@ -312,14 +311,16 @@ mysql-cmake_src_configure() {
 
 	if [[ ${PN} == "mysql" || ${PN} == "percona-server" ]] && mysql_version_is_at_least "5.6.12" ; then
 		mycmakeargs+=( -DWITH_EDITLINE=system )
+	else
+		mycmakeargs+=(
+			-DWITH_READLINE=$(usex bindist 1 0)
+			-DNOT_FOR_DISTRIBUTION=$(usex bindist 0 1)
+			$(usex bindist -DHAVE_BFD_H=0 '')
+		)
 	fi
 
-	# Bug 412851
-	# MariaDB requires NOT_FOR_DISTRIBUTION set to compile with GPLv3 readline linked
-	# Adds a warning about redistribution to configure
 	if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 		mycmakeargs+=(
-			-DNOT_FOR_DISTRIBUTION=1
 			-DWITH_JEMALLOC=$(usex jemalloc system)
 		)
 		mysql_version_is_at_least "10.0.9" && mycmakeargs+=( -DWITH_PCRE=system )
