@@ -69,6 +69,13 @@ if [[ "${PN}" == "mysql-cluster" ]]; then
 	esac
 fi
 
+# MariaDB has left the numbering schema but keeping compatibility
+if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]]; then
+	case ${PV} in
+		10.0*|10.1*) MYSQL_PV_MAJOR="5.6" ;;
+	esac
+fi
+
 # @ECLASS-VARIABLE: MYSQL_VERSION_ID
 # @DESCRIPTION:
 # MYSQL_VERSION_ID will be:
@@ -178,8 +185,14 @@ SLOT="0"
 IUSE="+community cluster debug embedded extraengine jemalloc latin1 max-idx-128 minimal
 	+perl profiling selinux ssl systemtap static static-libs tcmalloc test"
 
-if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] && \
-	mysql_version_is_at_least "5.5" || mysql_check_version_range "5.5.38 to 5.6.11.99" ; then
+# This probably could be simplified, but the syntax would have to be just right
+if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
+	IUSE="bindist ${IUSE}"
+elif [[ ${PN} == "mysql" || ${PN} == "percona-server" ]] && \
+	mysql_check_version_range "5.5.37 to 5.6.11.99" ; then
+	IUSE="bindist ${IUSE}"
+elif [[ ${PN} == "mysql-cluster" ]] && \
+	mysql_check_version_range "7.2 to 7.2.99.99"  ; then
 	IUSE="bindist ${IUSE}"
 fi
 
@@ -222,8 +235,12 @@ DEPEND="
 "
 
 # dev-db/mysql-5.6.12+ only works with dev-libs/libedit
-if [[ ${PN} == "mysql" || ${PN} == "percona-server" ]] && mysql_version_is_at_least "5.6.12" ; then
-	DEPEND="${DEPEND} dev-libs/libedit:0=[${MULTILIB_USEDEP}]"
+# This probably could be simplified
+if [[ ${PN} == "mysql" || ${PN} == "percona-server" ]] && \
+	mysql_version_is_at_least "5.6.12" ; then
+	DEPEND="${DEPEND} dev-libs/libedit"
+elif [[ ${PN} == "mysql-cluster" ]] && mysql_version_is_at_least "7.3"; then
+	DEPEND="${DEPEND} dev-libs/libedit"
 else
 	DEPEND="${DEPEND} !bindist? ( >=sys-libs/readline-4.1:0=[${MULTILIB_USEDEP}] )"
 fi
@@ -303,7 +320,7 @@ PDEPEND="perl? ( >=dev-perl/DBD-mysql-2.9004 )
 	 ~virtual/mysql-${MYSQL_PV_MAJOR}"
 
 # my_config.h includes ABI specific data
-MULTILIB_WRAPPED_HEADERS=( /usr/include/mysql/my_config.h )
+MULTILIB_WRAPPED_HEADERS=( /usr/include/mysql/my_config.h /usr/include/mysql/private/embedded_priv.h )
 
 #
 # HELPER FUNCTIONS:
@@ -430,16 +447,15 @@ multilib_src_configure() {
 		-DWITH_SSL=$(usex ssl system bundled)
 	)
 
-	if [[ ${PN} == "mysql" || ${PN} == "percona-server" ]] && mysql_version_is_at_least "5.6.12" ; then
-		mycmakeargs+=( -DWITH_EDITLINE=system )
-	else
+	if in_iuse bindist ; then
 		mycmakeargs+=(
 			-DWITH_READLINE=$(usex bindist 1 0)
 			-DNOT_FOR_DISTRIBUTION=$(usex bindist 0 1)
-			$(usex bindist -DHAVE_BFD_H=0)
+			$(usex bindist -DHAVE_BFD_H=0 '')
 		)
 	fi
 
+	mycmakeargs+=( -DWITH_EDITLINE=system )
 
 	if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 		mycmakeargs+=(
