@@ -11,7 +11,7 @@ if [[ ${PV} = 9999* ]]; then
 	inherit git-2
 	patchset=
 else
-	patchset=1
+	patchset=2
 	FIXUP_PATCH="${PN}-215-revert-systemd-messup.patch.xz"
 	SRC_URI="http://www.freedesktop.org/software/systemd/systemd-${PV}.tar.xz
 		http://dev.gentoo.org/~polynomial-c/${PN}/${FIXUP_PATCH}"
@@ -53,6 +53,8 @@ DEPEND="${COMMON_DEPEND}
 	app-text/docbook-xml-dtd:4.5
 	dev-libs/libxslt
 	dev-util/gperf
+	>=dev-util/intltool-0.50
+	>=sys-apps/coreutils-8.16
 	sys-libs/libcap
 	virtual/os-headers
 	virtual/pkgconfig
