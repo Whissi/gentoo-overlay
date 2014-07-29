@@ -4,14 +4,15 @@
 
 EAPI=5
 
-inherit autotools bash-completion-r1 eutils linux-info multilib toolchain-funcs versionator multilib-minimal
+inherit autotools bash-completion-r1 eutils linux-info multilib multilib-minimal toolchain-funcs user versionator
 
 if [[ ${PV} = 9999* ]]; then
 	EGIT_REPO_URI="git://anongit.freedesktop.org/systemd/systemd"
 	inherit git-2
-else
 	patchset=
-	FIXUP_PATCH="${P}-revert-systemd-messup.patch.xz"
+else
+	patchset=3
+	FIXUP_PATCH="${PN}-215-revert-systemd-messup.patch.xz"
 	SRC_URI="http://www.freedesktop.org/software/systemd/systemd-${PV}.tar.xz
 		http://dev.gentoo.org/~polynomial-c/${PN}/${FIXUP_PATCH}"
 	if [[ -n "${patchset}" ]]; then
@@ -19,7 +20,7 @@ else
 			http://dev.gentoo.org/~ssuominen/${P}-patches-${patchset}.tar.xz
 			http://dev.gentoo.org/~williamh/dist/${P}-patches-${patchset}.tar.xz"
 	fi
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sparc ~x86"
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
 fi
 
 DESCRIPTION="Linux dynamic and persistent device naming support (aka userspace devfs)"
@@ -27,14 +28,14 @@ HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
 
 LICENSE="LGPL-2.1 MIT GPL-2"
 SLOT="0"
-IUSE="acl doc +firmware-loader gudev introspection +kmod +openrc selinux static-libs"
+IUSE="acl doc +firmware-loader gudev introspection +kmod selinux static-libs"
 
 RESTRICT="test"
 
 COMMON_DEPEND=">=sys-apps/util-linux-2.20
 	acl? ( sys-apps/acl )
-	gudev? ( >=dev-libs/glib-2.22 )
-	introspection? ( >=dev-libs/gobject-introspection-1.31.1 )
+	gudev? ( >=dev-libs/glib-2.34.3[${MULTILIB_USEDEP}] )
+	introspection? ( >=dev-libs/gobject-introspection-1.38 )
 	kmod? ( >=sys-apps/kmod-16 )
 	selinux? ( >=sys-libs/libselinux-2.1.9 )
 	!<sys-libs/glibc-2.11
@@ -46,30 +47,27 @@ COMMON_DEPEND=">=sys-apps/util-linux-2.20
 	)"
 
 # Try with `emerge -C docbook-xml-dtd` to see the build failure without DTDs
+# Force new make >= -r4 to skip some parallel build issues
 DEPEND="${COMMON_DEPEND}
 	app-text/docbook-xml-dtd:4.2
 	app-text/docbook-xml-dtd:4.5
 	dev-libs/libxslt
 	dev-util/gperf
+	>=dev-util/intltool-0.50
+	>=sys-apps/coreutils-8.16
 	sys-libs/libcap
 	virtual/os-headers
 	virtual/pkgconfig
-	!<sys-devel/make-3.82-r4
-	!<sys-kernel/linux-headers-2.6.32
+	>=sys-devel/make-3.82-r4
+	>=sys-kernel/linux-headers-2.6.39
 	doc? ( >=dev-util/gtk-doc-1.18 )"
-
-if [[ ${PV} = 9999* ]]; then
-	DEPEND="${DEPEND}
-		>=dev-util/intltool-0.50"
-fi
 
 RDEPEND="${COMMON_DEPEND}
 	!<sys-fs/lvm2-2.02.103
 	!<sec-policy/selinux-base-2.20120725-r10"
 
-PDEPEND=">=virtual/udev-208
-	>=sys-apps/hwids-20140304[udev]
-	openrc? ( >=sys-fs/udev-init-scripts-26 )"
+PDEPEND=">=sys-apps/hwids-20140304[udev]
+	>=sys-fs/udev-init-scripts-26"
 
 S=${WORKDIR}/systemd-${PV}
 
@@ -81,7 +79,7 @@ multilib_check_headers() { :; }
 check_default_rules() {
 	# Make sure there are no sudden changes to upstream rules file
 	# (more for my own needs than anything else ...)
-	local udev_rules_md5=6bd3d421b9b6acd0e2d87ad720d6a389
+	local udev_rules_md5=c18b74c4f8bf4a397ee667ee419f3a8e
 	MD5=$(md5sum < "${S}"/rules/50-udev-default.rules)
 	MD5=${MD5/  -/}
 	if [[ ${MD5} != ${udev_rules_md5} ]]; then
@@ -95,13 +93,8 @@ pkg_setup() {
 	CONFIG_CHECK="~BLK_DEV_BSG ~DEVTMPFS ~!IDE ~INOTIFY_USER ~!SYSFS_DEPRECATED ~!SYSFS_DEPRECATED_V2 ~SIGNALFD ~EPOLL ~FHANDLE ~NET"
 	linux-info_pkg_setup
 
-	# Based on README from tarball:
-	local MINKV=3.0
-	# These arch's have the mandatory accept4() function support in Linux 2.6.32*, see:
-	# $ grep -r define.*accept4 linux-2.6.32*/*
-	if use amd64 || use ia64 || use mips || use sparc || use x86; then
-		MINKV=2.6.32
-	fi
+	# CONFIG_FHANDLE was introduced by 2.6.39
+	local MINKV=2.6.39
 
 	if kernel_is -lt ${MINKV//./ }; then
 		eerror "Your running kernel is too old to run this version of ${P}"
@@ -112,7 +105,7 @@ pkg_setup() {
 src_prepare() {
 	if ! [[ ${PV} = 9999* ]]; then
 		# secure_getenv() disable for non-glibc systems wrt bug #443030
-		if ! [[ $(grep -r secure_getenv * | wc -l) -eq 22 ]]; then
+		if ! [[ $(grep -r secure_getenv * | wc -l) -eq 28 ]]; then
 			eerror "The line count for secure_getenv() failed, see bug #443030"
 			die
 		fi
@@ -126,26 +119,10 @@ src_prepare() {
 	epatch "${DISTDIR}"/${FIXUP_PATCH}
 
 	cat <<-EOF > "${T}"/40-gentoo.rules
-	# Gentoo specific usb group
+	# Gentoo specific floppy and usb groups
+	SUBSYSTEM=="block", KERNEL=="fd[0-9]", GROUP="floppy"
 	SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", GROUP="usb"
-	# Keep this for Linux 2.6.32 kernels with incomplete devtmpfs support because
-	# accept4() function is supported for some arch's wrt #457868
-	SUBSYSTEM=="mem", KERNEL=="null|zero|full|random|urandom", MODE="0666"
 	EOF
-
-	# Remove requirements for gettext and intltool wrt bug #443028
-	if ! has_version dev-util/intltool && ! [[ ${PV} = 9999* ]]; then
-		sed -i \
-			-e '/INTLTOOL_APPLIED_VERSION=/s:=.*:=0.40.0:' \
-			-e '/XML::Parser perl module is required for intltool/s|^|:|' \
-			configure || die
-		eval export INTLTOOL_{EXTRACT,MERGE,UPDATE}=/bin/true
-		eval export {MSG{FMT,MERGE},XGETTEXT}=/bin/true
-	fi
-
-	# compile with older versions of gcc #451110
-	version_is_at_least 4.6 $(gcc-version) || \
-		sed -i 's:static_assert:alsdjflkasjdfa:' src/shared/macro.h
 
 	# change rules back to group uucp instead of dialout for now wrt #454556
 	sed -i -e 's/GROUP="dialout"/GROUP="uucp"/' rules/*.rules || die
@@ -196,7 +173,6 @@ multilib_src_configure() {
 		--disable-seccomp
 		--disable-xz
 		--disable-pam
-		--disable-xattr
 		--disable-gcrypt
 		--disable-audit
 		--disable-libcryptsetup
@@ -207,7 +183,9 @@ multilib_src_configure() {
 		--disable-quotacheck
 		--disable-logind
 		--disable-polkit
+		--disable-nls
 		--disable-myhostname
+		$(use_enable gudev)
 		--enable-split-usr
 		--with-html-dir=/usr/share/doc/${PF}/html
 		--without-python
@@ -215,7 +193,7 @@ multilib_src_configure() {
 		--with-rootprefix=
 		--with-rootlibdir=/$(get_libdir)
 	)
-	if multilib_build_binaries; then
+	if multilib_is_native_abi; then
 		econf_args+=(
 			$(use_enable static-libs static)
 			$(use_enable doc gtk-doc)
@@ -223,7 +201,6 @@ multilib_src_configure() {
 			$(use_enable acl)
 			$(use_enable kmod)
 			$(use_enable selinux)
-			$(use_enable gudev)
 		)
 	else
 		econf_args+=(
@@ -233,7 +210,6 @@ multilib_src_configure() {
 			--disable-acl
 			--disable-kmod
 			--disable-selinux
-			--disable-gudev
 			--disable-manpages
 		)
 	fi
@@ -249,7 +225,7 @@ multilib_src_compile() {
 	# but not everything -- separate building of the binaries as a workaround,
 	# which will force internal libraries required for the helpers to be built
 	# early enough, like eg. libsystemd-shared.la
-	if multilib_build_binaries; then
+	if multilib_is_native_abi; then
 		local lib_targets=( libudev.la )
 		use gudev && lib_targets+=( libgudev-1.0.la )
 		emake "${lib_targets[@]}"
@@ -285,12 +261,13 @@ multilib_src_compile() {
 		fi
 	else
 		local lib_targets=( libudev.la )
+		use gudev && lib_targets+=( libgudev-1.0.la )
 		emake "${lib_targets[@]}"
 	fi
 }
 
 multilib_src_install() {
-	if multilib_build_binaries; then
+	if multilib_is_native_abi; then
 		local lib_LTLIBRARIES="libudev.la" \
 			pkgconfiglib_DATA="src/libudev/libudev.pc"
 
@@ -359,6 +336,11 @@ multilib_src_install() {
 			install-pkgconfiglibDATA
 		)
 
+		if use gudev; then
+			lib_LTLIBRARIES+=" libgudev-1.0.la"
+			pkgconfiglib_DATA+=" src/gudev/gudev-1.0.pc"
+		fi
+
 		targets+=(
 			lib_LTLIBRARIES="${lib_LTLIBRARIES}"
 			pkgconfiglib_DATA="${pkgconfiglib_DATA}"
@@ -384,6 +366,14 @@ multilib_src_install_all() {
 	local netrules="80-net-setup-link.rules"
 	dodoc "${FILESDIR}"/${netrules}
 	docompress -x /usr/share/doc/${PF}/gentoo/${netrules}
+
+	if ! [[ ${PV} = 9999* ]]; then
+		insinto /usr/share/doc/${PF}/html/gudev
+		doins "${S}"/docs/gudev/html/*
+
+		insinto /usr/share/doc/${PF}/html/libudev
+		doins "${S}"/docs/libudev/html/*
+	fi
 }
 
 pkg_preinst() {
@@ -489,6 +479,11 @@ pkg_postinst() {
 	elog "fixing known issues visit:"
 	elog "http://wiki.gentoo.org/wiki/Udev"
 	elog "http://wiki.gentoo.org/wiki/Udev/upgrade"
+
+	# http://cgit.freedesktop.org/systemd/systemd/commit/rules/50-udev-default.rules?id=3dff3e00e044e2d53c76fa842b9a4759d4a50e69
+	# http://bugs.gentoo.org/246847
+	# http://bugs.gentoo.org/514174
+	enewgroup input
 
 	# Update hwdb database in case the format is changed by udev version.
 	if has_version 'sys-apps/hwids[udev]'; then
