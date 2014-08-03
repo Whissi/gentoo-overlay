@@ -8,7 +8,7 @@ PYTHON_COMPAT=(python{2_6,2_7})
 
 inherit eutils distutils-r1 systemd
 
-DESCRIPTION="Salt is a remote execution and configuration manager."
+DESCRIPTION="Salt is a remote execution and configuration manager"
 HOMEPAGE="http://saltstack.org/"
 
 if [[ ${PV} == 9999* ]]; then
