@@ -1,6 +1,6 @@
-# Copyright 1999-2013 Gentoo Foundation
+# Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/mysql-autotools.eclass,v 1.17 2013/03/16 19:20:34 robbat2 Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/mysql-autotools.eclass,v 1.20 2014/07/29 17:59:21 robbat2 Exp $
 
 # @ECLASS: mysql-autotools.eclass
 # @MAINTAINER:
@@ -112,7 +112,7 @@ mysql-autotools_configure_common() {
 	myconf="${myconf} $(use_with big-tables)"
 	myconf="${myconf} --enable-local-infile"
 	myconf="${myconf} --with-extra-charsets=all"
-	myconf="${myconf} --with-mysqld-user=mysql"
+	use prefix || myconf="${myconf} --with-mysqld-user=mysql"
 	myconf="${myconf} --with-server"
 	myconf="${myconf} --with-unix-socket-path=${EPREFIX}/var/run/mysqld/mysqld.sock"
 	myconf="${myconf} --without-libwrap"
@@ -612,6 +612,7 @@ mysql-autotools_src_install() {
 		-e "s!= /var!= ${EPREFIX}/var!" \
 		"${FILESDIR}/${mycnf_src}" \
 		> "${TMPDIR}/my.cnf.ok"
+	use prefix && sed -i -r -e '/^user[[:space:]]*=[[:space:]]*mysql$/d' "${TMPDIR}/my.cnf.ok"
 	if use latin1 ; then
 		sed -i \
 			-e "/character-set/s|utf8|latin1|g" \
