@@ -7,19 +7,15 @@ AUTOTOOLS_AUTORECONF=1
 
 inherit autotools-utils eutils systemd
 
-MY_PV="${PV%_*}"
-MY_P="${PN}-${MY_PV}"
-S="${WORKDIR}/${MY_P}"
-
 DESCRIPTION="An enhanced multi-threaded syslogd with database support and more"
 HOMEPAGE="http://www.rsyslog.com/"
 SRC_URI="
-	http://www.rsyslog.com/files/download/${PN}/${MY_P}.tar.gz
-	doc? ( http://www.rsyslog.com/files/download/${PN}/${PN}-doc-${MY_PV}.tar.gz )
+	http://www.rsyslog.com/files/download/${PN}/${P}.tar.gz
+	doc? ( http://www.rsyslog.com/files/download/${PN}/${PN}-doc-${PV}.tar.gz )
 "
 
 LICENSE="GPL-3 LGPL-3 Apache-2.0"
-KEYWORDS="~amd64 ~hppa ~x86"
+KEYWORDS="~amd64 ~arm ~hppa ~x86"
 SLOT="0"
 IUSE="dbi debug doc elasticsearch +gcrypt jemalloc kerberos mongodb mysql normalize omudpspoof oracle postgres rabbitmq redis relp rfc3195 rfc5424hmac snmp ssl systemd usertools zeromq"
 
@@ -71,24 +67,21 @@ DOCS=(
 	"${FILESDIR}"/${BRANCH}/README.gentoo
 )
 
-#PATCHES=(
-#	"${FILESDIR}"/${BRANCH}/${PN}-7.x-mmjsonparse.patch
-#	"${FILESDIR}"/${BRANCH}/fix-omruleset-default-value.patch
-#	"${FILESDIR}"/${BRANCH}/bugfix_52.patch
-#	"${FILESDIR}"/${BRANCH}/bugfix_73.patch
-#)
-
 src_unpack() {
-	unpack ${MY_P}.tar.gz
+	unpack ${P}.tar.gz
 
 	if use doc; then
-		local doc_tarball="${PN}-doc-${MY_PV}.tar.gz"
+		local doc_tarball="${PN}-doc-${PV}.tar.gz"
 
 		cd "${S}" || die "Cannot change dir into '$S'"
 		mkdir docs || die "Failed to create docs directory"
 		cd docs || die "Failed to change dir into '${S}/docs'"
 		unpack ${doc_tarball}
 	fi
+}
+
+src_prepare() {
+	epatch "${FILESDIR}"/${BRANCH}/20-rsyslog-json_tokener_errors.patch
 }
 
 src_configure() {
@@ -108,6 +101,7 @@ src_configure() {
 	fi
 
 	local myeconfargs=(
+		--disable-generate-man-pages
 		# Input Plugins without depedencies
 		--enable-imfile
 		--enable-impstats
@@ -130,11 +124,11 @@ src_configure() {
 		--enable-omuxsock
 		# Misc
 		--enable-pmaixforwardedfrom
+		--enable-pmciscoios
 		--enable-pmcisconames
 		--enable-pmlastmsg
 		--enable-pmrfc3164sd
 		--enable-pmsnare
-		#--enable-sm_cust_bindcdr - See upstream issue #90
 		# DB
 		$(use_enable dbi libdbi)
 		$(use_enable mongodb ommongodb)
