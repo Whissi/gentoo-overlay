@@ -52,7 +52,7 @@ configtest() {
 	local _retval=0
 
 	ebegin "Checking rsyslogd's configuration"
-	${_test_command} &>/dev/null
+	${_test_command} >/dev/null 2>&1
 	_retval=$?
 
 	if [ ${_retval} -ne 0 ]; then
