@@ -82,6 +82,9 @@ src_unpack() {
 
 src_prepare() {
 	epatch "${FILESDIR}"/${BRANCH}/20-rsyslog-json_tokener_errors.patch
+	epatch "${FILESDIR}"/${BRANCH}/30-rsyslog-imuxsock-shrink.patch
+	epatch "${FILESDIR}"/${BRANCH}/40-rsyslog-fix-building-without-atomic-instructions.patch
+	epatch "${FILESDIR}"/${BRANCH}/41-rsyslog-gcc-pedantic-fixes.patch
 }
 
 src_configure() {

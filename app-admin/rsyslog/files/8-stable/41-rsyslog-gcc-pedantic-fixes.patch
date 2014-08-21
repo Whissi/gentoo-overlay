@@ -1,0 +1,69 @@
+From bbd0f0143892045e48cbc49ef7dd9e3510750cb3 Mon Sep 17 00:00:00 2001
+From: Rainer Gerhards <rgerhards@adiscon.com>
+Date: Tue, 19 Aug 2014 16:55:33 +0200
+Subject: [PATCH] remove a couple of gcc --pedantic messages
+
+---
+ plugins/mmfields/mmfields.c | 2 +-
+ runtime/prop.h              | 2 +-
+ runtime/wti.h               | 2 +-
+ runtime/wtp.h               | 4 ++--
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/plugins/mmfields/mmfields.c b/plugins/mmfields/mmfields.c
+index c408a6c..cdce199 100644
+--- a/plugins/mmfields/mmfields.c
++++ b/plugins/mmfields/mmfields.c
+@@ -43,7 +43,7 @@ MODULE_TYPE_NOKEEP
+ MODULE_CNFNAME("mmfields")
+ 
+ 
+-DEFobjCurrIf(errmsg);
++DEFobjCurrIf(errmsg)
+ DEF_OMOD_STATIC_DATA
+ 
+ /* config variables */
+diff --git a/runtime/prop.h b/runtime/prop.h
+index 7cb2743..38d801d 100644
+--- a/runtime/prop.h
++++ b/runtime/prop.h
+@@ -33,7 +33,7 @@ struct prop_s {
+ 		uchar sz[CONF_PROP_BUFSIZE];
+ 	} szVal;
+ 	int len;		/* we use int intentionally, otherwise we may get some troubles... */
+-	DEF_ATOMIC_HELPER_MUT(mutRefCount);
++	DEF_ATOMIC_HELPER_MUT(mutRefCount)
+ };
+ 
+ /* interfaces */
+diff --git a/runtime/wti.h b/runtime/wti.h
+index 487abb7..496ef23 100644
+--- a/runtime/wti.h
++++ b/runtime/wti.h
+@@ -72,7 +72,7 @@ struct wti_s {
+ 	actWrkrInfo_t *actWrkrInfo; /* *array* of action wrkr infos for all actions
+ 				      (sized for max nbr of actions in config!) */
+ 	pthread_cond_t pcondBusy; /* condition to wake up the worker, protected by pmutUsr in wtp */
+-	DEF_ATOMIC_HELPER_MUT(mutIsRunning);
++	DEF_ATOMIC_HELPER_MUT(mutIsRunning)
+ 	struct {
+ 		uint8_t bPrevWasSuspended;
+ 		uint8_t bDoAutoCommit; /* do a commit after each message
+diff --git a/runtime/wtp.h b/runtime/wtp.h
+index 4bc284c..531355f 100644
+--- a/runtime/wtp.h
++++ b/runtime/wtp.h
+@@ -63,8 +63,8 @@ struct wtp_s {
+ 	rsRetVal (*pfDoWork)(void *pUsr, void *pWti);
+ 	/* end user objects */
+ 	uchar *pszDbgHdr;	/* header string for debug messages */
+-	DEF_ATOMIC_HELPER_MUT(mutCurNumWrkThrd);
+-	DEF_ATOMIC_HELPER_MUT(mutWtpState);
++	DEF_ATOMIC_HELPER_MUT(mutCurNumWrkThrd)
++	DEF_ATOMIC_HELPER_MUT(mutWtpState)
+ };
+ 
+ /* some symbolic constants for easier reference */
+-- 
+2.0.4
+
