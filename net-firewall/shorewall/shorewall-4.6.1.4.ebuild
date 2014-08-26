@@ -172,6 +172,8 @@ src_prepare() {
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-init.readme "${S}"/${MY_P_INIT}/shorewall-init.README.Gentoo.txt || die "Copying shorewall-init.systemd failed"
 		eend 0
 
+		eprefixify "${S}"/${MY_P_INIT}/init.gentoo.sh
+
 		cd "${S}"/${MY_P_INIT}
 		epatch "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-init-01_remove-ipset-functionality.patch
 		cd "${S}"
