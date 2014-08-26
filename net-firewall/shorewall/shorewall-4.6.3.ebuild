@@ -79,7 +79,6 @@ RDEPEND="
 	)
 	init? ( >=sys-apps/coreutils-8.20 )
 	!net-firewall/shorewall-core
-	!net-firewall/shorewall
 	!net-firewall/shorewall6
 	!net-firewall/shorewall-lite
 	!net-firewall/shorewall6-lite
