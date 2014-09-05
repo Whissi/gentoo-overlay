@@ -43,8 +43,8 @@ src_install() {
 	use gd && dobin src/vnstati
 	dobin src/vnstat src/vnstatd
 
-	exeinto /etc/cron.hourly
-	newexe "${FILESDIR}"/vnstat.cron vnstat
+	exeinto /usr/share/${PN}
+	newexe "${FILESDIR}"/vnstat-r1.cron vnstat.cron
 
 	insinto /etc
 	doins cfg/vnstat.conf
@@ -79,11 +79,16 @@ pkg_postinst() {
 	elog "and set correct permissions after that, e.g."
 	elog "   chown -R vnstat:vnstat /var/lib/vnstat"
 	elog
-	elog "Note: if an interface transfers more than ~4GB in"
-	elog "the time between cron runs, you may miss traffic"
+	elog "It is highly recommended to use the included vnstatd to update your"
+	elog "vnStat databases."
 	elog
-	elog "To update the interfaces database automatically with cron, uncomment"
-	elog "lines in /etc/cron.hourly/vnstat and set cron job to run it as"
-	elog "frequently as required. Alternatively you can use vnstatd. Init script"
-	elog "was installed into /etc/init.d/vnstatd for your convenience."
+	elog "If you want to use the old cron way to update your vnStat databases,"
+	elog "you have to install the cronjob manually:"
+	elog ""
+	elog "   cp /usr/share/${PN}/vnstat.cron /etc/cron.hourly/vnstat"
+	elog ""
+	elog "Note: if an interface transfers more than ~4GB in"
+	elog "the time between cron runs, you may miss traffic."
+	elog "That's why using vnstatd instead of the cronjob is"
+	elog "the recommended way to update your vnStat databases."
 }
