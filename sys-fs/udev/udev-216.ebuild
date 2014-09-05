@@ -4,15 +4,15 @@
 
 EAPI=5
 
-inherit autotools bash-completion-r1 eutils linux-info multilib multilib-minimal toolchain-funcs user versionator
+inherit autotools bash-completion-r1 eutils linux-info multilib multilib-minimal toolchain-funcs udev user versionator
 
 if [[ ${PV} = 9999* ]]; then
 	EGIT_REPO_URI="git://anongit.freedesktop.org/systemd/systemd"
 	inherit git-2
 	patchset=
 else
-	patchset=5
-	FIXUP_PATCH="${PN}-215-revert-systemd-messup.patch.xz"
+	patchset=2
+	FIXUP_PATCH="${PN}-216-revert-systemd-messup.patch.xz"
 	SRC_URI="http://www.freedesktop.org/software/systemd/systemd-${PV}.tar.xz
 		http://dev.gentoo.org/~polynomial-c/${PN}/${FIXUP_PATCH}"
 	if [[ -n "${patchset}" ]]; then
@@ -59,7 +59,7 @@ DEPEND="${COMMON_DEPEND}
 	virtual/os-headers
 	virtual/pkgconfig
 	>=sys-devel/make-3.82-r4
-	>=sys-kernel/linux-headers-3.13
+	>=sys-kernel/linux-headers-2.6.39
 	doc? ( >=dev-util/gtk-doc-1.18 )"
 
 RDEPEND="${COMMON_DEPEND}
@@ -167,53 +167,43 @@ multilib_src_configure() {
 		--sbindir=/sbin
 		--libdir=/usr/$(get_libdir)
 		--docdir=/usr/share/doc/${PF}
+		$(multilib_native_use_enable static-libs static)
 		--disable-nls
+		$(multilib_native_use_enable doc gtk-doc)
+		$(multilib_native_use_enable introspection)
 		--disable-python-devel
 		--disable-dbus
+		$(multilib_native_use_enable kmod)
 		--disable-seccomp
+		$(multilib_native_use_enable selinux)
 		--disable-xz
+		--disable-lz4
 		--disable-pam
+		$(multilib_native_use_enable acl)
 		--disable-gcrypt
 		--disable-audit
 		--disable-libcryptsetup
 		--disable-qrencode
 		--disable-microhttpd
 		--disable-gnutls
+		--disable-libcurl
+		--disable-libidn
 		--disable-readahead
 		--disable-quotacheck
 		--disable-logind
 		--disable-polkit
-		--disable-nls
 		--disable-myhostname
 		$(use_enable gudev)
+		$(multilib_is_native_abi || echo "--disable-manpages")
 		--enable-split-usr
 		--with-html-dir=/usr/share/doc/${PF}/html
 		--without-python
 		--with-bashcompletiondir="$(get_bashcompdir)"
+		$(use firmware-loader && echo "--with-firmware-path=/lib/firmware/updates:/lib/firmware")
 		--with-rootprefix=
-		--with-rootlibdir=/$(get_libdir)
+		$(multilib_is_native_abi && echo "--with-rootlibdir=/$(get_libdir)")
 	)
-	if multilib_is_native_abi; then
-		econf_args+=(
-			$(use_enable static-libs static)
-			$(use_enable doc gtk-doc)
-			$(use_enable introspection)
-			$(use_enable acl)
-			$(use_enable kmod)
-			$(use_enable selinux)
-		)
-	else
-		econf_args+=(
-			--disable-static
-			--disable-gtk-doc
-			--disable-introspection
-			--disable-acl
-			--disable-kmod
-			--disable-selinux
-			--disable-manpages
-		)
-	fi
-	use firmware-loader && econf_args+=( --with-firmware-path="/lib/firmware/updates:/lib/firmware" )
+
 	ECONF_SOURCE="${S}" econf "${econf_args[@]}"
 }
 
@@ -248,6 +238,7 @@ multilib_src_compile() {
 		emake "${helper_targets[@]}"
 
 		local man_targets=(
+			man/udev.conf.5
 			man/udev.link.5
 			man/udev.7
 			man/udevadm.8
@@ -489,12 +480,7 @@ pkg_postinst() {
 	if has_version 'sys-apps/hwids[udev]'; then
 		udevadm hwdb --update --root="${ROOT}"
 		# Only reload when we are not upgrading to avoid potential race w/ incompatible hwdb.bin and the running udevd
-		if [[ -z ${REPLACING_VERSIONS} ]]; then
-			# http://cgit.freedesktop.org/systemd/systemd/commit/?id=1fab57c209035f7e66198343074e9cee06718bda
-			if [[ ${ROOT} != "" ]] && [[ ${ROOT} != "/" ]]; then
-				return 0
-			fi
-			udevadm control --reload
-		fi
+		# http://cgit.freedesktop.org/systemd/systemd/commit/?id=1fab57c209035f7e66198343074e9cee06718bda
+		[[ -z ${REPLACING_VERSIONS} ]] && udev_reload
 	fi
 }
