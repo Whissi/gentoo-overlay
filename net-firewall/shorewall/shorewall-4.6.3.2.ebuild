@@ -192,14 +192,14 @@ src_compile() {
 src_install() {
 	# shorewall-core
 	einfo "Installing ${MY_P_CORE} ..."
-	DESTDIR="${D}" ${MY_P_CORE}/install.sh shorewallrc.gentoo || die "${MY_P_CORE}/install.sh failed"
+	DESTDIR="${D%/}" ${MY_P_CORE}/install.sh shorewallrc.gentoo || die "${MY_P_CORE}/install.sh failed"
 	dodoc "${S}"/${MY_P_CORE}/changelog.txt "${S}"/${MY_P_CORE}/releasenotes.txt
 
 	# shorewall
 	if use ipv4; then
 		einfo "Installing ${MY_P_IPV4} ..."
 		keepdir /var/lib/shorewall
-		DESTDIR="${D}" ${MY_P_IPV4}/install.sh shorewallrc.gentoo || die "${MY_P_IPV4}/install.sh failed"
+		DESTDIR="${D%/}" ${MY_P_IPV4}/install.sh shorewallrc.gentoo || die "${MY_P_IPV4}/install.sh failed"
 
 		if use doc; then
 			dodoc -r "${S}"/${MY_P_IPV4}/Samples
@@ -210,7 +210,7 @@ src_install() {
 	if use ipv6; then
 		einfo "Installing ${MY_P_IPV6} ..."
 		keepdir /var/lib/shorewall6
-		DESTDIR="${D}" ${MY_P_IPV6}/install.sh shorewallrc.gentoo || die "${MY_P_IPV6}/install.sh failed"
+		DESTDIR="${D%/}" ${MY_P_IPV6}/install.sh shorewallrc.gentoo || die "${MY_P_IPV6}/install.sh failed"
 
 		if use doc; then
 			dodoc -r "${S}"/${MY_P_IPV6}/Samples6
@@ -221,39 +221,39 @@ src_install() {
 	if use lite4; then
 		einfo "Installing ${MY_P_LITE4} ..."
 		keepdir /var/lib/shorewall-lite
-		DESTDIR="${D}" ${MY_P_LITE4}/install.sh shorewallrc.gentoo || die "${MY_P_LITE4}/install.sh failed"
+		DESTDIR="${D%/}" ${MY_P_LITE4}/install.sh shorewallrc.gentoo || die "${MY_P_LITE4}/install.sh failed"
 	fi
 
 	# shorewall6-lite
 	if use lite6; then
 		einfo "Installing ${MY_P_LITE6} ..."
 		keepdir /var/lib/shorewall6-lite
-		DESTDIR="${D}" ${MY_P_LITE6}/install.sh shorewallrc.gentoo || die "${MY_P_LITE6}/install.sh failed"
+		DESTDIR="${D%/}" ${MY_P_LITE6}/install.sh shorewallrc.gentoo || die "${MY_P_LITE6}/install.sh failed"
 	fi
 
 	# shorewall-init
 	if use init; then
 		einfo "Installing ${MY_P_INIT} ..."
-		DESTDIR="${D}" ${MY_P_INIT}/install.sh shorewallrc.gentoo || die "${MY_P_INIT}/install.sh failed"
+		DESTDIR="${D%/}" ${MY_P_INIT}/install.sh shorewallrc.gentoo || die "${MY_P_INIT}/install.sh failed"
 		dodoc "${S}"/${MY_P_INIT}/shorewall-init.README.Gentoo.txt
 
-		if [ -f "${D}/etc/logrotate.d/shorewall-init" ]; then
+		if [ -f "${D}etc/logrotate.d/shorewall-init" ]; then
 			# On Gentoo, shorewall-init will not create shorewall-ifupdown.log,
 			# so we don't need a logrotate folder at all
-			einfo "Removing unused \"${D}/etc/logrotate.d/shorewall-init\" ..."
-			rm -rf "${D}"/etc/logrotate.d/shorewall-init || die "Removing \"${D}/etc/logrotate.d/shorewall-init\" failed"
+			einfo "Removing unused \"${D}etc/logrotate.d/shorewall-init\" ..."
+			rm -rf "${D}"etc/logrotate.d/shorewall-init || die "Removing \"${D}etc/logrotate.d/shorewall-init\" failed"
 		fi
 
-		if [ -d "${D}/etc/NetworkManager" ]; then
+		if [ -d "${D}etc/NetworkManager" ]; then
 			# On Gentoo, we don't support NetworkManager
 			# so we don't need this folder at all
-			einfo "Removing unused \"${D}/etc/NetworkManager\" ..."
-			rm -rf "${D}"/etc/NetworkManager || die "Removing \"${D}/etc/NetworkManager\" failed"
+			einfo "Removing unused \"${D}etc/NetworkManager\" ..."
+			rm -rf "${D}"etc/NetworkManager || die "Removing \"${D}etc/NetworkManager\" failed"
 		fi
 
-		if [ -f "${D}/usr/share/shorewall-init/ifupdown" ]; then
+		if [ -f "${D}usr/share/shorewall-init/ifupdown" ]; then
 			# This script isn't supported on Gentoo
-			rm -rf "${D}"/usr/share/shorewall-init/ifupdown || die "Removing \"${D}/usr/share/shorewall-init/ifupdown\" failed"
+			rm -rf "${D}"usr/share/shorewall-init/ifupdown || die "Removing \"${D}usr/share/shorewall-init/ifupdown\" failed"
 		fi
 	fi
 
