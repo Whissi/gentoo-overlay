@@ -1,0 +1,11 @@
+[Unit]
+Description=vnstatd is a flexible and robust way to update vnStat databases
+
+[Service]
+After=network-online.target
+User=vnstat
+ExecStart=/usr/bin/vnstatd --nodaemon
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
