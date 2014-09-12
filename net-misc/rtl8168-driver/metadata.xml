@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-	<herd>no-herd</herd>
 	<maintainer>
 		<email>whissi@whissi.de</email>
 		<name>Thomas D.</name>
-		<description>I am just maintaining the ebuild the distfile.</description>
 	</maintainer>
 	<longdescription lang="en">
 		Linux driver for Realtek
