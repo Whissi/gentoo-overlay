@@ -5,12 +5,14 @@
 Description=shorewall-init
 Documentation=http://www.shorewall.net/Shorewall-init.html
 Before=network.target
+Conflicts=firewalld.service
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
+StandardOutput=syslog
 ExecStart=/sbin/shorewall-init start
 ExecStop=/sbin/shorewall-init stop
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=basic.target
