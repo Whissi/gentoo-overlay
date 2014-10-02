@@ -67,6 +67,8 @@ DOCS=(
 	"${FILESDIR}"/${BRANCH}/README.gentoo
 )
 
+PATCHES=( "${FILESDIR}"/${BRANCH}/10-respect_CFLAGS.patch )
+
 src_unpack() {
 	unpack ${P}.tar.gz
 
