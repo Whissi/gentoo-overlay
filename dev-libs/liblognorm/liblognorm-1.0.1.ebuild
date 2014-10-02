@@ -4,6 +4,9 @@
 
 EAPI=5
 
+AUTOTOOLS_IN_SOURCE_BUILD=1
+AUTOTOOLS_AUTORECONF="yes"
+
 inherit autotools-utils
 
 DESCRIPTION="Fast samples-based log normalization library"
@@ -16,8 +19,6 @@ KEYWORDS="~amd64 ~arm ~hppa ~x86 ~amd64-linux"
 #IUSE="debug static-libs" - "debug" USE flag disabled due to https://github.com/rsyslog/liblognorm/issues/5
 IUSE="static-libs"
 
-AUTOTOOLS_IN_SOURCE_BUILD=1
-
 RDEPEND="
 	>=dev-libs/libestr-0.1.3
 	>=dev-libs/json-c-0.11:=
@@ -29,6 +30,8 @@ DEPEND="
 "
 
 DOCS=( ChangeLog )
+
+PATCHES=( "${FILESDIR}"/respect_CFLAGS.patch )
 
 src_configure() {
 	local myeconfargs=(
