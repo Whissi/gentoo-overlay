@@ -66,7 +66,8 @@ DOCS=(README.rst AUTHORS)
 
 src_prepare() {
 	epatch "${FILESDIR}"/${PVR}/10-tests-nonroot.patch
-	epatch "${FILESDIR}"/${PVR}/20-bugfix_9526.patch
+
+	sed -i '/install_requires=/ d' setup.py || die "sed failed"
 
 	# this test fails because it trys to "pip install distribute"
 	einfo "Removing unit tests for buildout module ..."
