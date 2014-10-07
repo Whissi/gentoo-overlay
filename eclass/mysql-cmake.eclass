@@ -272,6 +272,7 @@ mysql-cmake_src_prepare() {
 		# Don't build bundled xz-utils
 		rm -f "${S}/storage/tokudb/ft-index/cmake_modules/TokuThirdParty.cmake"
 		touch "${S}/storage/tokudb/ft-index/cmake_modules/TokuThirdParty.cmake"
+		sed -i 's/ build_lzma//' "${S}/storage/tokudb/ft-index/ft/CMakeLists.txt" || die
 	fi
 
 	epatch_user
@@ -418,7 +419,7 @@ mysql-cmake_src_install() {
 	esac
 	einfo "Building default my.cnf (${mysql_mycnf_version})"
 	insinto "${MY_SYSCONFDIR#${EPREFIX}}"
-	doins "${S}"/scripts/mysqlaccess.conf
+	[[ -f "${S}/scripts/mysqlaccess.conf" ]] && doins "${S}"/scripts/mysqlaccess.conf
 	mycnf_src="my.cnf-${mysql_mycnf_version}"
 	sed -e "s!@DATADIR@!${MY_DATADIR}!g" \
 		"${FILESDIR}/${mycnf_src}" \

@@ -290,6 +290,10 @@ else
 	fi
 fi
 
+if [[ ${PN} == "mysql" || ${PN} == "percona-server" ]] ; then
+	mysql_version_is_at_least "5.7.5" && DEPEND="${DEPEND} dev-libs/boost"
+fi
+
 if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 	mysql_check_version_range "5.1.38 to 5.3.99" && DEPEND="${DEPEND} libevent? ( >=dev-libs/libevent-1.4 )"
 	mysql_version_is_at_least "5.2" && DEPEND="${DEPEND} oqgraph? ( >=dev-libs/boost-1.40.0 )"
@@ -356,8 +360,11 @@ if [[ ${PN} == "mariadb-galera" ]] ; then
 	# The wsrep API version must match between the ebuild and sys-cluster/galera.
 	# This will be indicated by WSREP_REVISION in the ebuild and the first number
 	# in the version of sys-cluster/galera
+	#
+	# lsof is required as of 5.5.38 and 10.0.11 for the rsync sst
 	RDEPEND="${RDEPEND}
 		=sys-cluster/galera-${WSREP_REVISION}*
+		sys-process/lsof
 	"
 fi
 
