@@ -59,7 +59,7 @@ DEPEND="${COMMON_DEPEND}
 	virtual/os-headers
 	virtual/pkgconfig
 	>=sys-devel/make-3.82-r4
-	>=sys-kernel/linux-headers-2.6.39
+	>=sys-kernel/linux-headers-3.7
 	doc? ( >=dev-util/gtk-doc-1.18 )"
 
 RDEPEND="${COMMON_DEPEND}
