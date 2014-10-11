@@ -15,6 +15,8 @@ description_clear="${description_clear} then wide open and unprotected."
 
 description_reset="All the packet and byte counters in the firewall are reset."
 
+command="/usr/sbin/shorewall6-lite"
+
 depend() {
 	need net
 	provide firewall
@@ -23,7 +25,7 @@ depend() {
 
 status() {
 	local _retval
-	/sbin/shorewall6-lite status 1>/dev/null
+	${command} status 1>/dev/null
 	_retval=$?
 	if [ ${_retval} = '0' ]; then
 		einfo 'status: started'
@@ -38,13 +40,13 @@ status() {
 
 start() {
 	ebegin "Starting shorewall6-lite"
-	/sbin/shorewall6-lite ${OPTIONS} start ${STARTOPTIONS} 1>/dev/null
+	${command} ${OPTIONS} start ${STARTOPTIONS} 1>/dev/null
 	eend $? 
 }
 
 stop() {
 	ebegin "Stopping shorewall6-lite"
-	/sbin/shorewall6-lite ${OPTIONS} stop ${STOPOPTIONS} 1>/dev/null
+	${command} ${OPTIONS} stop ${STOPOPTIONS} 1>/dev/null
 	eend $?
 }
 
@@ -55,11 +57,11 @@ restart() {
 	# runscript.sh greps this script...  (09 Jul 2004 agriffis)
 
 	ebegin "Restarting shorewall6-lite"
-	/sbin/shorewall6-lite status 1>/dev/null
+	${command} status 1>/dev/null
 	if [ $? != 0 ] ; then
 		svc_start
 	else
-		/sbin/shorewall6-lite ${OPTIONS} restart ${RESTARTOPTIONS} 1>/dev/null
+		${command} ${OPTIONS} restart ${RESTARTOPTIONS} 1>/dev/null
 	fi
 	eend $?
 }
@@ -69,7 +71,7 @@ clear() {
 	# state. (21 Nov 2004 eldad)
 
 	ebegin "Clearing all shorewall6-lite rules and setting policy to ACCEPT"
-	/sbin/shorewall6-lite ${OPTIONS} clear 1>/dev/null
+	${command} ${OPTIONS} clear 1>/dev/null
 	eend $?
 }
 
@@ -77,6 +79,6 @@ reset() {
 	# reset the packet and byte counters in the firewall
 
 	ebegin "Resetting the packet and byte counters in shorewall6-lite"
-	/sbin/shorewall6-lite ${OPTIONS} reset 1>/dev/null
+	${command} ${OPTIONS} reset 1>/dev/null
 	eend $?
 }
