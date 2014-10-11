@@ -1,0 +1,14 @@
+Add missing docstring for templates directory
+
+This fixes the following build error message:
+
+	package init file 'salt/templates/__init__.py' not found (or not a regular file)
+
+diff -rupN old/salt-2014.1.12/salt/templates/__init__.py new/salt-2014.1.12/salt/templates/__init__.py
+--- salt/templates/__init__.py	1970-01-01 01:00:00.000000000 +0100
++++ salt/templates/__init__.py	2014-10-11 15:47:26.777638084 +0200
+@@ -0,0 +1,4 @@
++# -*- coding: utf-8 -*-
++'''
++Templates Directory
++'''
