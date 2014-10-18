@@ -55,19 +55,20 @@ DEPEND="
 	test? (
 		dev-python/pip[${PYTHON_USEDEP}]
 		dev-python/virtualenv[${PYTHON_USEDEP}]
-		dev-python/SaltTesting[${PYTHON_USEDEP}]
+		>=dev-python/SaltTesting-2014.4.24[${PYTHON_USEDEP}]
 		dev-python/mock[${PYTHON_USEDEP}]
 		dev-python/timelib[${PYTHON_USEDEP}]
 		${RDEPEND}
 	)
 "
 
+PATCHES=(
+	"${FILESDIR}"/${PVR}/10-tests-nonroot.patch
+	"${FILESDIR}"/${PVR}/add-missing-init-file-for-templates.patch
+)
 DOCS=(README.rst AUTHORS)
 
-src_prepare() {
-	epatch "${FILESDIR}"/${PVR}/10-tests-nonroot.patch
-	epatch "${FILESDIR}"/${PVR}/20-minion-error.patch
-
+python_prepare() {
 	sed -i '/install_requires=/ d' setup.py || die "sed failed"
 
 	# this test fails because it trys to "pip install distribute"
