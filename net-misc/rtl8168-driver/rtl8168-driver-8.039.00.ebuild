@@ -56,7 +56,6 @@ pkg_setup() {
 }
 
 src_prepare() {
-	epatch "${FILESDIR}"/${PV}-delayed_work_ethtool_ops_fix2.patch
 	convert_to_m "${S}/src/Makefile"
 }
 
