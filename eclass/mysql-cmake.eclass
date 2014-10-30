@@ -1,6 +1,6 @@
 # Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/mysql-cmake.eclass,v 1.24 2014/07/31 22:26:07 grknight Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/mysql-cmake.eclass,v 1.25 2014/10/08 17:25:46 grknight Exp $
 
 # @ECLASS: mysql-cmake.eclass
 # @MAINTAINER:
@@ -209,6 +209,14 @@ configure_cmake_standard() {
 				$(cmake-utils_use odbc CONNECT_WITH_ODBC)
 			)
 		fi
+		if in_iuse galera ; then
+			mycmakeargs+=( $(cmake-utils_use_with galera WSREP) )
+		fi
+
+		if mysql_version_is_at_least "10.1.1" ; then
+			mycmakeargs+=(  $(cmake-utils_use_with innodb-lz4 INNODB_LZ4)
+					$(cmake-utils_use_with innodb-lzo INNODB_LZO) )
+		fi
 	fi
 
 	if [[ ${PN} == "percona-server" ]]; then
@@ -415,7 +423,8 @@ mysql-cmake_src_install() {
 	# Configuration stuff
 	case ${MYSQL_PV_MAJOR} in
 		5.[1-4]*) mysql_mycnf_version="5.1" ;;
-		5.[5-9]|6*|7*|8*|9*|10*) mysql_mycnf_version="5.5" ;;
+		5.5) mysql_mycnf_version="5.5" ;;
+		5.[6-9]|6*|7*|8*|9*|10*) mysql_mycnf_version="5.6" ;;
 	esac
 	einfo "Building default my.cnf (${mysql_mycnf_version})"
 	insinto "${MY_SYSCONFDIR#${EPREFIX}}"

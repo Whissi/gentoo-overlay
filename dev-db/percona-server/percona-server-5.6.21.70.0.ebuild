@@ -3,20 +3,11 @@
 # $Header: $
 
 EAPI="5"
+MY_EXTRAS_VER="20140817-2331Z"
 
-MY_EXTRAS_VER="20140729-2200Z"
-MY_PV="${PV//_alpha_pre/-m}"
-MY_PV="${MY_PV//_/-}"
-
-# Build type
-BUILD="cmake"
-
-inherit toolchain-funcs mysql-v2
+inherit toolchain-funcs mysql-multilib
 # only to make repoman happy. it is really set in the eclass
 IUSE="$IUSE"
-
-# Define the mysql-extras source
-EGIT_REPO_URI="git://git.overlays.gentoo.org/proj/mysql-extras.git"
 
 # REMEMBER: also update eclass/mysql*.eclass before committing!
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~x86-linux"
@@ -32,11 +23,16 @@ RDEPEND="${RDEPEND}"
 # and create your own mysql-extras tarball, looking at 000_index.txt
 
 # Official test instructions:
-# USE='-cluster embedded extraengine perl ssl static-libs community' \
+# USE='extraengine perl ssl static-libs community' \
 # FEATURES='test userpriv -usersandbox' \
 # ebuild percona-server-X.X.XX.ebuild \
 # digest clean package
-src_test() {
+multilib_src_test() {
+
+	if ! multilib_is_native_abi ; then
+		einfo "Server tests not available on non-native abi".
+		return 0;
+	fi
 
 	local TESTDIR="${CMAKE_BUILD_DIR}/mysql-test"
 	local retstatus_unit
@@ -63,9 +59,13 @@ src_test() {
 
 		# Ensure that parallel runs don't die
 		export MTR_BUILD_THREAD="$((${RANDOM} % 100))"
+		# Enable parallel testing, auto will try to detect number of cores
+		# You may set this by hand.
+		# The default maximum is 8 unless MTR_MAX_PARALLEL is increased
+		export MTR_PARALLEL="${MTR_PARALLEL:-auto}"
 
 		# create directories because mysqladmin might right out of order
-		mkdir -p "${S}"/mysql-test/var-tests{,/log}
+		mkdir -p "${T}"/var-tests{,/log}
 
 		# These are failing in Percona 5.6 for now and are believed to be
 		# false positives:
@@ -85,6 +85,8 @@ src_test() {
 		# main.variables main.myisam main.merge_recover
 		# fails due to ulimit not able to open enough files (needs 5000)
 		#
+		# main.mysqlhotcopy_archive main.mysqlhotcopy_myisam
+		# Called with bad parameters should be reported upstream
 
 		for t in main.mysql_client_test \
 			binlog.binlog_statement_insert_delayed main.information_schema \
@@ -92,8 +94,8 @@ src_test() {
 			perfschema.binlog_edge_mix perfschema.binlog_edge_stmt \
 			funcs_1.is_columns_mysql funcs_1.is_tables_mysql funcs_1.is_triggers \
 			main.variables main.myisam main.merge_recover \
-			main.percona_bug1289599; do
-				mysql-v2_disable_test  "$t" "False positives in Gentoo"
+			main.percona_bug1289599 main.mysqlhotcopy_archive main.mysqlhotcopy_myisam ; do
+				mysql-multilib_disable_test  "$t" "False positives in Gentoo"
 		done
 
 		# Run mysql tests
@@ -103,8 +105,8 @@ src_test() {
 		ulimit -n 3000
 
 		# run mysql-test tests
-		perl mysql-test-run.pl --force --vardir="${S}/mysql-test/var-tests" \
-			--testcase-timeout=30 --parallel=auto
+		perl mysql-test-run.pl --force --vardir="${T}/var-tests" \
+			--testcase-timeout=30
 		retstatus_tests=$?
 		[[ $retstatus_tests -eq 0 ]] || eerror "tests failed"
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
