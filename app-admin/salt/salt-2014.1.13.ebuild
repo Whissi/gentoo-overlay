@@ -43,7 +43,7 @@ RDEPEND="
 	openssl? ( dev-python/pyopenssl[${PYTHON_USEDEP}] )
 	libvirt? ( || (
 		dev-python/libvirt-python[${PYTHON_USEDEP}]
-		app-emulation/libvirt[python,${PYTHON_USEDEP}]
+		app-emulation/libvirt
 		)
 	)
 	mongodb? ( dev-python/pymongo[${PYTHON_USEDEP}] )
