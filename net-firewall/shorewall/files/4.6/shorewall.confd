@@ -1,6 +1,6 @@
 # Global start/restart/stop options
 #
-OPTIONS=""
+OPTIONS="-tvv"
 
 # Start options
 #

@@ -4,7 +4,7 @@
 [Unit]
 Description=Shorewall IPv6 firewall lite
 Documentation=man:shorewall6-lite(8) http://www.shorewall.net/Documentation_Index.html
-After=network.target
+After=network-online.target
 Conflicts=ip6tables.service firewalld.service
 
 [Service]

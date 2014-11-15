@@ -4,8 +4,9 @@
 [Unit]
 Description=shorewall-init
 Documentation=http://www.shorewall.net/Shorewall-init.html
-Before=network.target
-Conflicts=firewalld.service
+Before=network-pre.target
+Wants=network-pre.target
+Conflicts=iptables.service firewalld.service
 
 [Service]
 Type=oneshot

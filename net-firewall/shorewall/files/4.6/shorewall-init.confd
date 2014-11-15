@@ -1,4 +1,4 @@
-# List the Shorewall products that Shorewall-init is to
+# List the Shorewall products Shorewall-init should
 # initialize (space-separated list).
 #
 # Sample: PRODUCTS="shorewall shorewall6-lite"
