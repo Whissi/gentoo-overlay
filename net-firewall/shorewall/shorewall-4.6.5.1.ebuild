@@ -156,15 +156,15 @@ src_prepare() {
 
 	# shorewall-core
 	mv "${S}"/${MY_P_CORE} "${S}"/${MY_PN_CORE} || die "Failed to move '${S}/${MY_P_CORE}' to '${S}/${MY_PN_CORE}'"
-	ebegin "Applying Gentoo-specific changes to ${MY_P_CORE}"
-	ln -s ../shorewallrc.gentoo ${MY_PN_CORE}/shorewallrc.gentoo
+	ebegin "Applying Gentoo-specific changes to ${MY_P_CORE} ..."
+	ln -s ../shorewallrc.gentoo ${MY_PN_CORE}/shorewallrc.gentoo || die "Failed to symlink shorewallrc.gentoo"
 	eend 0
 
 	# shorewall
 	if use ipv4; then
 		mv "${S}"/${MY_P_IPV4} "${S}"/${MY_PN_IPV4} || die "Failed to move '${S}/${MY_P_IPV4}' to '${S}/${MY_PN_IPV4}'"
 		ebegin "Applying Gentoo-specific changes to ${MY_P_IPV4}"
-		ln -s ../shorewallrc.gentoo ${MY_PN_IPV4}/shorewallrc.gentoo
+		ln -s ../shorewallrc.gentoo ${MY_PN_IPV4}/shorewallrc.gentoo || die "Failed to symlink shorewallrc.gentoo"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall.confd "${S}"/${MY_PN_IPV4}/default.gentoo || die "Copying shorewall.confd failed"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall.initd "${S}"/${MY_PN_IPV4}/init.gentoo.sh || die "Copying shorewall.initd failed"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall.systemd "${S}"/${MY_PN_IPV4}/gentoo.service || die "Copying shorewall.systemd failed"
@@ -175,7 +175,7 @@ src_prepare() {
 	if use ipv6; then
 		mv "${S}"/${MY_P_IPV6} "${S}"/${MY_PN_IPV6} || die "Failed to move '${S}/${MY_P_IPV6}' to '${S}/${MY_PN_IPV6}'"
 		ebegin "Applying Gentoo-specific changes to ${MY_P_IPV6}"
-		ln -s ../shorewallrc.gentoo ${MY_PN_IPV6}/shorewallrc.gentoo
+		ln -s ../shorewallrc.gentoo ${MY_PN_IPV6}/shorewallrc.gentoo || die "Failed to symlink shorewallrc.gentoo"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall6.confd "${S}"/${MY_PN_IPV6}/default.gentoo || die "Copying shorewall6.confd failed"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall6.initd "${S}"/${MY_PN_IPV6}/init.gentoo.sh || die "Copying shorewall6.initd failed"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall6.systemd "${S}"/${MY_PN_IPV6}/gentoo.service || die "Copying shorewall6.systemd failed"
@@ -186,7 +186,7 @@ src_prepare() {
 	if use lite4; then
 		mv "${S}"/${MY_P_LITE4} "${S}"/${MY_PN_LITE4} || die "Failed to move '${S}/${MY_P_LITE4}' to '${S}/${MY_PN_LITE4}'"
 		ebegin "Applying Gentoo-specific changes to ${MY_P_LITE4}"
-		ln -s ../shorewallrc.gentoo ${MY_PN_LITE4}/shorewallrc.gentoo
+		ln -s ../shorewallrc.gentoo ${MY_PN_LITE4}/shorewallrc.gentoo || die "Failed to symlink shorewallrc.gentoo"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-lite.confd "${S}"/${MY_PN_LITE4}/default.gentoo || die "Copying shorewall-lite.confd failed"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-lite.initd "${S}"/${MY_PN_LITE4}/init.gentoo.sh || die "Copying shorewall-lite.initd failed"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-lite.systemd "${S}"/${MY_PN_LITE4}/gentoo.service || die "Copying shorewall-lite.systemd failed"
@@ -197,7 +197,7 @@ src_prepare() {
 	if use lite6; then
 		mv "${S}"/${MY_P_LITE6} "${S}"/${MY_PN_LITE6} || die "Failed to move '${S}/${MY_P_LITE6}' to '${S}/${MY_PN_LITE6}'"
 		ebegin "Applying Gentoo-specific changes to ${MY_P_LITE6}"
-		ln -s ../shorewallrc.gentoo ${MY_PN_LITE6}/shorewallrc.gentoo
+		ln -s ../shorewallrc.gentoo ${MY_PN_LITE6}/shorewallrc.gentoo || die "Failed to symlink shorewallrc.gentoo"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall6-lite.confd "${S}"/${MY_PN_LITE6}/default.gentoo || die "Copying shorewall6-lite.confd failed"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall6-lite.initd "${S}"/${MY_PN_LITE6}/init.gentoo.sh || die "Copying shorewall6-lite.initd failed"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall6-lite.systemd "${S}"/${MY_PN_LITE6}/gentoo.service || die "Copying shorewall6-lite.systemd failed"
@@ -208,7 +208,7 @@ src_prepare() {
 	if use init; then
 		mv "${S}"/${MY_P_INIT} "${S}"/${MY_PN_INIT} || die "Failed to move '${S}/${MY_P_INIT}' to '${S}/${MY_PN_INIT}'"
 		ebegin "Applying Gentoo-specific changes to ${MY_P_INIT}"
-		ln -s ../shorewallrc.gentoo ${MY_PN_INIT}/shorewallrc.gentoo
+		ln -s ../shorewallrc.gentoo ${MY_PN_INIT}/shorewallrc.gentoo || die "Failed to symlink shorewallrc.gentoo"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-init.confd "${S}"/${MY_PN_INIT}/default.gentoo || die "Copying shorewall-init.confd failed"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-init.initd "${S}"/${MY_PN_INIT}/init.gentoo.sh || die "Copying shorewall-init.initd failed"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-init.systemd "${S}"/${MY_PN_INIT}/gentoo.service || die "Copying shorewall-init.systemd failed"
@@ -227,6 +227,7 @@ src_prepare() {
 		mv "${S}"/${MY_P_DOCS} "${S}"/${MY_PN_DOCS} || die "Failed to move '${S}/${MY_P_DOCS}' to '${S}/${MY_PN_DOCS}'"
 	fi
 
+	epatch "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-4.6.5.1-Correct-IPv6-handling-of-LOG_BACKEND-LOG.patch
 	epatch_user
 }
 
@@ -304,45 +305,6 @@ src_install() {
 			# This script isn't supported on Gentoo
 			rm -rf "${D}"usr/share/shorewall-init/ifupdown || die "Removing \"${D}usr/share/shorewall-init/ifupdown\" failed"
 		fi
-
-		declare -a _SW_PRODUCTS_TO_ENABLE=()
-
-		if use ipv4; then
-			_SW_PRODUCTS_TO_ENABLE+=("${MY_PN_IPV4/#S/s}")
-		fi
-
-		if use ipv6; then
-			_SW_PRODUCTS_TO_ENABLE+=("${MY_PN_IPV6/#S/s}")
-		fi
-
-		if use lite4 && ! use ipv4; then
-			# Only register shorewall-lite if the full product isn't installed.
-			# You cannot run both products at the same time!
-			_SW_PRODUCTS_TO_ENABLE+=("${MY_PN_LITE4/#S/s}")
-		fi
-
-		if use lite6 && ! use ipv6; then
-			# Only register shorewall6-lite if the full product isn't installed.
-			# You cannot run both products at the same time!
-			_SW_PRODUCTS_TO_ENABLE+=("${MY_PN_LITE6/#S/s}")
-		fi
-
-		local _SW_INIT_PRODUCTS_DISPLAY_MSG= _PRODUCT=
-		for _PRODUCT in "${_SW_PRODUCTS_TO_ENABLE[@]}"
-		do
-			if [ -z ${_SW_INIT_PRODUCTS_DISPLAY_MSG} ]; then
-				_SW_INIT_PRODUCTS_DISPLAY_MSG="\"${_PRODUCT/#s/S}\""
-			else
-				_SW_INIT_PRODUCTS_DISPLAY_MSG+=" and \"${_PRODUCT/#s/S}\""
-			fi
-		done
-		unset _PRODUCT
-
-		local _SW_INIT_CONF="${D}etc/conf.d/shorewall-init" _SW_INIT_PRODUCTS_LIST="${_SW_PRODUCTS_TO_ENABLE[@]}"
-		einfo "Registering ${_SW_INIT_PRODUCTS_DISPLAY_MSG} in ${MY_PN_INIT} ..."
-		sed --in-place "s/^PRODUCTS=\"\"$/PRODUCTS=\"$_SW_INIT_PRODUCTS_LIST\"/" "${_SW_INIT_CONF}" || \
-			die "Failed to register ${_SW_INIT_PRODUCTS_DISPLAY_MSG} in \"${_SW_INIT_CONF}\""
-
 	fi
 
 	if use doc; then

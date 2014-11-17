@@ -59,9 +59,12 @@ check_firewall_script() {
 
 	if [ ! -x ${STATEDIR}/firewall ]; then
 		eerror "\"${PRODUCT}\" isn't configured!"
-		eerror "Please go to your 'administrative system'" \
-			"and deploy the compiled firewall" \
-			"configuration for this system."
+
+		if [ ${PRODUCT} = shorewall-lite -o ${PRODUCT} = shorewall6-lite ]; then
+			eerror "Please go to your 'administrative system'" \
+				"and deploy the compiled firewall" \
+				"configuration for this system."
+		fi
 
 		return 1
 	fi
