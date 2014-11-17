@@ -227,7 +227,6 @@ src_prepare() {
 		mv "${S}"/${MY_P_DOCS} "${S}"/${MY_PN_DOCS} || die "Failed to move '${S}/${MY_P_DOCS}' to '${S}/${MY_PN_DOCS}'"
 	fi
 
-	epatch "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-4.6.5.1-Correct-IPv6-handling-of-LOG_BACKEND-LOG.patch
 	epatch_user
 }
 
