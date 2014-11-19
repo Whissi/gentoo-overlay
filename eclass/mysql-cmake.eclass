@@ -209,6 +209,14 @@ configure_cmake_standard() {
 				$(cmake-utils_use odbc CONNECT_WITH_ODBC)
 			)
 		fi
+
+		if mysql_version_is_at_least "10.0.15"; then
+			# Disable mroonga until the groonga options can be analyzed
+			# Groonga is bundled in and lots of defaults and possible dep magic
+			# It can be a package on its own
+			mycmakeargs+=( -DWITHOUT_HA_MROONGA=1 )
+		fi
+
 		if in_iuse galera ; then
 			mycmakeargs+=( $(cmake-utils_use_with galera WSREP) )
 		fi
