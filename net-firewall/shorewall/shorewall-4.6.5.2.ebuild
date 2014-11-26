@@ -117,7 +117,6 @@ RDEPEND="
 	!net-firewall/shorewall-lite
 	!net-firewall/shorewall6-lite
 	!net-firewall/shorewall-init
-	!<sys-apps/openrc-0.13
 	!<sys-apps/systemd-214
 "
 
