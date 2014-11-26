@@ -1,7 +1,7 @@
 #
 # Gentoo Shorewall 4.5 rc file
 #
-BUILD=                                  #Default is to detect the build system
+BUILD=gentoo                            #Default is to detect the build system
 HOST=gentoo                             #Gentoo GNU Linux
 PREFIX=@GENTOO_PORTAGE_EPREFIX@/usr                             #Top-level directory for shared files, libraries, etc.
 SHAREDIR=${PREFIX}/share                #Directory for arch-neutral files.
