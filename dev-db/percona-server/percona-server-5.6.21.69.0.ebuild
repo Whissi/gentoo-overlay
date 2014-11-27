@@ -98,6 +98,13 @@ multilib_src_test() {
 				mysql-multilib_disable_test  "$t" "False positives in Gentoo"
 		done
 
+		if ! use extraengine ; then
+			# bug 401673, 530766
+			for t in federated.federated_plugin ; do
+				mysql-multilib_disable_test  "$t" "Test $t requires USE=extraengine (Need federated engine)"
+			done
+		fi
+
 		# Run mysql tests
 		pushd "${TESTDIR}"
 
