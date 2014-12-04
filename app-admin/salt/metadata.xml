@@ -25,6 +25,7 @@ backbone of cloud and data center management.
 		<remote-id type="pypi">salt</remote-id>
 	</upstream>
 	<use>
+		<flag name="api">Enable support for salt-api.</flag>
 		<flag name="cherrypy">Enable support for cherrypy.</flag>
 		<flag name="libcloud">Enable salt-cloud support via libcloud.</flag>
 		<flag name="libvirt">Support managing virtual machines with app-emulation/libvirt.</flag>
