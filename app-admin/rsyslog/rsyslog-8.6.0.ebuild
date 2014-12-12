@@ -9,12 +9,31 @@ inherit autotools-utils eutils systemd
 
 DESCRIPTION="An enhanced multi-threaded syslogd with database support and more"
 HOMEPAGE="http://www.rsyslog.com/"
-SRC_URI="http://www.rsyslog.com/files/download/${PN}/${P}.tar.gz"
+
+if [[ ${PV} == "9999" ]]; then
+	EGIT_REPO_URI="
+		git://github.com/rsyslog/${PN}.git
+		https://github.com/rsyslog/${PN}.git
+	"
+
+	DOC_REPO_URI="
+		git://github.com/rsyslog/${PN}-doc.git
+		https://github.com/rsyslog/${PN}-doc.git
+	"
+
+	inherit git-r3
+	KEYWORDS=""
+else
+	SRC_URI="
+		http://www.rsyslog.com/files/download/${PN}/${P}.tar.gz
+		doc? ( http://www.rsyslog.com/files/download/${PN}/${PN}-doc-${PV}.tar.gz )
+	"
+	KEYWORDS="~amd64 ~arm ~hppa ~x86"
+fi
 
 LICENSE="GPL-3 LGPL-3 Apache-2.0"
-KEYWORDS="~amd64 ~x86"
 SLOT="0"
-IUSE="dbi debug doc elasticsearch +gcrypt kerberos mongodb mysql normalize omudpspoof oracle postgres rabbitmq redis relp rfc3195 rfc5424hmac snmp ssl systemd usertools zeromq"
+IUSE="dbi debug doc elasticsearch +gcrypt jemalloc kerberos mongodb mysql normalize omudpspoof postgres rabbitmq redis relp rfc3195 rfc5424hmac snmp ssl systemd test usertools zeromq"
 
 RDEPEND="
 	>=dev-libs/json-c-0.11:=
@@ -24,17 +43,16 @@ RDEPEND="
 	dbi? ( >=dev-db/libdbi-0.8.3 )
 	elasticsearch? ( >=net-misc/curl-7.35.0 )
 	gcrypt? ( >=dev-libs/libgcrypt-1.5.3:= )
+	jemalloc? ( >=dev-libs/jemalloc-3.3.1 )
 	kerberos? ( virtual/krb5 )
 	mongodb? ( >=dev-libs/libmongo-client-0.1.4 )
 	mysql? ( virtual/mysql )
 	normalize? (
 		>=dev-libs/libee-0.4.0
-		>=dev-libs/liblognorm-0.3.1:=
-		!>=dev-libs/liblognorm-1.0.0
+		>=dev-libs/liblognorm-1.0.0:=
 	)
 	omudpspoof? ( >=net-libs/libnet-1.1.6 )
-	oracle? ( >=dev-db/oracle-instantclient-basic-10.2 )
-	postgres? ( >=dev-db/postgresql-base-8.4.20 )
+	postgres? ( >=virtual/postgresql-8.4.20 )
 	rabbitmq? ( >=net-libs/rabbitmq-c-0.3.0 )
 	redis? ( >=dev-libs/hiredis-0.11.0 )
 	relp? ( >=dev-libs/librelp-1.2.5 )
@@ -47,10 +65,17 @@ RDEPEND="
 DEPEND="${RDEPEND}
 	virtual/pkgconfig"
 
-BRANCH="7-stable"
+if [[ ${PV} == "9999" ]]; then
+	RDEPEND+=" doc? ( >=dev-python/sphinx-1.1.3-r7 )"
+fi
 
-# Test suite requires a special setup or will always fail
-RESTRICT="test"
+BRANCH="8-stable"
+
+if [[ ${PV} < "8.7" ]]; then
+	# Test suite is broken in v8.6.0 release tarball
+	# Upstream is notified; Will be fixed with v8.7.0 in January
+	RESTRICT="test"
+fi
 
 # Maitainer note : open a bug to upstream
 # showing that building in a separate dir fails
@@ -61,16 +86,39 @@ AUTOTOOLS_PRUNE_LIBTOOL_FILES="modules"
 DOCS=(
 	AUTHORS
 	ChangeLog
-	doc/rsyslog-example.conf
 	"${FILESDIR}"/${BRANCH}/README.gentoo
 )
 
-PATCHES=(
-	"${FILESDIR}"/${BRANCH}/${PN}-7.x-mmjsonparse.patch
-	"${FILESDIR}"/${BRANCH}/fix-omruleset-default-value.patch
-	"${FILESDIR}"/${BRANCH}/bugfix_52.patch
-	"${FILESDIR}"/${BRANCH}/bugfix_73.patch
-)
+src_unpack() {
+	if [[ ${PV} == "9999" ]]; then
+		git-r3_fetch
+		git-r3_checkout
+	else
+		unpack ${P}.tar.gz
+	fi
+
+	if use doc; then
+		if [[ ${PV} == "9999" ]]; then
+			git-r3_fetch "${DOC_REPO_URI}"
+			git-r3_checkout "${DOC_REPO_URI}" "${S}"/docs
+		else
+			local doc_tarball="${PN}-doc-${PV}.tar.gz"
+
+			cd "${S}" || die "Cannot change dir into '$S'"
+			mkdir docs || die "Failed to create docs directory"
+			cd docs || die "Failed to change dir into '${S}/docs'"
+			unpack ${doc_tarball}
+		fi
+	fi
+}
+
+src_prepare() {
+	epatch "${FILESDIR}"/${BRANCH}/10-respect_CFLAGS-r1.patch
+
+	epatch_user
+
+	autotools-utils_src_prepare
+}
 
 src_configure() {
 	# Maintainer notes:
@@ -89,15 +137,16 @@ src_configure() {
 	fi
 
 	local myeconfargs=(
+		--disable-generate-man-pages
+		$(use_enable test testbench)
 		# Input Plugins without depedencies
+		--enable-imdiag
 		--enable-imfile
 		--enable-impstats
 		--enable-imptcp
-		--enable-imttcp
 		# Message Modificiation Plugins without depedencies
 		--enable-mmanon
 		--enable-mmaudit
-		--enable-mmcount
 		--enable-mmfields
 		--enable-mmjsonparse
 		--enable-mmpstrucdata
@@ -111,28 +160,26 @@ src_configure() {
 		--enable-omuxsock
 		# Misc
 		--enable-pmaixforwardedfrom
+		--enable-pmciscoios
 		--enable-pmcisconames
 		--enable-pmlastmsg
-		--enable-pmrfc3164sd
 		--enable-pmsnare
-		--enable-sm_cust_bindcdr
 		# DB
 		$(use_enable dbi libdbi)
 		$(use_enable mongodb ommongodb)
 		$(use_enable mysql)
-		$(use_enable oracle)
 		$(use_enable postgres pgsql)
 		$(use_enable redis omhiredis)
 		# Debug
 		$(use_enable debug)
 		$(use_enable debug diagtools)
-		$(use_enable debug imdiag)
 		$(use_enable debug memcheck)
 		$(use_enable debug rtinst)
 		$(use_enable debug valgrind)
 		# Misc
 		$(use_enable elasticsearch)
 		$(use_enable gcrypt libgcrypt)
+		$(use_enable jemalloc)
 		$(use_enable kerberos gssapi-krb5)
 		$(use_enable normalize mmnormalize)
 		$(use_enable omudpspoof)
@@ -154,12 +201,45 @@ src_configure() {
 	autotools-utils_src_configure
 }
 
+src_compile() {
+	autotools-utils_src_compile
+
+	if use doc -a ${PV} == "9999"; then
+		einfo "Building documentation ..."
+		local doc_dir="${S}/docs"
+		cd "${doc_dir}" || die "Cannot chdir into \"${doc_dir}\"!"
+		sphinx-build -b html source build || die "Building documentation failed!"
+	fi
+}
+
+src_test() {
+	local _has_increased_ulimit=
+
+	if ulimit -n 3072; then
+		_has_increased_ulimit="true"
+	fi
+
+	if ! emake --jobs 1 check; then
+		eerror "Test suite failed! :("
+
+		if [ -z "${_has_increased_ulimit}" ]; then
+			eerror "Probably because open file limit couldn't be set to 3072."
+		fi
+
+		if has userpriv $FEATURES; then
+			eerror "Please try to reproduce the test suite failure with FEATURES=-userpriv " \
+				"before you submit a bug report."
+		fi
+
+	fi
+}
+
 src_install() {
-	use doc && HTML_DOCS=( "${S}"/doc/ )
+	use doc && HTML_DOCS=( "${S}/docs/build/" )
 	autotools-utils_src_install
 
-	newconfd "${FILESDIR}/${BRANCH}/${PN}.confd-r1" ${PN}
-	newinitd "${FILESDIR}/${BRANCH}/${PN}.initd-r1" ${PN}
+	newconfd "${FILESDIR}/${BRANCH}/${PN}.confd" ${PN}
+	newinitd "${FILESDIR}/${BRANCH}/${PN}.initd" ${PN}
 
 	keepdir /var/empty/dev
 	keepdir /var/spool/${PN}
@@ -173,7 +253,7 @@ src_install() {
 	doins "${FILESDIR}/${BRANCH}/50-default.conf"
 
 	insinto /etc/logrotate.d/
-	newins "${FILESDIR}/${BRANCH}/${PN}.logrotate-r1" ${PN}
+	newins "${FILESDIR}/${BRANCH}/${PN}.logrotate" ${PN}
 
 	if use mysql; then
 		insinto /usr/share/doc/${PF}/scripts/mysql

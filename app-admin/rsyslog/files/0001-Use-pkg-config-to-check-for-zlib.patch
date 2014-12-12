@@ -1,0 +1,41 @@
+From 2709ac1256b09fa3bfb2fa14fac8e2977ef677f4 Mon Sep 17 00:00:00 2001
+From: Thomas D <whissi@whissi.de>
+Date: Fri, 12 Dec 2014 16:10:40 +0100
+Subject: [PATCH 1/2] Use pkg-config to check for zlib
+
+---
+ configure.ac | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 9227b02..e09124c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -231,14 +231,16 @@ if test "$enable_regexp" = "yes"; then
+ fi
+ 
+ 
+-
+-AC_CHECK_HEADER(zlib.h, [zlib_header="yes"], [zlib_header="no" enable_zlib="false"])
+-if test "$zlib_header" = "yes"; then
+-	AC_CHECK_LIB(z, deflate,
+-		[AC_DEFINE(USE_NETZIP, 1, [Define if you want to enable zlib support]) 
+-		 ZLIB_LIBS="-lz"
+-		 AC_SUBST(ZLIB_LIBS)], enable_zlib="false")
+-fi
++# zlib support
++PKG_CHECK_MODULES([ZLIB], [zlib], [found_zlib=yes], [found_zlib=no])
++AS_IF([test "x$found_zlib" = "xno"], [
++        AC_SEARCH_LIBS([inflate], [z], [AC_CHECK_HEADER([zlib.h], [found_zlib=yes])])
++        if test "x$found_zlib" = "xno" ; then
++                AC_MSG_ERROR([zlib library and headers not found])
++        fi
++        ZLIB_LIBS="-lz"
++        AC_SUBST(ZLIB_LIBS)
++])
+ 
+ 
+ #gssapi
+-- 
+2.2.0
+
