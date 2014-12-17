@@ -1,6 +1,6 @@
 # Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-python/SaltTesting/SaltTesting-2014.4.24.ebuild,v 1.2 2014/08/10 21:06:37 slyfox Exp $
+# $Header: $
 
 EAPI=5
 
