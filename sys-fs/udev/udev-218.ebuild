@@ -11,8 +11,8 @@ if [[ ${PV} = 9999* ]]; then
 	inherit git-2
 	patchset=
 else
-	patchset=4
-	FIXUP_PATCH="${PN}-216-revert-systemd-messup.patch.xz"
+	patchset=1
+	FIXUP_PATCH="${PN}-218-revert-systemd-messup.patch.xz"
 	SRC_URI="http://www.freedesktop.org/software/systemd/systemd-${PV}.tar.xz
 		http://dev.gentoo.org/~polynomial-c/${PN}/${FIXUP_PATCH}"
 	if [[ -n "${patchset}" ]]; then
@@ -28,7 +28,7 @@ HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
 
 LICENSE="LGPL-2.1 MIT GPL-2"
 SLOT="0"
-IUSE="acl doc firmware-loader gudev introspection +kmod selinux static-libs"
+IUSE="acl doc gudev introspection +kmod selinux static-libs"
 
 RESTRICT="test"
 
@@ -90,33 +90,30 @@ check_default_rules() {
 }
 
 pkg_setup() {
-	CONFIG_CHECK="~BLK_DEV_BSG ~DEVTMPFS ~!IDE ~INOTIFY_USER ~!SYSFS_DEPRECATED ~!SYSFS_DEPRECATED_V2 ~SIGNALFD ~EPOLL ~FHANDLE ~NET"
-	linux-info_pkg_setup
+	if [[ ${MERGE_TYPE} != buildonly ]]; then
+		CONFIG_CHECK="~BLK_DEV_BSG ~DEVTMPFS ~!IDE ~INOTIFY_USER ~!SYSFS_DEPRECATED ~!SYSFS_DEPRECATED_V2 ~SIGNALFD ~EPOLL ~FHANDLE ~NET ~!FW_LOADER_USER_HELPER"
+		linux-info_pkg_setup
 
-	# CONFIG_FHANDLE was introduced by 2.6.39
-	local MINKV=2.6.39
+		# CONFIG_FHANDLE was introduced by 2.6.39
+		local MINKV=2.6.39
 
-	if kernel_is -lt ${MINKV//./ }; then
-		eerror "Your running kernel is too old to run this version of ${P}"
-		eerror "You need to upgrade kernel at least to ${MINKV}"
-	fi
+		if kernel_is -lt ${MINKV//./ }; then
+			eerror "Your running kernel is too old to run this version of ${P}"
+			eerror "You need to upgrade kernel at least to ${MINKV}"
+		fi
 
-	if ! use firmware-loader; then
 		if kernel_is -lt 3 7; then
 			ewarn "Your running kernel is too old to have firmware loader and"
 			ewarn "this version of ${P} doesn't have userspace firmware loader"
 			ewarn "If you need firmware support, you need to upgrade kernel at least to 3.7"
 		fi
-		ewarn "You have USE firmware-loader disabled, which means if you need an firmware loaded,"
-		ewarn "you have to configure kernel for it. Linux 3.7 is the first version with kernel"
-		ewarn "firmware loader."
 	fi
 }
 
 src_prepare() {
 	if ! [[ ${PV} = 9999* ]]; then
 		# secure_getenv() disable for non-glibc systems wrt bug #443030
-		if ! [[ $(grep -r secure_getenv * | wc -l) -eq 28 ]]; then
+		if ! [[ $(grep -r secure_getenv * | wc -l) -eq 27 ]]; then
 			eerror "The line count for secure_getenv() failed, see bug #443030"
 			die
 		fi
@@ -185,6 +182,7 @@ multilib_src_configure() {
 		--disable-python-devel
 		--disable-dbus
 		$(multilib_native_use_enable kmod)
+		--disable-xkbcommon
 		--disable-seccomp
 		$(multilib_native_use_enable selinux)
 		--disable-xz
@@ -199,10 +197,10 @@ multilib_src_configure() {
 		--disable-gnutls
 		--disable-libcurl
 		--disable-libidn
-		--disable-readahead
 		--disable-quotacheck
 		--disable-logind
 		--disable-polkit
+		--disable-terminal
 		--disable-myhostname
 		$(use_enable gudev)
 		$(multilib_is_native_abi || echo "--disable-manpages")
@@ -210,9 +208,9 @@ multilib_src_configure() {
 		--with-html-dir=/usr/share/doc/${PF}/html
 		--without-python
 		--with-bashcompletiondir="$(get_bashcompdir)"
-		$(use firmware-loader && echo "--with-firmware-path=/lib/firmware/updates:/lib/firmware")
 		--with-rootprefix=
 		$(multilib_is_native_abi && echo "--with-rootlibdir=/$(get_libdir)")
+		$(multilib_is_native_abi || echo "MOUNT_CFLAGS=' ' MOUNT_LIBS=' '")
 	)
 
 	ECONF_SOURCE="${S}" econf "${econf_args[@]}"
