@@ -5,8 +5,9 @@
 EAPI="5"
 
 GENTOO_DEPEND_ON_PERL="no"
+PYTHON_COMPAT=( python2_7 )
 
-inherit autotools base eutils linux-info multilib perl-app systemd user
+inherit autotools base eutils linux-info multilib perl-app python-single-r1 systemd user
 
 DESCRIPTION="A a daemon which collects system statistic and provides mechanisms to store the values"
 
@@ -16,7 +17,7 @@ SRC_URI="${HOMEPAGE}/files/${P}.tar.bz2"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="contrib debug kernel_linux kernel_FreeBSD kernel_Darwin perl static-libs"
+IUSE="contrib debug kernel_linux kernel_FreeBSD kernel_Darwin perl selinux static-libs"
 
 # The plugin lists have to follow here since they extend IUSE
 
@@ -55,7 +56,7 @@ unset plugin
 COMMON_DEPEND="
 	dev-libs/libgcrypt:=
 	sys-devel/libtool
-	perl?					( dev-lang/perl[ithreads] ( || ( sys-devel/libperl[ithreads] >=sys-devel/libperl-5.10 ) ) )
+	perl?					( dev-lang/perl:=[ithreads] )
 	collectd_plugins_apache?		( net-misc/curl )
 	collectd_plugins_ascent?		( net-misc/curl dev-libs/libxml2 )
 	collectd_plugins_bind?			( dev-libs/libxml2 )
@@ -79,10 +80,10 @@ COMMON_DEPEND="
 	collectd_plugins_nut?			( sys-power/nut )
 	collectd_plugins_onewire?		( sys-fs/owfs )
 	collectd_plugins_oracle?		( dev-db/oracle-instantclient-basic )
-	collectd_plugins_perl?			( dev-lang/perl[ithreads] ( || ( sys-devel/libperl[ithreads] >=sys-devel/libperl-5.10 ) ) )
+	collectd_plugins_perl?			( dev-lang/perl:=[ithreads] )
 	collectd_plugins_ping?			( net-libs/liboping )
-	collectd_plugins_postgresql?		( dev-db/postgresql-base )
-	collectd_plugins_python?		( =dev-lang/python-2* )
+	collectd_plugins_postgresql?		( dev-db/postgresql )
+	collectd_plugins_python?		( ${PYTHON_DEPS} )
 	collectd_plugins_routeros?		( net-libs/librouteros )
 	collectd_plugins_rrdcached?		( net-analyzer/rrdtool )
 	collectd_plugins_rrdtool?		( net-analyzer/rrdtool )
@@ -109,11 +110,16 @@ DEPEND="${COMMON_DEPEND}
 	)"
 
 RDEPEND="${COMMON_DEPEND}
-	collectd_plugins_syslog?		( virtual/logger )"
+	collectd_plugins_syslog?		( virtual/logger )
+	selinux?				( sec-policy/selinux-collectd )"
 
-EPATCH_SUFFIX="patch"
+REQUIRED_USE="
+	collectd_plugins_python?		( ${PYTHON_REQUIRED_USE} )"
+
 PATCHES=(
-	"${FILESDIR}/${PVR}/"
+	"${FILESDIR}/${PN}-4.10.3"-werror.patch
+	"${FILESDIR}/${PN}-5.4.1"-{nohal,libocci,libperl,lt}.patch
+	"${FILESDIR}/${PN}-5.4.1-upstream-bug553.patch"
 )
 
 # @FUNCTION: collectd_plugin_kernel_linux
@@ -199,6 +205,8 @@ pkg_setup() {
 			elog "Cannot find a linux kernel configuration. Continuing anyway."
 		fi
 	fi
+
+	use collectd_plugins_python && python-single-r1_pkg_setup
 
 	enewgroup collectd
 	enewuser collectd -1 -1 /var/lib/collectd collectd
@@ -310,9 +318,9 @@ src_configure() {
 src_install() {
 	emake DESTDIR="${D}" install
 
-	fixlocalpod
+	perl_delete_localpod
 
-	find "${ED}/usr/" -name "*.la" -delete
+	find "${D}/usr/" -name "*.la" -delete
 
 	# use collectd_plugins_ping && setcap cap_net_raw+ep ${D}/usr/sbin/collectd
 	# we cannot do this yet
@@ -330,12 +338,12 @@ src_install() {
 	keepdir /var/lib/${PN}
 	fowners collectd:collectd /var/lib/${PN}
 
-	newinitd "${FILESDIR}"/${PVR}/${PN}.initd ${PN}
-	newconfd "${FILESDIR}"/${PVR}/${PN}.confd ${PN}
+	newinitd "${FILESDIR}/${PN}.initd" ${PN}
+	newconfd "${FILESDIR}/${PN}.confd" ${PN}
 	systemd_dounit "contrib/${PN}.service"
 
 	insinto /etc/logrotate.d
-	newins "${FILESDIR}"/${PVR}/${PN}.logrotate collectd
+	newins "${FILESDIR}/${PN}.logrotate" collectd
 
 	sed -i -e 's:^.*PIDFile     "/var/run/collectd.pid":PIDFile     "/run/collectd/collectd.pid":' "${D}"/etc/collectd.conf || die
 	sed -i -e 's:^#	SocketFile "/var/run/collectd-unixsock":#	SocketFile "/run/collectd/collectd.socket":' "${D}"/etc/collectd.conf || die
@@ -360,7 +368,7 @@ pkg_postinst() {
 
 	echo
 	elog "collectd is now started as unprivileged user by default."
-	elog "You may want to recheck the configuration."
+	elog "You may want to revisit the configuration."
 	elog
 
 	if use collectd_plugins_email; then

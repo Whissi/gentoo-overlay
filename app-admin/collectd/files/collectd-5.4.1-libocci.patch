@@ -1,17 +1,14 @@
-This patch will link the Oracle plug-in against libocci.
-
-See <https://bugs.gentoo.org/347607> for further details.
-
-diff -r -u collectd-4.10.2.orig/configure.in collectd-4.10.2/configure.in
---- collectd-4.10.2.orig/configure.ac	2010-11-28 03:27:47.000000000 +0100
-+++ collectd-4.10.2/configure.ac	2010-11-28 03:28:23.000000000 +0100
-@@ -2446,14 +2446,14 @@
+diff --git configure.ac configure.ac
+index 7029e1e..72f6ff4 100644
+--- configure.ac
++++ configure.ac
+@@ -2941,14 +2941,14 @@ AC_ARG_WITH(oracle, [AS_HELP_STRING([--with-oracle@<:@=ORACLE_HOME@:>@], [Path t
  ])
  if test "x$ORACLE_HOME" != "x"
  then
 -	with_oracle_cppflags="-I$ORACLE_HOME/rdbms/public"
 +	with_oracle_cppflags="-I$ORACLE_HOME/rdbms/public -locci"
- 
+
  	if test -e "$ORACLE_HOME/lib/ldflags"
  	then
  		with_oracle_libs=`cat "$ORACLE_HOME/lib/ldflags"`

@@ -65,3 +65,11 @@ stop_pre() {
 		configtest || return 1
 	fi
 }
+
+stop_post() {
+	if [ -f "${COLLECTD_PIDFILE}" ]; then
+		ebegin "Removing stale PID file"
+		rm --force "${COLLECTD_PIDFILE}"
+		eend $?
+	fi
+}

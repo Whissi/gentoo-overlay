@@ -1,4 +1,8 @@
-Make sure that "PIDFile" option cannot be set when command-line option "-P" was used. (Fixes #553)
+From 09fb81e130ad70bf0547cec3d3c349ce8cb092cf Mon Sep 17 00:00:00 2001
+From: Thomas D <whissi@whissi.de>
+Date: Wed, 12 Feb 2014 15:32:15 +0100
+Subject: [PATCH] Make sure that "PIDFile" option cannot be set when
+ command-line option "-P" was used. (Fixes #553)
 
 The "PIDFile" value from command-line option "-P", which should take
 precedence over any "PIDFile" value from configuration files, could be
@@ -8,8 +12,6 @@ We introduced a new global variable "pidfile_from_cli" which will be set
 to 1 when the command-line option "-P" was detected and the
 "global_option_set" function will only set the "PIDFile" option if
 "pidfile_from_cli" is 0.
-
-See <https://github.com/collectd/collectd/pull/553>
 ---
  src/collectd.c   | 2 ++
  src/collectd.h   | 1 +
@@ -66,6 +68,3 @@ index 0e54f26..c5d3e36 100644
  	sfree (cf_global_options[i].value);
  
  	if (value != NULL)
--- 
-1.8.5.4
-

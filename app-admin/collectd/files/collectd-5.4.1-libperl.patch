@@ -1,16 +1,8 @@
-This patch will fix perl detection in Gentoo.
-
-This is probably needed due to "--as-needed" compiler switch and the
-lack of "-lpthread".
-
-See <https://bugs.gentoo.org/show_bug.cgi?id=437680#c7> for further
-details.
-
-diff --git a/configure.in b/configure.in
-index 1cfc2fc..384c298 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -2944,11 +2944,13 @@ if test "x$with_libperl" = "xyes" \
+diff --git configure.ac configure.ac
+index ce8a9bc..eaa464e 100644
+--- configure.ac
++++ configure.ac
+@@ -3109,11 +3109,13 @@ if test "x$with_libperl" = "xyes" \
  then
    SAVE_CFLAGS="$CFLAGS"
    SAVE_LDFLAGS="$LDFLAGS"
@@ -21,18 +13,17 @@ index 1cfc2fc..384c298 100644
    CFLAGS="$CFLAGS $PERL_CFLAGS"
    LDFLAGS="$LDFLAGS $PERL_LDFLAGS"
 +  LIBS="$LIBS -lperl -lpthread"
- 
+
    AC_CACHE_CHECK([for libperl],
      [c_cv_have_libperl],
-@@ -2967,7 +2969,10 @@ dnl ARCHFLAGS="" -> disable multi -arch on OSX (see Config_heavy.pl:fetch_string
- 			 Nullsv);
-       ]]),
+@@ -3132,7 +3134,10 @@ dnl ARCHFLAGS="" -> disable multi -arch on OSX (see Config_heavy.pl:fetch_string
+ ]]]
+       )],
        [c_cv_have_libperl="yes"],
 -      [c_cv_have_libperl="no"]
-+      [ 
-+        c_cv_have_libperl="no" 
++      [
++        c_cv_have_libperl="no"
 +        LIBS="$SAVE_LIBS"
 +      ]
      )
    )
- 
