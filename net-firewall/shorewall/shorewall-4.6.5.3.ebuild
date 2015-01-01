@@ -1,4 +1,4 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -150,7 +150,7 @@ src_prepare() {
 	# This allows us to use patches from upstream and keeps epatch_user working
 
 	einfo "Preparing shorewallrc ..."
-	cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewallrc-r1 "${S}"/shorewallrc.gentoo || die "Copying shorewallrc-r1 failed"
+	cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewallrc "${S}"/shorewallrc.gentoo || die "Copying shorewallrc failed"
 	eprefixify "${S}"/shorewallrc.gentoo
 
 	# shorewall-core
