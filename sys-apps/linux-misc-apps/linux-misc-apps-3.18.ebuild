@@ -1,4 +1,4 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -101,9 +101,7 @@ src_prepare() {
 		-e '/^nosy-dump.*CPPFLAGS/s,CPPFLAGS =,CPPFLAGS +=,g' \
 		"${S}"/tools/firewire/Makefile
 
-	sed -i \
-		-e 's/^  BUILD_OUTPUT    := \$\(PWD\)$/  BUILD_OUTPUT    := $(shell PWD)/' \
-		"${S}"/tools/power/x86/turbostat/Makefile || die "sed failed"
+	epatch "${FILESDIR}"/${PN}-turbostat-Makefile.patch
 }
 
 kernel_asm_arch() {
@@ -139,7 +137,7 @@ src_compile() {
 	for t in ${TARGET_MAKE_SIMPLE[@]} ; do
 		dir=${t/:*} target=${t/*:}
 		einfo "Building $dir => $target"
-		emake -C $dir BUILD_OUTPUT="${S}/${dir}" ARCH=${karch} $target
+		emake -C $dir ARCH=${karch} $target
 	done
 }
 
