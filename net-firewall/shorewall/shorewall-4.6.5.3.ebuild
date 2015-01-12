@@ -145,6 +145,13 @@ pkg_pretend() {
 	check_extra_config
 }
 
+pkg_setup() {
+	if [ -n "${DIGEST}" ]; then
+		einfo "Unsetting environment variable \"DIGEST\" to prevent conflicts with package's \"install.sh\" script ..."
+		unset DIGEST
+	fi
+}
+
 src_prepare() {
 	# We are moving each unpacked source from MY_P_* to MY_PN_*.
 	# This allows us to use patches from upstream and keeps epatch_user working
