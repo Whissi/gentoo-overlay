@@ -184,7 +184,7 @@ fi
 LICENSE="GPL-2"
 SLOT="0"
 
-IUSE="+community cluster debug embedded extraengine jemalloc latin1 max-idx-128 minimal
+IUSE="+community cluster debug embedded extraengine jemalloc latin1 minimal
 	+perl profiling selinux ssl systemtap static static-libs tcmalloc test"
 
 # This probably could be simplified, but the syntax would have to be just right
@@ -209,6 +209,9 @@ if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]]; then
 	# MariaDB 10.1 introduces InnoDB/XtraDB compression with external libraries
 	# Choices are bzip2, lz4, lzma, lzo.  bzip2 and lzma enabled by default as they are system libraries
 	mysql_version_is_at_least "10.1.1" && IUSE="${IUSE} innodb-lz4 innodb-lzo"
+
+	# 10.1.2 introduces a cracklib password checker
+	mysql_version_is_at_least "10.1.1" && IUSE="${IUSE} cracklib"
 fi
 
 if [[ -n "${WSREP_REVISION}" ]]; then
@@ -288,6 +291,8 @@ if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 		innodb-lz4? ( app-arch/lz4 )
 		innodb-lzo? ( dev-libs/lzo )
 		"
+
+	mysql_version_is_at_least "10.1.2" && DEPEND="${DEPEND} cracklib? ( sys-libs/cracklib:0= )"
 fi
 
 [[ ${PN} == "percona-server" ]] && DEPEND="${DEPEND} !minimal? ( pam? ( virtual/pam:0= ) )"

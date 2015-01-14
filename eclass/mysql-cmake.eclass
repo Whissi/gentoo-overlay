@@ -232,6 +232,10 @@ configure_cmake_standard() {
 			mycmakeargs+=(  $(cmake-utils_use_with innodb-lz4 INNODB_LZ4)
 					$(cmake-utils_use_with innodb-lzo INNODB_LZO) )
 		fi
+
+		if mysql_version_is_at_least "10.1.2" ; then
+			mycmakeargs+=( $(mysql-cmake_use_plugin cracklib CRACKLIB_PASSWORD_CHECK ) )
+		fi
 	else
 		mycmakeargs+=( $(cmake-utils_use_with extraengine FEDERATED_STORAGE_ENGINE) )
 	fi
