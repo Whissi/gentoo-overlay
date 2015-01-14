@@ -6,7 +6,7 @@ EAPI=5
 
 MY_PN="percona-${PN/-bin}"
 MY_PV="${PV%_*}"
-MY_PVR="${MY_PV}-5027"
+MY_PVR="${MY_PV}-5059"
 MY_P="${MY_PN}-${MY_PV}"
 MY_PF="${MY_PN}-${MY_PVR}"
 
@@ -17,10 +17,10 @@ InnoDB and XtraDB databases"
 HOMEPAGE="http://www.percona.com/software/percona-xtrabackup"
 SRC_URI="
 	amd64? (
-		http://www.percona.com/downloads/XtraBackup/Percona-XtraBackup-${MY_PV}/binary/tarball/${MY_PF}-Linux-x86_64.tar.gz -> ${MY_P}-x86_64.tar.gz
+		http://www.percona.com/downloads/XtraBackup/XtraBackup-${MY_PV}/binary/tarball/${MY_PF}-Linux-x86_64.tar.gz -> ${MY_P}-x86_64.tar.gz
 	)
 	x86? (
-		http://www.percona.com/downloads/XtraBackup/Percona-XtraBackup-${MY_PV}/binary/tarball/${MY_PF}-Linux-i686.tar.gz -> ${MY_P}-x86_32.tar.gz
+		http://www.percona.com/downloads/XtraBackup/XtraBackup-${MY_PV}/binary/tarball/${MY_PF}-Linux-i686.tar.gz -> ${MY_P}-x86_32.tar.gz
 	)"
 
 LICENSE="GPL-2"
@@ -34,6 +34,7 @@ RDEPEND="
 	dev-libs/libaio
 	dev-libs/libgcrypt:11
 	dev-libs/libgpg-error
+	sys-libs/zlib
 "
 
 if use amd64; then
@@ -53,7 +54,6 @@ src_install() {
 	for bin in innobackupex xbcrypt xbstream xtrabackup; do
 		dobin bin/${bin}
 	done
-	dosym /usr/bin/innobackupex /usr/bin/innobackupex-1.5.1
 }
 
 pkg_postinst() {
