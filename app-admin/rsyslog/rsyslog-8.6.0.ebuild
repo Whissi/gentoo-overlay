@@ -1,4 +1,4 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -52,7 +52,7 @@ RDEPEND="
 		>=dev-libs/liblognorm-1.0.0:=
 	)
 	omudpspoof? ( >=net-libs/libnet-1.1.6 )
-	postgres? ( >=virtual/postgresql-8.4.20 )
+	postgres? ( >=dev-db/postgresql-8.4.20 )
 	rabbitmq? ( >=net-libs/rabbitmq-c-0.3.0 )
 	redis? ( >=dev-libs/hiredis-0.11.0 )
 	relp? ( >=dev-libs/librelp-1.2.5 )
