@@ -1,4 +1,4 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -24,8 +24,8 @@ fi
 
 LICENSE="Apache-2.0"
 SLOT="0"
-IUSE="cherrypy gnupg keyring ldap libcloud libvirt mako mongodb mysql nova"
-IUSE+=" openssl raet redis +zeromq test timelib"
+IUSE="api gnupg keyring ldap libcloud libvirt mako mongodb mysql nova"
+IUSE+=" openssl raet redis selinux +zeromq test timelib"
 
 RDEPEND="
 	dev-python/jinja[${PYTHON_USEDEP}]
@@ -35,7 +35,12 @@ RDEPEND="
 	>=dev-python/requests-1.0.0[${PYTHON_USEDEP}]
 	dev-python/setuptools[${PYTHON_USEDEP}]
 	sys-apps/pciutils
-	cherrypy? ( >=dev-python/cherrypy-3.2.2[${PYTHON_USEDEP}] )
+	api? (
+		|| (
+			dev-python/cherrypy[${PYTHON_USEDEP}]
+			www-servers/tornado[${PYTHON_USEDEP}]
+		)
+	)
 	gnupg? ( dev-python/python-gnupg[${PYTHON_USEDEP}] )
 	keyring? ( dev-python/keyring[${PYTHON_USEDEP}] )
 	ldap? ( dev-python/python-ldap[${PYTHON_USEDEP}] )
@@ -52,12 +57,13 @@ RDEPEND="
 		dev-python/raet[${PYTHON_USEDEP}]
 	)
 	redis? ( dev-python/redis-py[${PYTHON_USEDEP}] )
+	selinux? ( sec-policy/selinux-salt )
+	timelib? ( dev-python/timelib[${PYTHON_USEDEP}] )
 	zeromq? (
 		>=dev-python/pyzmq-2.2.0[${PYTHON_USEDEP}]
 		dev-python/m2crypto[${PYTHON_USEDEP}]
 		dev-python/pycrypto[${PYTHON_USEDEP}]
 	)
-	timelib? ( dev-python/timelib[${PYTHON_USEDEP}] )
 "
 
 DEPEND="
@@ -82,12 +88,16 @@ PATCHES=(
 python_prepare() {
 	# this test fails because it trys to "pip install distribute"
 	rm tests/unit/{modules,states}/zcbuildout_test.py
+
+	# these tests fail because they depend on features that are only
+	# in git versions of SaltTesting
+	rm tests/unit/{templates/jinja,modules/hashutil}_test.py
 }
 
 python_install_all() {
 	USE_SETUPTOOLS=1 distutils-r1_python_install_all
 
-	for s in minion master syndic; do
+	for s in minion master syndic $(use api && echo api); do
 		newinitd "${FILESDIR}"/${s}.initd salt-${s}
 		newconfd "${FILESDIR}"/${s}.confd salt-${s}
 		systemd_newunit "${FILESDIR}"/${s}.service salt-${s}.service
