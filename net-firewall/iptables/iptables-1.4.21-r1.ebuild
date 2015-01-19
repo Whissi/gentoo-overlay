@@ -1,4 +1,4 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -18,13 +18,14 @@ SLOT="0/10"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
 IUSE="ipv6 netlink static-libs"
 
-DEPEND="
-	virtual/os-headers
-	virtual/pkgconfig
-"
-
 RDEPEND="
 	netlink? ( net-libs/libnfnetlink )
+"
+
+DEPEND="
+	${RDEPEND}
+	virtual/os-headers
+	virtual/pkgconfig
 "
 
 src_prepare() {
