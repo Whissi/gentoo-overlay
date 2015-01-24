@@ -1,4 +1,4 @@
-# Copyright 1999-2013 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -52,5 +52,5 @@ src_install() {
 
 	dodoc "${MY_S}"/*.txt
 
-	pax-mark m "${D}${HPSSACLI_BASEDIR}"/*.bin
+	pax-mark m "${D%/}${HPSSACLI_BASEDIR}"/*.bin
 }

@@ -1,4 +1,4 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -10,10 +10,7 @@ MY_PV=$(replace_version_separator 2 '-')
 
 DESCRIPTION="HP Smart Storage Administrator (HP SSA) CLI (HPSSACLI)"
 HOMEPAGE="http://h20564.www2.hp.com/portal/site/hpsc/public/psi/home/?sp4ts.oid=5409020"
-SRC_URI="
-	amd64? ( http://downloads.linux.hp.com/SDR/repo/spp/RHEL/6/x86_64/current/${PN}-${MY_PV}.x86_64.rpm )
-	x86? ( http://downloads.linux.hp.com/SDR/repo/spp/RHEL/6/i386/current/${PN}-${MY_PV}.i386.rpm )
-"
+SRC_URI="http://downloads.linux.hp.com/SDR/repo/spp/RHEL/7/x86_64/current/${PN}-${MY_PV}.x86_64.rpm"
 
 LICENSE="hp-proliant-essentials"
 SLOT="0"
@@ -52,5 +49,5 @@ src_install() {
 
 	dodoc "${MY_S}"/*.txt
 
-	pax-mark m "${D}${HPSSACLI_BASEDIR}"/*.bin
+	pax-mark m "${D%/}${HPSSACLI_BASEDIR}"/*.bin
 }
