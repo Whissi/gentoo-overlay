@@ -1,0 +1,38 @@
+diff -rupN old/vnstat-1.13/cfg/vnstat.conf new/vnstat-1.13/cfg/vnstat.conf
+--- old/vnstat-1.13/cfg/vnstat.conf	2015-01-08 20:57:46.000000000 +0100
++++ new/vnstat-1.13/cfg/vnstat.conf	2015-01-24 14:27:30.008159863 +0100
+@@ -49,7 +49,7 @@ MaxBandwidth 1000
+ 
+ # interface specific limits
+ #  example 8Mbit limit for 'ethnone':
+-MaxBWethnone 8
++#MaxBWethnone 8
+ 
+ # how many seconds should sampling for -tr take by default
+ Sampletime 5
+@@ -76,10 +76,10 @@ TrafficlessDays 1
+ ##
+ 
+ # switch to given user when started as root (leave empty to disable)
+-DaemonUser ""
++DaemonUser "vnstat"
+ 
+ # switch to given user when started as root (leave empty to disable)
+-DaemonGroup ""
++DaemonGroup "vnstat"
+ 
+ # how often (in seconds) interface data is updated
+ UpdateInterval 30
+@@ -110,10 +110,10 @@ CreateDirs 1
+ UpdateFileOwner 1
+ 
+ # file used for logging if UseLogging is set to 1
+-LogFile "/var/log/vnstat/vnstat.log"
++LogFile "/var/log/vnstat/vnstatd.log"
+ 
+ # file used as daemon pid / lock file
+-PidFile "/var/run/vnstat/vnstat.pid"
++PidFile "/run/vnstat/vnstatd.pid"
+ 
+ 
+ # vnstati
