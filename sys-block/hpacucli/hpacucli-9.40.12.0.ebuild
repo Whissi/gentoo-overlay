@@ -1,6 +1,6 @@
-# Copyright 1999-2013 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-block/hpacucli/hpacucli-9.30.15.0.ebuild,v 1.1 2012/12/01 21:01:59 flameeyes Exp $
+# $Header: $
 
 EAPI=5
 
@@ -59,12 +59,5 @@ src_install() {
 		EOF
 	doenvd "${T}"/45${PN}
 
-	pax-mark m "${D}/opt/hp/hpacucli/"*
-}
-
-pkg_postinst() {
-	elog
-	elog "For more information regarding this utility, please read"
-	elog "/usr/share/doc/${P}/${PN}-${MY_PV}.noarch.txt"
-	elog
+	pax-mark m "${D}opt/hp/hpacucli/"*
 }
