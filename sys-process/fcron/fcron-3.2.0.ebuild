@@ -176,13 +176,15 @@ src_install() {
 }
 
 pkg_postinst() {
-	elog "If it's the first time you install fcron make sure to execute"
-	elog "  emerge --config ${CATEGORY}/${PN}"
-	elog "to configure the proper settings."
-	if ! use system-crontab; then
-		echo ""
-		ewarn "Remember that fcron will *not* use /etc/cron.d in this configuration"
-		echo ""
+	if [[ -z "${REPLACING_VERSIONS}" ]]; then
+		elog "If it's the first time you install fcron make sure to execute"
+		elog "  emerge --config ${CATEGORY}/${PN}"
+		elog "to configure the proper settings."
+		if ! use system-crontab; then
+			echo ""
+			ewarn "Remember that fcron will *not* use /etc/cron.d in this configuration"
+			echo ""
+		fi
 	fi
 }
 
