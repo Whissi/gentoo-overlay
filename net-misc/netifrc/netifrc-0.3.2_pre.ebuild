@@ -1,16 +1,17 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
 EAPI=5
 
-inherit eutils udev
+inherit eutils systemd
 
 DESCRIPTION="Gentoo Network Interface Management Scripts"
 HOMEPAGE="http://www.gentoo.org/proj/en/base/openrc/"
 
 if [[ ${PV} == "9999" ]]; then
 	EGIT_REPO_URI="https://github.com/Whissi/${PN}.git"
+	EGIT_BRANCH="next"
 	inherit git-2
 else
 	SRC_URI="https://github.com/Whissi/netifrc/releases/download/v${PV}/${P}.tar.bz2"
@@ -21,12 +22,10 @@ LICENSE="BSD-2"
 SLOT="0"
 IUSE=""
 
-COMMON_DEPEND="!<sys-fs/udev-init-scripts-26-r1"
-DEPEND="${COMMON_DEPEND}
-	kernel_linux? ( virtual/pkgconfig )"
-RDEPEND="${COMMON_DEPEND}
-	>=sys-apps/openrc-0.12
-	!<sys-apps/openrc-0.12"
+DEPEND="kernel_linux? ( virtual/pkgconfig )
+	!<sys-fs/udev-172"
+
+RDEPEND="sys-apps/gentoo-functions"
 
 src_prepare() {
 	if [[ ${PV} == "9999" ]] ; then
@@ -36,18 +35,13 @@ src_prepare() {
 		GIT_DIR="${S}/.git" git log >"${S}"/ChangeLog
 	fi
 
-	#einfo "Setting ${PN} version to ${MY_PV} ..."
-	#sed -e "s/^VERSION=.*/VERSION=\"${MY_PV}\"/" -i Makefile.inc || \
-	#	die "Failed to patch ${PN} version"
-
 	# Allow user patches to be applied without modifying the ebuild
 	epatch_user
 }
 
 src_compile() {
 	MAKE_ARGS="${MAKE_ARGS}
-		LIBEXECDIR=${EPREFIX}/lib/${PN} PF=${PF}
-		UDEVDIR=$(get_udevdir)"
+		LIBEXECDIR=${EPREFIX}/lib/${PN} PF=${PF}"
 
 	use prefix && MAKE_ARGS="${MAKE_ARGS} MKPREFIX=yes PREFIX=${EPREFIX}"
 
@@ -57,6 +51,13 @@ src_compile() {
 src_install() {
 	emake ${MAKE_ARGS} DESTDIR="${D}" install
 	dodoc README CREDITS FEATURE-REMOVAL-SCHEDULE STYLE TODO ChangeLog
+
+	# Install the service file
+	LIBEXECDIR=${EPREFIX}/lib/${PN}
+	UNIT_DIR="$(systemd_get_unitdir)"
+	sed "s:@LIBEXECDIR@:${LIBEXECDIR}:" "${S}/systemd/net_at.service.in" > "${T}/net_at.service" || die "Setting LIBEXECDIR failed!"
+	systemd_newunit "${T}/net_at.service" 'net@.service'
+	dosym "${UNIT_DIR}/net@.service" "${UNIT_DIR}/net@lo.service"
 }
 
 pkg_postinst() {
