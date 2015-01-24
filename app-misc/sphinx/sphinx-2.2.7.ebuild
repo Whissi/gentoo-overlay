@@ -15,14 +15,18 @@ SRC_URI="http://sphinxsearch.com/files/${MY_P}.tar.gz"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sparc ~x86 ~amd64-linux ~ppc-macos ~x86-macos ~sparc-solaris ~sparc64-solaris"
-IUSE="debug id64 mysql odbc postgres stemmer syslog test xml"
+IUSE="debug +iconv +id64 +mysql odbc postgres re2 stemmer +syslog test +xml"
 
-RDEPEND="mysql? ( virtual/mysql )
+RDEPEND="
+	mysql? ( virtual/mysql )
 	postgres? ( >=dev-db/postgresql-8.4.20 )
 	odbc? ( dev-db/unixODBC )
+	re2? ( >=dev-libs/re2-0_p20140304 )
 	stemmer? ( dev-libs/snowball-stemmer )
+	syslog? ( virtual/logger )
 	xml? ( dev-libs/expat )
-	virtual/libiconv"
+	iconv? ( virtual/libiconv )
+"
 
 S=${WORKDIR}/${MY_P}
 
@@ -38,6 +42,7 @@ src_prepare() {
 	sed -i -e '19i#include <string.h>' api/libsphinxclient/test.c || die
 
 	pushd api/libsphinxclient || die
+	mv configure.in configure.ac || die "Failed to rename configure.in!"
 	eautoreconf
 	popd || die
 }
@@ -50,12 +55,15 @@ src_configure() {
 		--sysconfdir="${EPREFIX}/etc/${PN}" \
 		$(use_enable id64) \
 		$(use_with debug) \
+		$(use_with iconv) \
 		$(use_with mysql) \
 		$(use_with odbc unixodbc) \
 		$(use_with postgres pgsql) \
+		$(use_with re2 ) \
 		$(use_with stemmer libstemmer) \
 		$(use_with syslog syslog) \
-		$(use_with xml libexpat )
+		$(use_with xml libexpat ) \
+		--without-rlp
 
 	cd api/libsphinxclient || die
 	econf STRIP=:
@@ -73,8 +81,8 @@ src_test() {
 }
 
 src_install() {
-	emake DESTDIR="${D}" install || die "install failed"
-	emake DESTDIR="${D}" -C api/libsphinxclient install || die "install libsphinxclient failed"
+	emake DESTDIR="${D%/}" install || die "install failed"
+	emake DESTDIR="${D%/}" -C api/libsphinxclient install || die "install libsphinxclient failed"
 
 	dodoc doc/*
 
