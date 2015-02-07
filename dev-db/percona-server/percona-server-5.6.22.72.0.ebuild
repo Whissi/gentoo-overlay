@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI="5"
-MY_EXTRAS_VER="20141021-1750Z"
+MY_EXTRAS_VER="20150113-1853Z"
 
 inherit toolchain-funcs mysql-multilib
 # only to make repoman happy. it is really set in the eclass

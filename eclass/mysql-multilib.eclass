@@ -1,6 +1,6 @@
 # Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/mysql-multilib.eclass,v 1.11 2014/11/26 00:34:41 grknight Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/mysql-multilib.eclass,v 1.12 2015/01/28 13:48:58 grknight Exp $
 
 # @ECLASS: mysql-multilib.eclass
 # @MAINTAINER:
@@ -39,7 +39,7 @@ case "${EAPI:-0}" in
 	*) die "Unsupported EAPI: ${EAPI}" ;;
 esac
 
-EXPORT_FUNCTIONS pkg_setup src_unpack src_prepare src_configure src_compile src_install pkg_preinst pkg_postinst pkg_config
+EXPORT_FUNCTIONS pkg_pretend pkg_setup src_unpack src_prepare src_configure src_compile src_install pkg_preinst pkg_postinst pkg_config
 
 #
 # VARIABLES:
@@ -187,17 +187,27 @@ SLOT="0"
 IUSE="+community cluster debug embedded extraengine jemalloc latin1 minimal
 	+perl profiling selinux ssl systemtap static static-libs tcmalloc test"
 
+### Begin readline/libedit
+### If the world was perfect, we would use external libedit on both to have a similar experience
+### However libedit does not seem to support UTF-8 keyboard input
+
 # This probably could be simplified, but the syntax would have to be just right
-if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] && \
-        mysql_check_version_range "5.5.37 to 10.0.13.99" ; then
-	IUSE="bindist ${IUSE}"
-elif [[ ${PN} == "mysql" || ${PN} == "percona-server" ]] && \
-	mysql_check_version_range "5.5.37 to 5.6.11.99" ; then
-	IUSE="bindist ${IUSE}"
-elif [[ ${PN} == "mysql-cluster" ]] && \
-	mysql_check_version_range "7.2 to 7.2.99.99"  ; then
+#if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] && \
+#	mysql_check_version_range "5.5.37 to 10.0.13.99" ; then
+#	IUSE="bindist ${IUSE}"
+#elif [[ ${PN} == "mysql" || ${PN} == "percona-server" ]] && \
+#	mysql_check_version_range "5.5.37 to 5.6.11.99" ; then
+#	IUSE="bindist ${IUSE}"
+#elif [[ ${PN} == "mysql-cluster" ]] && \
+#	mysql_check_version_range "7.2 to 7.2.99.99"  ; then
+#	IUSE="bindist ${IUSE}"
+#fi
+
+if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 	IUSE="bindist ${IUSE}"
 fi
+
+### End readline/libedit
 
 if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]]; then
 	IUSE="${IUSE} oqgraph pam sphinx tokudb"
@@ -253,20 +263,30 @@ DEPEND="
 	systemtap? ( >=dev-util/systemtap-1.3:0= )
 "
 
+### Begin readline/libedit
+### If the world was perfect, we would use external libedit on both to have a similar experience
+### However libedit does not seem to support UTF-8 keyboard input
+
 # dev-db/mysql-5.6.12+ only works with dev-libs/libedit
 # mariadb 10.0.14 fixes libedit detection. changed to follow mysql
 # This probably could be simplified
-if [[ ${PN} == "mysql" || ${PN} == "percona-server" ]] && \
-	mysql_version_is_at_least "5.6.12" ; then
-	DEPEND="${DEPEND} dev-libs/libedit:0=[${MULTILIB_USEDEP}]"
-elif [[ ${PN} == "mysql-cluster" ]] && mysql_version_is_at_least "7.3"; then
-	DEPEND="${DEPEND} dev-libs/libedit:0=[${MULTILIB_USEDEP}]"
-elif [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] && \
-	mysql_version_is_at_least "10.0.14" ; then
-	DEPEND="${DEPEND} dev-libs/libedit:0=[${MULTILIB_USEDEP}]"
-else
+#if [[ ${PN} == "mysql" || ${PN} == "percona-server" ]] && \
+#	mysql_version_is_at_least "5.6.12" ; then
+#	DEPEND="${DEPEND} dev-libs/libedit:0=[${MULTILIB_USEDEP}]"
+#elif [[ ${PN} == "mysql-cluster" ]] && mysql_version_is_at_least "7.3"; then
+#	DEPEND="${DEPEND} dev-libs/libedit:0=[${MULTILIB_USEDEP}]"
+#elif [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] && \
+#	mysql_version_is_at_least "10.0.14" ; then
+#	DEPEND="${DEPEND} dev-libs/libedit:0=[${MULTILIB_USEDEP}]"
+#else
+#	DEPEND="${DEPEND} !bindist? ( >=sys-libs/readline-4.1:0=[${MULTILIB_USEDEP}] )"
+#fi
+
+if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 	DEPEND="${DEPEND} !bindist? ( >=sys-libs/readline-4.1:0=[${MULTILIB_USEDEP}] )"
 fi
+
+### End readline/libedit
 
 if [[ ${PN} == "mysql" || ${PN} == "percona-server" ]] ; then
 	mysql_version_is_at_least "5.7.5" && DEPEND="${DEPEND} >=dev-libs/boost-1.56.0:0="
@@ -390,6 +410,31 @@ mysql-multilib_disable_test() {
 # EBUILD FUNCTIONS
 #
 
+# @FUNCTION: mysql-multilib_pkg_pretend
+# @DESCRIPTION:
+# Perform some basic tests and tasks during pkg_pretend phase:
+mysql-multilib_pkg_pretend() {
+	if [[ ${MERGE_TYPE} != binary ]] ; then
+		# Bug 508724
+		if [[ ${PN} == 'mariadb' || ${PN} == 'mariadb-galera' ]] && \
+		   test-flags-CC -fuse-ld=bfd > /dev/null &&
+			$(tc-getLD) --version | grep -q "GNU gold"; then
+			eerror "MariaDB will not build with the gold linker."
+			eerror "Please select the bfd linker with binutils-config."
+			die "GNU gold detected"
+		fi
+		if use_if_iuse tokudb && [[ $(gcc-major-version) -lt 4 || \
+			$(gcc-major-version) -eq 4 && $(gcc-minor-version) -lt 7 ]] ; then
+			eerror "${PN} with tokudb needs to be built with gcc-4.7 or later."
+			eerror "Please use gcc-config to switch to gcc-4.7 or later version."
+			die
+		fi
+	fi
+	if use cluster && [[ "${PN}" != "mysql-cluster" ]]; then
+		die "NDB Cluster support has been removed from all packages except mysql-cluster"
+	fi
+}
+
 # @FUNCTION: mysql-multilib_pkg_setup
 # @DESCRIPTION:
 # Perform some basic tests and tasks during pkg_setup phase:
@@ -410,23 +455,9 @@ mysql-multilib_pkg_setup() {
 	enewgroup mysql 60 || die "problem adding 'mysql' group"
 	enewuser mysql 60 -1 /dev/null mysql || die "problem adding 'mysql' user"
 
-	if use cluster && [[ "${PN}" != "mysql-cluster" ]]; then
-		ewarn "Upstream has noted that the NDB cluster support in the 5.0 and"
-		ewarn "5.1 series should NOT be put into production. In the near"
-		ewarn "future, it will be disabled from building."
-	fi
-
 	if [[ ${PN} == "mysql-cluster" ]] ; then
 		mysql_version_is_at_least "7.2.9" && java-pkg-opt-2_pkg_setup
 	fi
-
-	if use_if_iuse tokudb && [[ "${MERGE_TYPE}" != "binary" && $(gcc-major-version) -lt 4 || \
-		$(gcc-major-version) -eq 4 && $(gcc-minor-version) -lt 7 ]] ; then
-		eerror "${PN} with tokudb needs to be built with gcc-4.7 or later."
-		eerror "Please use gcc-config to switch to gcc-4.7 or later version."
-		die
-	fi
-
 }
 
 # @FUNCTION: mysql-multilib_src_unpack
@@ -459,6 +490,29 @@ mysql-multilib_src_prepare() {
 # @DESCRIPTION:
 # Configure mysql to build the code for Gentoo respecting the use flags.
 mysql-multilib_src_configure() {
+	# Bug #114895, bug #110149
+	filter-flags "-O" "-O[01]"
+
+	CXXFLAGS="${CXXFLAGS} -fno-strict-aliasing"
+	CXXFLAGS="${CXXFLAGS} -felide-constructors"
+	# Causes linkage failures.  Upstream bug #59607 removes it
+	if ! mysql_version_is_at_least "5.6" ; then
+		CXXFLAGS="${CXXFLAGS} -fno-implicit-templates"
+	fi
+	# As of 5.7, exceptions are used!
+	if ! mysql_version_is_at_least "5.7" ; then
+		CXXFLAGS="${CXXFLAGS} -fno-exceptions -fno-rtti"
+	fi
+	export CXXFLAGS
+
+	# bug #283926, with GCC4.4, this is required to get correct behavior.
+	append-flags -fno-strict-aliasing
+
+	# bug 508724 mariadb cannot use ld.gold
+	if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
+		append-ldflags $(test-flags-CXX -fuse-ld=bfd)
+	fi
+
 	multilib-minimal_src_configure
 }
 
@@ -519,7 +573,8 @@ multilib_src_configure() {
 		)
 	fi
 
-	mycmakeargs+=( -DWITH_EDITLINE=system )
+	### TODO: make this system but issues with UTF-8 prevent it
+	mycmakeargs+=( -DWITH_EDITLINE=bundled )
 
 	if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 		mycmakeargs+=(
@@ -536,24 +591,6 @@ multilib_src_configure() {
 	else
 		configure_cmake_minimal
 	fi
-
-	# Bug #114895, bug #110149
-	filter-flags "-O" "-O[01]"
-
-	CXXFLAGS="${CXXFLAGS} -fno-strict-aliasing"
-	CXXFLAGS="${CXXFLAGS} -felide-constructors"
-	# Causes linkage failures.  Upstream bug #59607 removes it
-	if ! mysql_version_is_at_least "5.6" ; then
-		CXXFLAGS="${CXXFLAGS} -fno-implicit-templates"
-	fi
-	# As of 5.7, exceptions are used!
-	if ! mysql_version_is_at_least "5.7" ; then
-		CXXFLAGS="${CXXFLAGS} -fno-exceptions -fno-rtti"
-	fi
-	export CXXFLAGS
-
-	# bug #283926, with GCC4.4, this is required to get correct behavior.
-	append-flags -fno-strict-aliasing
 
 	cmake-utils_src_configure
 }
