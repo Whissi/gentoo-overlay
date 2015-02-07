@@ -11,7 +11,6 @@ DESCRIPTION+=' a high-level tool for configuring Netfilter'
 HOMEPAGE="http://www.shorewall.net/"
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~hppa ~ppc ~ppc64 ~sparc ~x86"
 IUSE="doc +init +ipv4 ipv6 lite4 lite6"
 
 MY_PV=${PV/_rc/-RC}
@@ -69,6 +68,8 @@ if [[ ${MY_PV} = *-Beta* ]] || [[ ${MY_PV} = *-RC* ]]; then
 	# Cleaning up temporary variables
 	unset _tmp_last_index
 	unset _tmp_suffix
+else
+	KEYWORDS="~alpha ~amd64 ~hppa ~ppc ~ppc64 ~sparc ~x86"
 fi
 
 SRC_URI="
