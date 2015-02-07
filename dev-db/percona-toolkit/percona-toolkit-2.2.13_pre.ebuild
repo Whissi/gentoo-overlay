@@ -1,4 +1,4 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -42,7 +42,7 @@ DEPEND="${COMMON_DEPEND}
 src_prepare() {
 	# bug 501904 - CVE-2014-2029
 	# sed -i -e '/^=item --\[no\]version-check/,/^default: yes/{/^default: yes/d}' bin/*
-	epatch "${FILESDIR}/${MY_P}-no-versioncheck.patch"
+	epatch "${FILESDIR}/${PN}-2.2.11-no-versioncheck.patch"
 }
 
 # Percona Toolkit does NOT contain the UDF code for Murmur/FNV any more.
