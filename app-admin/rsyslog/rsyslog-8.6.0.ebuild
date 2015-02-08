@@ -257,7 +257,7 @@ src_install() {
 
 	if use mysql; then
 		insinto /usr/share/doc/${PF}/scripts/mysql
-		doins plugins/ommysql/{createDB.sql,contrib/delete_mysql}
+		doins plugins/ommysql/createDB.sql
 	fi
 
 	if use postgres; then

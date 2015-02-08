@@ -22,7 +22,6 @@ if [[ ${PV} == "9999" ]]; then
 	"
 
 	inherit git-r3
-	KEYWORDS=""
 else
 	SRC_URI="
 		http://www.rsyslog.com/files/download/${PN}/${P}.tar.gz
@@ -254,7 +253,7 @@ src_install() {
 
 	if use mysql; then
 		insinto /usr/share/doc/${PF}/scripts/mysql
-		doins plugins/ommysql/{createDB.sql,contrib/delete_mysql}
+		doins plugins/ommysql/createDB.sql
 	fi
 
 	if use postgres; then
