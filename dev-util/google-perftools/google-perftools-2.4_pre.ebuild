@@ -1,4 +1,4 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -20,7 +20,7 @@ SLOT="0/4.2.1"
 # linux x86/amd64/ppc/ppc64/arm
 # OSX ppc/amd64
 # AIX ppc/ppc64
-KEYWORDS="-* ~amd64 ~arm ~ppc64 ~x86 ~x86-fbsd ~amd64-linux ~x86-linux"
+KEYWORDS="~amd64 ~x86"
 IUSE="largepages +debug minimal test static-libs"
 
 DEPEND="sys-libs/libunwind"
