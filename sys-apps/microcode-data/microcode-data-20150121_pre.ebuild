@@ -12,7 +12,7 @@ MY_P="${PN}-${MY_PV}"
 # Find updates by searching and clicking the first link (hopefully it's the one):
 # http://www.intel.com/content/www/us/en/search.html?keyword=Processor+Microcode+Data+File
 
-NUM="24616"
+NUM="24661"
 DESCRIPTION="Intel IA32 microcode update data"
 HOMEPAGE="http://inertiawar.com/microcode/ https://downloadcenter.intel.com/Detail_Desc.aspx?DwnldID=${NUM}"
 SRC_URI="http://downloadmirror.intel.com/${NUM}/eng/microcode-${MY_PV}.tgz"
