@@ -14,7 +14,7 @@ HOMEPAGE="http://code.google.com/p/gperftools/"
 SRC_URI="https://googledrive.com/host/0B6NtGsLhIcf7MWxMMF9JdTN3UVk/${MY_P}.tar.gz"
 
 LICENSE="MIT"
-SLOT="0/4.2.1"
+SLOT="0/4.2.6"
 # contains ASM code, with support for
 # freebsd x86/amd64
 # linux x86/amd64/ppc/ppc64/arm
