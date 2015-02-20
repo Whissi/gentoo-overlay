@@ -70,7 +70,7 @@ DEPEND="
 	dev-python/setuptools[${PYTHON_USEDEP}]
 	test? (
 		dev-python/pip[${PYTHON_USEDEP}]
-		>=dev-python/SaltTesting-2014.4.24[${PYTHON_USEDEP}]
+		>=dev-python/SaltTesting-2015.2.16[${PYTHON_USEDEP}]
 		dev-python/timelib[${PYTHON_USEDEP}]
 		dev-python/virtualenv[${PYTHON_USEDEP}]
 		${RDEPEND}
@@ -113,5 +113,6 @@ python_test() {
 
 	# using ${T} for the TMPDIR makes some tests needs paths that exceed PATH_MAX
 	USE_SETUPTOOLS=1 SHELL="/bin/bash" TMPDIR="/tmp" \
-		./tests/runtests.py --unit-tests --no-report --verbose || die "testing failed"
+		${EPYTHON} tests/runtests.py \
+		--unit-tests --no-report --verbose || die "testing failed"
 }

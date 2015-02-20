@@ -1,4 +1,4 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -25,7 +25,7 @@ fi
 LICENSE="Apache-2.0"
 SLOT="0"
 IUSE="api gnupg keyring ldap libcloud libvirt mako mongodb mysql nova"
-IUSE+=" openssl raet redis +zeromq test timelib"
+IUSE+=" openssl raet redis selinux +zeromq test timelib"
 
 RDEPEND="
 	dev-python/jinja[${PYTHON_USEDEP}]
@@ -35,6 +35,12 @@ RDEPEND="
 	>=dev-python/requests-1.0.0[${PYTHON_USEDEP}]
 	dev-python/setuptools[${PYTHON_USEDEP}]
 	sys-apps/pciutils
+	api? (
+		|| (
+			dev-python/cherrypy[${PYTHON_USEDEP}]
+			www-servers/tornado[${PYTHON_USEDEP}]
+		)
+	)
 	gnupg? ( dev-python/python-gnupg[${PYTHON_USEDEP}] )
 	keyring? ( dev-python/keyring[${PYTHON_USEDEP}] )
 	ldap? ( dev-python/python-ldap[${PYTHON_USEDEP}] )
@@ -45,31 +51,26 @@ RDEPEND="
 	mysql? ( dev-python/mysql-python[${PYTHON_USEDEP}] )
 	nova? ( >=dev-python/python-novaclient-2.17.0[${PYTHON_USEDEP}] )
 	openssl? ( dev-python/pyopenssl[${PYTHON_USEDEP}] )
-	api? (
-		|| (
-			dev-python/cherrypy[${PYTHON_USEDEP}]
-			www-servers/tornado[${PYTHON_USEDEP}]
-		)
-	)
 	raet? (
 		dev-python/libnacl[${PYTHON_USEDEP}]
 		dev-python/ioflo[${PYTHON_USEDEP}]
 		dev-python/raet[${PYTHON_USEDEP}]
 	)
 	redis? ( dev-python/redis-py[${PYTHON_USEDEP}] )
+	selinux? ( sec-policy/selinux-salt )
+	timelib? ( dev-python/timelib[${PYTHON_USEDEP}] )
 	zeromq? (
 		>=dev-python/pyzmq-2.2.0[${PYTHON_USEDEP}]
 		dev-python/m2crypto[${PYTHON_USEDEP}]
 		dev-python/pycrypto[${PYTHON_USEDEP}]
 	)
-	timelib? ( dev-python/timelib[${PYTHON_USEDEP}] )
 "
 
 DEPEND="
 	dev-python/setuptools[${PYTHON_USEDEP}]
 	test? (
 		dev-python/pip[${PYTHON_USEDEP}]
-		>=dev-python/SaltTesting-2014.4.24[${PYTHON_USEDEP}]
+		>=dev-python/SaltTesting-2015.2.16[${PYTHON_USEDEP}]
 		dev-python/timelib[${PYTHON_USEDEP}]
 		dev-python/virtualenv[${PYTHON_USEDEP}]
 		${RDEPEND}
@@ -81,12 +82,15 @@ REQUIRED_USE="|| ( raet zeromq )"
 
 PATCHES=(
 	"${FILESDIR}/${PN}-2014.1.2-tests-nonroot.patch"
-	"${FILESDIR}/${P}-remove-pydsl-includes-test.patch"
 )
 
 python_prepare() {
 	# this test fails because it trys to "pip install distribute"
 	rm tests/unit/{modules,states}/zcbuildout_test.py
+
+	# these tests fail because they depend on features that are only
+	# in git versions of SaltTesting
+	rm tests/unit/{templates/jinja,modules/hashutil}_test.py
 }
 
 python_install_all() {
@@ -108,5 +112,6 @@ python_test() {
 
 	# using ${T} for the TMPDIR makes some tests needs paths that exceed PATH_MAX
 	USE_SETUPTOOLS=1 SHELL="/bin/bash" TMPDIR="/tmp" \
-		./tests/runtests.py --unit-tests --no-report --verbose || die "testing failed"
+		${EPYTHON} tests/runtests.py \
+		--unit-tests --no-report --verbose || die "testing failed"
 }
