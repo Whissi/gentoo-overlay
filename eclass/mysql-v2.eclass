@@ -1,6 +1,6 @@
 # Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/mysql-v2.eclass,v 1.35 2014/08/10 05:47:24 robbat2 Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/mysql-v2.eclass,v 1.36 2015/02/16 14:37:50 grknight Exp $
 
 # @ECLASS: mysql-v2.eclass
 # @MAINTAINER:
@@ -266,7 +266,7 @@ REQUIRED_USE="${REQUIRED_USE} minimal? ( !cluster !extraengine !embedded ) stati
 # Be warned, *DEPEND are version-dependant
 # These are used for both runtime and compiletime
 DEPEND="
-	ssl? ( >=dev-libs/openssl-0.9.6d )
+	ssl? ( >=dev-libs/openssl-0.9.6d:0 )
 	kernel_linux? ( sys-process/procps )
 	>=sys-apps/sed-4
 	>=sys-apps/texinfo-4.7-r1
@@ -284,14 +284,10 @@ elif [[ ${PN} == "mysql-cluster" ]] && mysql_version_is_at_least "7.3"; then
 	DEPEND="${DEPEND} dev-libs/libedit"
 else
 	if mysql_version_is_at_least "5.5" ; then
-		DEPEND="${DEPEND} !bindist? ( >=sys-libs/readline-4.1 )"
+		DEPEND="${DEPEND} !bindist? ( >=sys-libs/readline-4.1:0 )"
 	else
-		DEPEND="${DEPEND} >=sys-libs/readline-4.1"
+		DEPEND="${DEPEND} >=sys-libs/readline-4.1:0"
 	fi
-fi
-
-if [[ ${PN} == "mysql" || ${PN} == "percona-server" ]] ; then
-	mysql_version_is_at_least "5.7.5" && DEPEND="${DEPEND} dev-libs/boost"
 fi
 
 if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
@@ -360,11 +356,8 @@ if [[ ${PN} == "mariadb-galera" ]] ; then
 	# The wsrep API version must match between the ebuild and sys-cluster/galera.
 	# This will be indicated by WSREP_REVISION in the ebuild and the first number
 	# in the version of sys-cluster/galera
-	#
-	# lsof is required as of 5.5.38 and 10.0.11 for the rsync sst
 	RDEPEND="${RDEPEND}
 		=sys-cluster/galera-${WSREP_REVISION}*
-		sys-process/lsof
 	"
 fi
 
@@ -515,8 +508,7 @@ mysql-v2_pkg_setup() {
 		mysql_version_is_at_least "7.2.9" && java-pkg-opt-2_pkg_setup
 	fi
 
-	if use_if_iuse tokudb && [[ "${MERGE_TYPE}" != "binary" && $(gcc-major-version) -lt 4 || \
-		$(gcc-major-version) -eq 4 && $(gcc-minor-version) -lt 7 ]] ; then
+	if use_if_iuse tokudb && [[ $(gcc-major-version) -lt 4 || $(gcc-major-version) -eq 4 && $(gcc-minor-version) -lt 7 ]] ; then
 		eerror "${PN} with tokudb needs to be built with gcc-4.7 or later."
 		eerror "Please use gcc-config to switch to gcc-4.7 or later version."
 		die
