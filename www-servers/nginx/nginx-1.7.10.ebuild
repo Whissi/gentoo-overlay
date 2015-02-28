@@ -48,13 +48,13 @@ HTTP_SLOWFS_CACHE_MODULE_URI="http://labs.frickle.com/files/ngx_slowfs_cache-${H
 HTTP_SLOWFS_CACHE_MODULE_WD="${WORKDIR}/ngx_slowfs_cache-${HTTP_SLOWFS_CACHE_MODULE_PV}"
 
 # http_fancyindex (https://github.com/aperezdc/ngx-fancyindex, BSD license)
-HTTP_FANCYINDEX_MODULE_PV="0.3.4"
+HTTP_FANCYINDEX_MODULE_PV="0.3.5"
 HTTP_FANCYINDEX_MODULE_P="ngx_http_fancyindex-${HTTP_FANCYINDEX_MODULE_PV}"
 HTTP_FANCYINDEX_MODULE_URI="https://github.com/aperezdc/ngx-fancyindex/archive/v${HTTP_FANCYINDEX_MODULE_PV}.tar.gz"
 HTTP_FANCYINDEX_MODULE_WD="${WORKDIR}/ngx-fancyindex-${HTTP_FANCYINDEX_MODULE_PV}"
 
 # http_lua (https://github.com/openresty/lua-nginx-module, BSD license)
-HTTP_LUA_MODULE_PV="0.9.14"
+HTTP_LUA_MODULE_PV="0.9.15"
 HTTP_LUA_MODULE_P="ngx_http_lua-${HTTP_LUA_MODULE_PV}"
 HTTP_LUA_MODULE_URI="https://github.com/openresty/lua-nginx-module/archive/v${HTTP_LUA_MODULE_PV}.tar.gz"
 HTTP_LUA_MODULE_WD="${WORKDIR}/lua-nginx-module-${HTTP_LUA_MODULE_PV}"
@@ -121,9 +121,9 @@ HTTP_STICKY_MODULE_URI="https://bitbucket.org/nginx-goodies/nginx-sticky-module-
 HTTP_STICKY_MODULE_WD="${WORKDIR}/nginx-goodies-nginx-sticky-module-ng-bd312d586752"
 
 # ajp-module (https://github.com/yaoweibin/nginx_ajp_module, BSD-2)
-HTTP_AJP_MODULE_PV="0.3.0"
+HTTP_AJP_MODULE_PV="bf6cd93f2098b59260de8d494f0f4b1f11a84627"
 HTTP_AJP_MODULE_P="ngx_http_ajp_module-${HTTP_AJP_MODULE_PV}"
-HTTP_AJP_MODULE_URI="https://github.com/yaoweibin/nginx_ajp_module/archive/v${HTTP_AJP_MODULE_PV}.tar.gz"
+HTTP_AJP_MODULE_URI="https://github.com/yaoweibin/nginx_ajp_module/archive/${HTTP_AJP_MODULE_PV}.tar.gz"
 HTTP_AJP_MODULE_WD="${WORKDIR}/nginx_ajp_module-${HTTP_AJP_MODULE_PV}"
 
 # mogilefs-module (http://www.grid.net.ru/nginx/mogilefs.en.html, BSD-2)
@@ -553,7 +553,7 @@ src_install() {
 	if use nginx_modules_http_perl; then
 		cd "${S}"/objs/src/http/modules/perl/
 		einstall DESTDIR="${D%/}" INSTALLDIRS=vendor
-		fixlocalpod
+		perl_delete_localpod
 	fi
 
 	if use nginx_modules_http_cache_purge; then
@@ -578,7 +578,7 @@ src_install() {
 
 	if use nginx_modules_http_auth_pam; then
 		docinto ${HTTP_AUTH_PAM_MODULE_P}
-		dodoc "${HTTP_AUTH_PAM_MODULE_WD}"/{README,ChangeLog}
+		dodoc "${HTTP_AUTH_PAM_MODULE_WD}"/{README.md,ChangeLog}
 	fi
 
 	if use nginx_modules_http_upstream_check; then
