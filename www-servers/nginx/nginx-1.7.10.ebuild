@@ -59,7 +59,7 @@ HTTP_LUA_MODULE_P="ngx_http_lua-${HTTP_LUA_MODULE_PV}"
 HTTP_LUA_MODULE_URI="https://github.com/openresty/lua-nginx-module/archive/v${HTTP_LUA_MODULE_PV}.tar.gz"
 HTTP_LUA_MODULE_WD="${WORKDIR}/lua-nginx-module-${HTTP_LUA_MODULE_PV}"
 
-# http_auth_pam (http://web.iti.upv.es/~sto/nginx/, https://github.com/stogh/ngx_http_auth_pam_module, BSD-2 license)
+# http_auth_pam (http://web.iti.upv.es/~sto/nginx/, https://github.com/stogh/ngx_http_auth_pam_module/, BSD-2 license)
 HTTP_AUTH_PAM_MODULE_PV="1.4"
 HTTP_AUTH_PAM_MODULE_P="ngx_http_auth_pam-${HTTP_AUTH_PAM_MODULE_PV}"
 HTTP_AUTH_PAM_MODULE_URI="https://github.com/stogh/ngx_http_auth_pam_module/archive/v${HTTP_AUTH_PAM_MODULE_PV}.tar.gz"
