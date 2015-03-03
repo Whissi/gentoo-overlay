@@ -56,7 +56,6 @@ MY_P_DOCS=${MY_PN_DOCS/#S/s}-${MY_PV}
 MY_URL_PREFIX=
 MY_URL_SUFFIX=
 if [[ ${MY_PV} = *-Beta* ]] || [[ ${MY_PV} = *-RC* ]]; then
-	KEYWORDS=""
 	MY_URL_PREFIX='development/'
 
 	_tmp_last_index=$(($(get_last_version_component_index ${MY_PV})+1))
