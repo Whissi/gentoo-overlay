@@ -200,7 +200,7 @@ src_configure() {
 src_compile() {
 	autotools-utils_src_compile
 
-	if use doc -a ${PV} == "9999"; then
+	if use doc && [[ "${PV}" == "9999" ]]; then
 		einfo "Building documentation ..."
 		local doc_dir="${S}/docs"
 		cd "${doc_dir}" || die "Cannot chdir into \"${doc_dir}\"!"
