@@ -1,5 +1,5 @@
 #!/sbin/runscript
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -20,7 +20,7 @@ description_configtest="Run collectd's internal config check."
 required_files="${COLLECTD_CONFIGFILE}"
 
 depend() {
-	use net
+	use net dns
 }
 
 _checkconfig() {
@@ -68,8 +68,8 @@ stop_pre() {
 
 stop_post() {
 	if [ -f "${COLLECTD_PIDFILE}" ]; then
-		ebegin "Removing stale PID file"
+		vebegin "Removing stale PID file"
 		rm --force "${COLLECTD_PIDFILE}"
-		eend $?
+		veend $?
 	fi
 }
