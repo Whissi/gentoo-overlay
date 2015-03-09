@@ -236,6 +236,7 @@ src_configure() {
 		memory md netlink nfs numa processes serial swap tcpconns thermal users vmem vserver
 		wireless"
 
+	local need_libstatgrab=0
 	local libstatgrab_plugins="cpu disk interface load memory swap users"
 	local bsd_plugins="cpu tcpconns ${libstatgrab_plugins}"
 
@@ -271,6 +272,11 @@ src_configure() {
 			if has ${plugin} ${myos_plugins}; then
 				# ... and available in this os
 				myconf+=" $(use_enable collectd_plugins_${plugin} ${plugin})"
+				# ... must we link against libstatgrab? Bug #541518
+				if use kernel_FreeBSD && has ${plugin} ${libstatgrab_plugins}; then
+					einfo "We must link against libstatgrab due to plugin \"${plugin}\" ..."
+					need_libstatgrab=1
+				fi
 			else
 				# ... and NOT available in this os
 				if use collectd_plugins_${plugin}; then
@@ -290,6 +296,12 @@ src_configure() {
 			myconf+=" $(use_enable collectd_plugins_${plugin} ${plugin})"
 		fi
 	done
+
+	if [ "${need_libstatgrab}" -eq 1 ]; then
+		myconf+=" --with-libstatgrab"
+	else
+		myconf+=" --without-libstatgrab"
+	fi
 
 	# Need JAVA_HOME for java.
 	if use collectd_plugins_java; then
