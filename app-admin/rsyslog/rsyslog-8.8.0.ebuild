@@ -125,6 +125,7 @@ src_prepare() {
 	if [[ ${PV} != "9999" ]]; then
 		epatch "${FILESDIR}"/${BRANCH}/20-rsyslog-use-valgrind-only-when-requested.patch
 		epatch "${FILESDIR}"/${BRANCH}/50-rsyslog-run-queue-persist-test-only-once.patch
+		epatch -p1 "${FILESDIR}"/${BRANCH}/50-rsyslog-8.8.0-Add-missing-files-to-run-test-suite.patch
 	fi
 
 	epatch_user

@@ -1,0 +1,41 @@
+From: Michael Biebl <biebl@debian.org>
+Date: Tue, 10 Mar 2015 21:02:30 +0100
+Subject: Add missing files to run test-suite
+
+---
+ tests/testsuites/mmnormalize_regex.rulebase     | 1 +
+ tests/testsuites/mmnormalize_tokenized.rulebase | 5 +++++
+ tests/testsuites/mmnormalize_variable.rulebase  | 1 +
+ 3 files changed, 7 insertions(+)
+ create mode 100644 tests/testsuites/mmnormalize_regex.rulebase
+ create mode 100644 tests/testsuites/mmnormalize_tokenized.rulebase
+ create mode 100644 tests/testsuites/mmnormalize_variable.rulebase
+
+diff --git a/tests/testsuites/mmnormalize_regex.rulebase b/tests/testsuites/mmnormalize_regex.rulebase
+new file mode 100644
+index 0000000..f58e8f2
+--- /dev/null
++++ b/tests/testsuites/mmnormalize_regex.rulebase
+@@ -0,0 +1 @@
++rule=:http host ports are %hps:regex:([0-9.\x3a]+(, )?)+% etc
+\ No newline at end of file
+diff --git a/tests/testsuites/mmnormalize_tokenized.rulebase b/tests/testsuites/mmnormalize_tokenized.rulebase
+new file mode 100644
+index 0000000..da5242d
+--- /dev/null
++++ b/tests/testsuites/mmnormalize_tokenized.rulebase
+@@ -0,0 +1,5 @@
++rule=only_ips:%only_ips:tokenized:, :ipv4%
++rule=local_ips:local ips are %local_ips:tokenized:, :ipv4%
++rule=external_ips:%external_ips:tokenized:, :ipv4% are external ips
++rule=paths:for %user:char-to:@%@localhost path was %fragments:tokenized:\x3a:char-sep:\x3a%
++rule=recur_comma_colon_nos:comma separated list of colon separated numbers: %some_nos:tokenized:, :tokenized: \x3a :tokenized:#:number%
+\ No newline at end of file
+diff --git a/tests/testsuites/mmnormalize_variable.rulebase b/tests/testsuites/mmnormalize_variable.rulebase
+new file mode 100644
+index 0000000..4d40d4c
+--- /dev/null
++++ b/tests/testsuites/mmnormalize_variable.rulebase
+@@ -0,0 +1 @@
++rule=hms:%hr:number%:%min:number%:%sec:number% %zone:word%
+\ No newline at end of file

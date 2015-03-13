@@ -53,12 +53,12 @@ RDEPEND="
 		>=dev-libs/liblognorm-1.1.0:=
 	)
 	omudpspoof? ( >=net-libs/libnet-1.1.6 )
-	postgres? ( >=dev-db/postgresql-8.4.20 )
+	postgres? ( >=dev-db/postgresql-8.4.20:= )
 	rabbitmq? ( >=net-libs/rabbitmq-c-0.3.0 )
 	redis? ( >=dev-libs/hiredis-0.11.0 )
 	relp? ( >=dev-libs/librelp-1.2.5 )
 	rfc3195? ( >=dev-libs/liblogging-1.0.1:=[rfc3195] )
-	rfc5424hmac? ( >=dev-libs/openssl-0.9.8y )
+	rfc5424hmac? ( >=dev-libs/openssl-0.9.8y:= )
 	snmp? ( >=net-analyzer/net-snmp-5.7.2 )
 	ssl? ( >=net-libs/gnutls-2.12.23 )
 	systemd? ( >=sys-apps/systemd-208 )
@@ -67,7 +67,7 @@ DEPEND="${RDEPEND}
 	virtual/pkgconfig"
 
 if [[ ${PV} == "9999" ]]; then
-	RDEPEND+=" doc? ( >=dev-python/sphinx-1.1.3-r7 )"
+	DEPEND+=" doc? ( >=dev-python/sphinx-1.1.3-r7 )"
 fi
 
 BRANCH="8-stable"
@@ -94,8 +94,20 @@ src_unpack() {
 
 	if use doc; then
 		if [[ ${PV} == "9999" ]]; then
+			local _EGIT_BRANCH=
+			if [ -n "${EGIT_BRANCH}" ]; then
+				# Cannot use rsyslog commits/branches for documentation repository
+				_EGIT_BRANCH=${EGIT_BRANCH}
+				unset EGIT_BRANCH
+			fi
+
 			git-r3_fetch "${DOC_REPO_URI}"
 			git-r3_checkout "${DOC_REPO_URI}" "${S}"/docs
+
+			if [ -n "${_EGIT_BRANCH}" ]; then
+				# Restore previous EGIT_BRANCH information
+				EGIT_BRANCH=${_EGIT_BRANCH}
+			fi
 		else
 			local doc_tarball="${PN}-doc-${PV}.tar.gz"
 
@@ -109,6 +121,11 @@ src_unpack() {
 
 src_prepare() {
 	epatch "${FILESDIR}"/${BRANCH}/10-respect_CFLAGS-r1.patch
+
+	if [[ ${PV} != "9999" ]]; then
+		epatch "${FILESDIR}"/${BRANCH}/20-rsyslog-use-valgrind-only-when-requested.patch
+		epatch "${FILESDIR}"/${BRANCH}/50-rsyslog-run-queue-persist-test-only-once.patch
+	fi
 
 	epatch_user
 
