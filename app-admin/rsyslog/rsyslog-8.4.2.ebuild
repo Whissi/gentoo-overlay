@@ -67,7 +67,10 @@ DOCS=(
 	"${FILESDIR}"/${BRANCH}/README.gentoo
 )
 
-PATCHES=( "${FILESDIR}"/${BRANCH}/10-respect_CFLAGS.patch )
+PATCHES=(
+	"${FILESDIR}"/${BRANCH}/10-respect_CFLAGS.patch
+	"${FILESDIR}"/${BRANCH}/50-rsyslog-fix-size-based-legacy-config-statements.patch
+)
 
 src_unpack() {
 	unpack ${P}.tar.gz

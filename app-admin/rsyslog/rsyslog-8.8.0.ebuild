@@ -10,6 +10,12 @@ inherit autotools-utils eutils systemd
 DESCRIPTION="An enhanced multi-threaded syslogd with database support and more"
 HOMEPAGE="http://www.rsyslog.com/"
 
+BRANCH="8-stable"
+
+PATCHES=(
+	"${FILESDIR}"/${BRANCH}/10-respect_CFLAGS-r1.patch
+)
+
 if [[ ${PV} == "9999" ]]; then
 	EGIT_REPO_URI="
 		git://github.com/rsyslog/${PN}.git
@@ -28,6 +34,11 @@ else
 		doc? ( http://www.rsyslog.com/files/download/${PN}/${PN}-doc-${PV}.tar.gz )
 	"
 	KEYWORDS="~amd64 ~arm ~hppa ~x86"
+
+	PATCHES+=( "${FILESDIR}"/${BRANCH}/50-rsyslog-run-queue-persist-test-only-once.patch )
+	PATCHES+=( "${FILESDIR}"/${BRANCH}/50-rsyslog-fix-size-based-legacy-config-statements.patch )
+	PATCHES+=( "${FILESDIR}"/${BRANCH}/50-rsyslog-add-option-to-disable-valgrind-usage-in-testbench.patch )
+	PATCHES+=( "${FILESDIR}"/${BRANCH}/50-rsyslog-8.8.0-Add-missing-files-to-run-test-suite.patch )
 fi
 
 LICENSE="GPL-3 LGPL-3 Apache-2.0"
@@ -69,8 +80,6 @@ DEPEND="${RDEPEND}
 if [[ ${PV} == "9999" ]]; then
 	DEPEND+=" doc? ( >=dev-python/sphinx-1.1.3-r7 )"
 fi
-
-BRANCH="8-stable"
 
 # Maitainer note : open a bug to upstream
 # showing that building in a separate dir fails
@@ -119,20 +128,6 @@ src_unpack() {
 	fi
 }
 
-src_prepare() {
-	epatch "${FILESDIR}"/${BRANCH}/10-respect_CFLAGS-r1.patch
-
-	if [[ ${PV} != "9999" ]]; then
-		epatch "${FILESDIR}"/${BRANCH}/20-rsyslog-use-valgrind-only-when-requested.patch
-		epatch "${FILESDIR}"/${BRANCH}/50-rsyslog-run-queue-persist-test-only-once.patch
-		epatch -p1 "${FILESDIR}"/${BRANCH}/50-rsyslog-8.8.0-Add-missing-files-to-run-test-suite.patch
-	fi
-
-	epatch_user
-
-	autotools-utils_src_prepare
-}
-
 src_configure() {
 	# Maintainer notes:
 	# * Guardtime support is missing because libgt isn't yet available
@@ -151,6 +146,7 @@ src_configure() {
 
 	local myeconfargs=(
 		--disable-generate-man-pages
+		--without-valgrind-testbench
 		$(use_enable test testbench)
 		# Input Plugins without depedencies
 		--enable-imdiag

@@ -15,7 +15,7 @@ diff --git a/tests/testsuites/mmnormalize_regex.rulebase b/tests/testsuites/mmno
 new file mode 100644
 index 0000000..f58e8f2
 --- /dev/null
-+++ b/tests/testsuites/mmnormalize_regex.rulebase
++++ tests/testsuites/mmnormalize_regex.rulebase
 @@ -0,0 +1 @@
 +rule=:http host ports are %hps:regex:([0-9.\x3a]+(, )?)+% etc
 \ No newline at end of file
@@ -23,7 +23,7 @@ diff --git a/tests/testsuites/mmnormalize_tokenized.rulebase b/tests/testsuites/
 new file mode 100644
 index 0000000..da5242d
 --- /dev/null
-+++ b/tests/testsuites/mmnormalize_tokenized.rulebase
++++ tests/testsuites/mmnormalize_tokenized.rulebase
 @@ -0,0 +1,5 @@
 +rule=only_ips:%only_ips:tokenized:, :ipv4%
 +rule=local_ips:local ips are %local_ips:tokenized:, :ipv4%
@@ -35,7 +35,7 @@ diff --git a/tests/testsuites/mmnormalize_variable.rulebase b/tests/testsuites/m
 new file mode 100644
 index 0000000..4d40d4c
 --- /dev/null
-+++ b/tests/testsuites/mmnormalize_variable.rulebase
++++ tests/testsuites/mmnormalize_variable.rulebase
 @@ -0,0 +1 @@
 +rule=hms:%hr:number%:%min:number%:%sec:number% %zone:word%
 \ No newline at end of file
