@@ -1,0 +1,34 @@
+From ace0e646a1cabfdeaadddc089d1685ba746561ef Mon Sep 17 00:00:00 2001
+From: Thomas D.
+Date: Fri, 27 Mar 2015 01:16:25 +0100
+Subject: [PATCH 1/2] Don't output pidfile before parsing command line
+ arguments
+
+---
+ src/ipmievd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/ipmievd.c b/src/ipmievd.c
+index 9ba2ece..d3847f0 100644
+--- a/src/ipmievd.c
++++ b/src/ipmievd.c
+@@ -704,7 +704,6 @@ ipmievd_main(struct ipmi_event_intf * eintf, int argc, char ** argv)
+ 
+ 	memset(pidfile, 0, 64);
+ 	sprintf(pidfile, "%s%d", DEFAULT_PIDFILE, eintf->intf->devnum);
+-	lprintf(LOG_NOTICE, "ipmievd: using pidfile %s", pidfile);
+ 
+ 	for (i = 0; i < argc; i++) {
+ 		if (strncasecmp(argv[i], "help", 4) == 0) {
+@@ -739,6 +738,8 @@ ipmievd_main(struct ipmi_event_intf * eintf, int argc, char ** argv)
+ 		}
+ 	}
+ 
++	lprintf(LOG_NOTICE, "ipmievd: using pidfile %s", pidfile);
++
+ 	/*
+ 	 * We need to open interface before forking daemon
+ 	 * so error messages are not lost to syslog and
+-- 
+2.3.3
+
