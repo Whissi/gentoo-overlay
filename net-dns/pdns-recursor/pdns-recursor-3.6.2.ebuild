@@ -1,4 +1,4 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -15,7 +15,7 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE="lua"
 
-DEPEND="lua? ( >=dev-lang/lua-5.1 )"
+DEPEND="lua? ( >=dev-lang/lua-5.1:= )"
 RDEPEND="${DEPEND}
 	!<net-dns/pdns-2.9.20-r1"
 DEPEND="${DEPEND}

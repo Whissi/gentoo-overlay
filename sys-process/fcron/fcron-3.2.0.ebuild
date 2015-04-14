@@ -20,7 +20,7 @@ IUSE="debug pam selinux linguas_fr +mta +system-crontab readline"
 DEPEND="selinux? ( sys-libs/libselinux )
 	mta? ( virtual/mta )
 	pam? ( virtual/pam )
-	readline? ( sys-libs/readline )"
+	readline? ( sys-libs/readline:= )"
 
 # see bug 282214 for the reason to depend on bash
 RDEPEND="${DEPEND}
