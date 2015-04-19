@@ -6,7 +6,7 @@ Description=Shorewall IPv4 firewall lite
 Documentation=man:shorewall-lite(8) http://www.shorewall.net/Documentation_Index.html
 Wants=network-online.target
 After=network-online.target
-Conflicts=iptables.service firewalld.service
+Conflicts=iptables.service firewalld.service iptables-restore.service
 
 [Service]
 Type=oneshot

@@ -217,7 +217,7 @@ src_prepare() {
 		ln -s ../shorewallrc.gentoo ${MY_PN_INIT}/shorewallrc.gentoo || die "Failed to symlink shorewallrc.gentoo"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-init.confd "${S}"/${MY_PN_INIT}/default.gentoo || die "Copying shorewall-init.confd failed"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-init.initd "${S}"/${MY_PN_INIT}/init.gentoo.sh || die "Copying shorewall-init.initd failed"
-		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-init.systemd "${S}"/${MY_PN_INIT}/gentoo.service || die "Copying shorewall-init.systemd failed"
+		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-init.systemd-r1 "${S}"/${MY_PN_INIT}/gentoo.service || die "Copying shorewall-init.systemd failed"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-init.readme "${S}"/${MY_PN_INIT}/shorewall-init.README.Gentoo.txt || die "Copying shorewall-init.systemd failed"
 		eend 0
 
