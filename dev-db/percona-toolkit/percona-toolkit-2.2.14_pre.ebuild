@@ -1,4 +1,4 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -12,7 +12,7 @@ S="${WORKDIR}/${MY_P}"
 
 DESCRIPTION="essential command-line utilities for MySQL"
 HOMEPAGE="http://www.percona.com/software/percona-toolkit/"
-SRC_URI="http://www.percona.com/downloads/${PN}/${MY_PV}/${MY_P}.tar.gz"
+SRC_URI="http://www.percona.com/downloads/${PN}/${MY_PV}/tarball/${MY_P}.tar.gz"
 
 LICENSE="|| ( GPL-2 Artistic )"
 SLOT="0"
@@ -42,7 +42,7 @@ DEPEND="${COMMON_DEPEND}
 src_prepare() {
 	# bug 501904 - CVE-2014-2029
 	# sed -i -e '/^=item --\[no\]version-check/,/^default: yes/{/^default: yes/d}' bin/*
-	epatch "${FILESDIR}/${MY_P}-no-versioncheck.patch"
+	epatch "${FILESDIR}/${PN}-2.2.11-no-versioncheck.patch"
 }
 
 # Percona Toolkit does NOT contain the UDF code for Murmur/FNV any more.
