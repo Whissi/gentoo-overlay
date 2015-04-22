@@ -83,15 +83,12 @@ REQUIRED_USE="|| ( raet zeromq )"
 PATCHES=(
 	"${FILESDIR}/${PN}-2014.1.2-tests-nonroot.patch"
 	"${FILESDIR}/${PN}-2014.7.1-pydsl-includes-test-workaround.patch"
+	"${FILESDIR}/${PN}-2014.7.5-archive-test.patch"
 )
 
 python_prepare() {
 	# this test fails because it trys to "pip install distribute"
 	rm tests/unit/{modules,states}/zcbuildout_test.py
-
-	# these tests fail because they depend on features that are only
-	# in git versions of SaltTesting
-	rm tests/unit/{templates/jinja,modules/hashutil}_test.py
 }
 
 python_install_all() {
