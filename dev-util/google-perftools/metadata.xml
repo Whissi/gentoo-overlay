@@ -14,6 +14,11 @@
 			operations.
 		</flag>
 
+		<flag name="optimisememory">
+			In this mode, tcmalloc will use less memory overhead, at the cost of
+			running (likely not noticeably) slower.
+		</flag>
+
 		<flag name="debug">
 			Build a set of libraries with debug support (so-called
 			debugalloc). These are available by default but are not needed

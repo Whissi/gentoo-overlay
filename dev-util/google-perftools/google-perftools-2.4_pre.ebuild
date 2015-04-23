@@ -21,7 +21,7 @@ SLOT="0/4.2.6"
 # OSX ppc/amd64
 # AIX ppc/ppc64
 KEYWORDS="~amd64 ~x86"
-IUSE="largepages +debug minimal test static-libs"
+IUSE="largepages optimisememory +debug minimal test static-libs"
 
 DEPEND="sys-libs/libunwind"
 RDEPEND="${DEPEND}"
@@ -50,6 +50,7 @@ src_prepare() {
 
 src_configure() {
 	use largepages && append-cppflags -DTCMALLOC_LARGE_PAGES
+	use optimisememory && append-cppflags -DTCMALLOC_SMALL_BUT_SLOW
 	append-flags -fno-strict-aliasing -fno-omit-frame-pointer
 
 	local myeconfargs=(
