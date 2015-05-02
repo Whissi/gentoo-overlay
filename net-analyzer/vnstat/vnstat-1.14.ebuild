@@ -1,4 +1,4 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -11,13 +11,19 @@ SRC_URI="http://humdi.net/vnstat/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~hppa ~ppc ~ppc64 ~sparc ~x86"
-IUSE="gd"
+KEYWORDS="~amd64 ~x86"
+IUSE="gd selinux test"
 
-DEPEND="gd? ( media-libs/gd[png] )"
+COMMON_DEPEND="
+	gd? ( media-libs/gd[png] )
+"
+DEPEND="
+	${COMMON_DEPEND}
+	test? ( dev-libs/check )
+"
 RDEPEND="
-	${DEPEND}
-	!<sys-apps/openrc-0.13
+	${COMMON_DEPEND}
+	selinux? ( sec-policy/selinux-vnstatd )
 "
 
 pkg_setup() {
@@ -28,11 +34,13 @@ pkg_setup() {
 src_prepare() {
 	tc-export CC
 
-	sed -i 's:^DaemonUser.*:DaemonUser "vnstat":' cfg/vnstat.conf || die "Failed to set DaemonUser!"
-	sed -i 's:^DaemonGroup.*:DaemonGroup "vnstat":' cfg/vnstat.conf || die "Failed to set DaemonGroup!"
-	sed -i 's:^MaxBWethnone.*:# &:' cfg/vnstat.conf || die "Failed to comment out example!"
-	sed -i 's:vnstat[.]log:vnstatd.log:' cfg/vnstat.conf || die "Failed to adjust LogFile name!"
-	sed -i 's:^PidFile.*:PidFile "/run/vnstat/vnstatd.pid":' cfg/vnstat.conf || die "Failed to adjust PidFile directive!"
+	epatch "${FILESDIR}"/${PN}-gentoo.conf.diff
+
+	sed -i \
+		-e '/PIDFILE/s|/var/run|/run|' \
+		src/common.h || die
+
+	epatch_user
 }
 
 src_compile() {
@@ -53,7 +61,7 @@ src_install() {
 	newconfd "${FILESDIR}"/vnstatd-r1.confd vnstatd
 	newinitd "${FILESDIR}"/vnstatd-r1.initd vnstatd
 
-	systemd_newunit "${FILESDIR}"/vnstatd.systemd vnstatd.service
+	systemd_newunit "${S}"/examples/systemd/vnstat.service vnstatd.service
 	systemd_newtmpfilesd "${FILESDIR}"/vnstatd.tmpfile vnstatd.conf
 
 	keepdir /var/lib/vnstat
@@ -69,7 +77,6 @@ src_install() {
 pkg_postinst() {
 	# Workaround feature/bug #141619
 	chown -R vnstat:vnstat "${ROOT}"/var/lib/vnstat
-	chown vnstat:vnstat "${ROOT}"/var/run/vnstatd
 	ewarn "vnStat db files owning user and group has been changed to \"vnstat\"."
 
 	elog
