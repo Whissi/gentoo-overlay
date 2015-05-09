@@ -1,10 +1,10 @@
 [Unit]
-Description=The Salt Minion
+Description=The Salt API service
 After=syslog.target network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/salt-minion
+ExecStart=/usr/bin/salt-api
 
 [Install]
 WantedBy=multi-user.target

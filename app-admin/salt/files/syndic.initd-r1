@@ -1,0 +1,34 @@
+#!/sbin/runscript
+# Copyright 1999-2015 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+SALT_CONFIGDIR=${SALT_CONFIGDIR:-"/etc/salt"}
+SALT_PIDFILE=${SALT_PIDFILE:-"/run/salt-syndic.pid"}
+SALT_SSDARGS=${SALT_SSDARGS:-"--background --wait 1000"}
+SALT_TERMTIMEOUT=${SALT_TERMTIMEOUT:-"TERM/30/KILL/5"}
+SALT_USER=${SALT_USER:-"root"}
+
+command="/usr/bin/salt-syndic"
+
+command_args="--config-dir ${SALT_CONFIGDIR}"
+command_args="${command_args} --pid-file ${SALT_PIDFILE}"
+command_args="${command_args} --user ${SALT_USER}"
+command_args="${command_args} ${SALT_OPTS}"
+
+description="The Salt syndic daemon, a special minion that passes through"
+description="${description} commands from a higher master."
+
+name="SALT syndic daemon"
+
+pidfile=${SALT_PIDFILE}
+
+retry="${SALT_TERMTIMEOUT}"
+
+required_dirs="${SALT_CONFIGDIR}"
+
+start_stop_daemon_args="${SALT_SSDARGS}"
+
+depend() {
+	use logger net
+}
