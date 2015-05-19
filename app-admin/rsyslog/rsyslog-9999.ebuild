@@ -12,9 +12,7 @@ HOMEPAGE="http://www.rsyslog.com/"
 
 BRANCH="8-stable"
 
-PATCHES=(
-	"${FILESDIR}"/${BRANCH}/10-respect_CFLAGS-r1.patch
-)
+PATCHES=()
 
 if [[ ${PV} == "9999" ]]; then
 	EGIT_REPO_URI="
@@ -74,6 +72,9 @@ DEPEND="${RDEPEND}
 
 if [[ ${PV} == "9999" ]]; then
 	DEPEND+=" doc? ( >=dev-python/sphinx-1.1.3-r7 )"
+	DEPEND+=" >=sys-devel/flex-2.5.39-r1"
+	DEPEND+=" >=sys-devel/bison-2.4.3"
+	DEPEND+=" >=dev-python/docutils-0.12"
 fi
 
 # Maitainer note : open a bug to upstream
@@ -140,6 +141,7 @@ src_configure() {
 	fi
 
 	local myeconfargs=(
+		--disable-debug-symbols
 		--disable-generate-man-pages
 		--without-valgrind-testbench
 		$(use_enable test testbench)
