@@ -26,6 +26,8 @@ pkg_setup() {
 }
 
 src_prepare() {
+	epatch "${FILESDIR}"/${PN}-3.7.2-FORTIFY_SOURCE.patch
+
 	epatch_user
 }
 
