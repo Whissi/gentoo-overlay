@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer>
+		<email>whissi@whissi.de</email>
+		<name>Thomas D. (Whissi)</name>
+	</maintainer>
+	<use>
+		<flag name="gsl">Enable GSL support (requires <pkg>sci-libs/gsl</pkg>)</flag>
+		<flag name="pcap">Enable pcap support (requires <pkg>net-libs/libpcap</pkg>)</flag>
+		<flag name="rtpstream">Enable RTP streaming support (requires <pkg>sys-libs/zlib</pkg></flag>
+		<flag name="sctp">Enable SCTP support (requires <pkg>net-misc/lksctp-tools</pkg>)</flag>
+		<flag name="ssl">Enable SIP TLS/SRTP support (requires <pkg>dev-libs/openssl</pkg>)</flag>
+	</use>
+	<upstream>
+		<bugs-to>https://github.com/SIPp/sipp/issues</bugs-to>
+	</upstream>
+</pkgmetadata>
