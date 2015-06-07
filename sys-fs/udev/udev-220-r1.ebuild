@@ -1,4 +1,4 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -12,7 +12,7 @@ if [[ ${PV} = 9999* ]]; then
 	patchset=
 else
 	patchset=1
-	FIXUP_PATCH="${PN}-218-revert-systemd-messup.patch.xz"
+	FIXUP_PATCH="${PN}-220-revert-systemd-messup.patch.xz"
 	SRC_URI="http://www.freedesktop.org/software/systemd/systemd-${PV}.tar.xz
 		http://dev.gentoo.org/~polynomial-c/${PN}/${FIXUP_PATCH}"
 	if [[ -n "${patchset}" ]]; then
@@ -28,7 +28,7 @@ HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
 
 LICENSE="LGPL-2.1 MIT GPL-2"
 SLOT="0"
-IUSE="acl doc gudev introspection +kmod selinux static-libs"
+IUSE="acl doc gudev hwdb introspection +kmod selinux static-libs"
 
 RESTRICT="test"
 
@@ -59,7 +59,7 @@ DEPEND="${COMMON_DEPEND}
 	virtual/os-headers
 	virtual/pkgconfig
 	>=sys-devel/make-3.82-r4
-	>=sys-kernel/linux-headers-3.7
+	>=sys-kernel/linux-headers-3.9
 	doc? ( >=dev-util/gtk-doc-1.18 )"
 
 RDEPEND="${COMMON_DEPEND}
@@ -79,7 +79,7 @@ multilib_check_headers() { :; }
 check_default_rules() {
 	# Make sure there are no sudden changes to upstream rules file
 	# (more for my own needs than anything else ...)
-	local udev_rules_md5=c18b74c4f8bf4a397ee667ee419f3a8e
+	local udev_rules_md5=b8ad860dccae0ca51656b33c405ea2ca
 	MD5=$(md5sum < "${S}"/rules/50-udev-default.rules)
 	MD5=${MD5/  -/}
 	if [[ ${MD5} != ${udev_rules_md5} ]]; then
@@ -113,7 +113,7 @@ pkg_setup() {
 src_prepare() {
 	if ! [[ ${PV} = 9999* ]]; then
 		# secure_getenv() disable for non-glibc systems wrt bug #443030
-		if ! [[ $(grep -r secure_getenv * | wc -l) -eq 27 ]]; then
+		if ! [[ $(grep -r secure_getenv * | wc -l) -eq 28 ]]; then
 			eerror "The line count for secure_getenv() failed, see bug #443030"
 			die
 		fi
@@ -125,6 +125,7 @@ src_prepare() {
 	fi
 
 	epatch "${DISTDIR}"/${FIXUP_PATCH}
+	rm man/systemd-{hwdb,udevd}.8 man/systemd-hwdb.xml || die
 
 	cat <<-EOF > "${T}"/40-gentoo.rules
 	# Gentoo specific floppy and usb groups
@@ -160,6 +161,8 @@ src_prepare() {
 		echo '#define secure_getenv(x) NULL' >> config.h.in
 		sed -i -e '/error.*secure_getenv/s:.*:#define secure_getenv(x) NULL:' src/shared/missing.h || die
 	fi
+	rm src/journal/audit_type-to-name.h src/udev/keyboard-keys-from-name.gperf \
+		|| die
 }
 
 multilib_src_configure() {
@@ -178,6 +181,7 @@ multilib_src_configure() {
 		$(multilib_native_use_enable static-libs static)
 		--disable-nls
 		$(multilib_native_use_enable doc gtk-doc)
+		$(multilib_native_use_enable hwdb)
 		$(multilib_native_use_enable introspection)
 		--disable-python-devel
 		--disable-dbus
@@ -210,8 +214,13 @@ multilib_src_configure() {
 		--with-bashcompletiondir="$(get_bashcompdir)"
 		--with-rootprefix=
 		$(multilib_is_native_abi && echo "--with-rootlibdir=/$(get_libdir)")
-		$(multilib_is_native_abi || echo "MOUNT_CFLAGS=' ' MOUNT_LIBS=' '")
 	)
+
+	if ! multilib_is_native_abi ; then
+		econf_args+=(
+			MOUNT_{CFLAGS,LIBS}=' '
+		)
+	fi
 
 	ECONF_SOURCE="${S}" econf "${econf_args[@]}"
 }
@@ -233,6 +242,7 @@ multilib_src_compile() {
 			udevd
 			udevadm
 		)
+		use hwdb && exec_targets+=( udev-hwdb )
 		emake "${exec_targets[@]}"
 
 		local helper_targets=(
@@ -247,6 +257,8 @@ multilib_src_compile() {
 		emake "${helper_targets[@]}"
 
 		local man_targets=(
+			$(usex hwdb 'man/systemd-hwdb.8' '')
+			man/systemd-udevd.8
 			man/udev.conf.5
 			man/udev.link.5
 			man/udev.7
@@ -286,7 +298,7 @@ multilib_src_install() {
 			install-man7
 			install-man8
 			install-pkgconfiglibDATA
-			install-sharepkgconfigDATA
+			install-pkgconfigdataDATA
 			install-typelibsDATA
 			install-dist_docDATA
 			libudev-install-hook
@@ -304,10 +316,10 @@ multilib_src_install() {
 		targets+=(
 			rootlibexec_PROGRAMS=""
 			rootbin_PROGRAMS=""
-			rootsbin_PROGRAMS="udevd udevadm"
+			rootsbin_PROGRAMS="udevd udevadm $(usex hwdb 'udev-hwdb' '')"
 			lib_LTLIBRARIES="${lib_LTLIBRARIES}"
-			MANPAGES="man/udev.link.5 man/udev.7 man/udevadm.8 man/udevd.8"
-			MANPAGES_ALIAS="man/systemd-udevd.8"
+			MANPAGES="man/udev.link.5 man/udev.7 man/udevadm.8 man/udevd.8 $(usex hwdb 'man/hwdb.7 man/udev-hwdb.8' '')"
+			MANPAGES_ALIAS="man/systemd-udevd.8 $(usex hwdb 'man/systemd-hwdb.8' '')"
 			pkgconfiglib_DATA="${pkgconfiglib_DATA}"
 			INSTALL_DIRS='$(sysconfdir)/udev/rules.d \
 					$(sysconfdir)/udev/hwdb.d \
@@ -393,9 +405,9 @@ pkg_postinst() {
 	mkdir -p "${ROOT%/}"/run
 
 	local netrules="80-net-setup-link.rules"
-	local net_rules="${ROOT}"/etc/udev/rules.d/${netrules}
+	local net_rules="${ROOT%/}"/etc/udev/rules.d/${netrules}
 	copy_net_rules() {
-		[[ -f ${net_rules} ]] || cp "${ROOT}"/usr/share/doc/${PF}/gentoo/${netrules} "${net_rules}"
+		[[ -f ${net_rules} ]] || cp "${ROOT%/}"/usr/share/doc/${PF}/gentoo/${netrules} "${net_rules}"
 	}
 
 	if [[ ${REPLACING_VERSIONS} ]] && [[ ${REPLACING_VERSIONS} < 209 ]] ; then
@@ -486,8 +498,8 @@ pkg_postinst() {
 	enewgroup input
 
 	# Update hwdb database in case the format is changed by udev version.
-	if has_version 'sys-apps/hwids[udev]'; then
-		udevadm hwdb --update --root="${ROOT}"
+	if use hwdb && has_version 'sys-apps/hwids[udev]'; then
+		udev-hwdb --root="${ROOT}" update
 		# Only reload when we are not upgrading to avoid potential race w/ incompatible hwdb.bin and the running udevd
 		# http://cgit.freedesktop.org/systemd/systemd/commit/?id=1fab57c209035f7e66198343074e9cee06718bda
 		[[ -z ${REPLACING_VERSIONS} ]] && udev_reload
