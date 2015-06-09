@@ -56,7 +56,7 @@ DEPEND="${RDEPEND}
 		>=dev-libs/boost-1.34[static-libs(+)]
 		botan? ( =dev-libs/botan-1.10*[static-libs(+)] )
 		cryptopp? ( dev-libs/crypto++[static-libs(+)] )
-		lua? ( dev-lang/lua[static-libs(+)] )
+		lua? ( dev-lang/lua:=[static-libs(+)] )
 		mysql? ( virtual/mysql[static-libs(+)] )
 		postgres? ( dev-db/postgresql[static-libs(+)] )
 		ldap? ( >=net-nds/openldap-2.0.27-r4[static-libs(+)] )
