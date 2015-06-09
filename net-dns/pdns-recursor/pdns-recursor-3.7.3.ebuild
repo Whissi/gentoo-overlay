@@ -21,12 +21,24 @@ RDEPEND="${DEPEND}
 DEPEND="${DEPEND}
 	>=dev-libs/boost-1.33.1"
 
-#pkg_setup() {
-#	filter-flags -ftree-vectorize
-#}
+pkg_setup() {
+	filter-flags -ftree-vectorize
+}
 
 src_prepare() {
+	epatch "${FILESDIR}"/${PN}-3.7.2-FORTIFY_SOURCE.patch
+
 	epatch_user
+}
+
+src_configure() {
+	CC="$(tc-getCC)" \
+	CXX="$(tc-getCXX)" \
+	OPTFLAGS="" \
+	LUA_LIBS_CONFIG="-llua" \
+	LUA_CPPFLAGS_CONFIG="" \
+	LUA="$(use lua && echo 1)" \
+	./configure
 }
 
 src_compile() {
