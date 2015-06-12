@@ -35,3 +35,8 @@
 # (see https://bugs.gentoo.org/show_bug.cgi?id=551644#c32)
 =sys-fs/udev-220-r1
 =sys-fs/udev-220-r2
+
+# Thomas D. <whissi@whissi.de> (12 June 2015)
+# Masked because pkg.refresh_db is at least broken
+# (see https://github.com/saltstack/salt/issues/24617)
+=app-admin/salt-2015.5.2
