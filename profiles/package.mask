@@ -30,7 +30,8 @@
 
 #--- END OF EXAMPLES ---
 
-# Thomas D. <whissi@whissi.de> (18 Feb 2014)
-# Masked because patch set is hosted on a private, unofficial
-# site (test ebuild, see https://bugs.gentoo.org/show_bug.cgi?id=501530)
-=net-dialup/ppp-2.4.6_pre
+# Thomas D. <whissi@whissi.de> (12 June 2015)
+# Masked because race condition between udev and udevadm trigger
+# (see https://bugs.gentoo.org/show_bug.cgi?id=551644#c32)
+=sys-fs/udev-220-r1
+=sys-fs/udev-220-r2
