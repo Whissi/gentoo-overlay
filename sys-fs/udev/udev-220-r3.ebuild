@@ -65,7 +65,8 @@ DEPEND="${COMMON_DEPEND}
 
 RDEPEND="${COMMON_DEPEND}
 	!<sys-fs/lvm2-2.02.103
-	!<sec-policy/selinux-base-2.20120725-r10"
+	!<sec-policy/selinux-base-2.20120725-r10
+	gudev? ( !dev-libs/libgudev )"
 
 PDEPEND=">=sys-apps/hwids-20140304[udev]
 	>=sys-fs/udev-init-scripts-26"
