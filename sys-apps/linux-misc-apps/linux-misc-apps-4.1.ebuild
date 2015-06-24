@@ -4,7 +4,7 @@
 
 EAPI=5
 
-inherit versionator eutils toolchain-funcs linux-info flag-o-matic
+inherit autotools versionator eutils toolchain-funcs flag-o-matic
 
 DESCRIPTION="Misc tools bundled with kernel sources"
 HOMEPAGE="http://kernel.org/"
@@ -23,19 +23,19 @@ if [ ${PV/_rc} != ${PV} ]; then
 	LINUX_VER=$(get_version_component_range 1-2).$(($(get_version_component_range 3)-1))
 	PATCH_VERSION=$(get_version_component_range 1-3)
 	LINUX_PATCH=patch-${PV//_/-}.xz
-	SRC_URI="mirror://kernel/linux/kernel/v3.x/testing/${LINUX_PATCH}
-		mirror://kernel/linux/kernel/v3.x/testing/v${PATCH_VERSION}/${LINUX_PATCH}"
+	SRC_URI="mirror://kernel/linux/kernel/v4.x/testing/${LINUX_PATCH}
+		mirror://kernel/linux/kernel/v4.x/testing/v${PATCH_VERSION}/${LINUX_PATCH}"
 elif [ $(get_version_component_count) == 4 ]; then
 	# stable-release series
 	LINUX_VER=$(get_version_component_range 1-3)
 	LINUX_PATCH=patch-${PV}.xz
-	SRC_URI="mirror://kernel/linux/kernel/v3.x/${LINUX_PATCH}"
+	SRC_URI="mirror://kernel/linux/kernel/v4.x/${LINUX_PATCH}"
 else
 	LINUX_VER=${PV}
 fi
 
 LINUX_SOURCES=linux-${LINUX_VER}.tar.xz
-SRC_URI="${SRC_URI} mirror://kernel/linux/kernel/v3.x/${LINUX_SOURCES}"
+SRC_URI="${SRC_URI} mirror://kernel/linux/kernel/v4.x/${LINUX_SOURCES}"
 
 # pmtools also provides turbostat
 # usbip available in seperate package now
@@ -57,7 +57,6 @@ TARGETS_SIMPLE=(
 	Documentation/laptops/freefall.c
 	Documentation/networking/timestamping/timestamping.c
 	Documentation/watchdog/src/watchdog-simple.c
-	tools/lguest/lguest.c
 	tools/vm/slabinfo.c
 	usr/gen_init_cpio.c
 )
@@ -69,6 +68,7 @@ TARGETS_SIMPLE=(
 # These have a broken make install, no DESTDIR
 TARGET_MAKE_SIMPLE=(
 	tools/firewire:nosy-dump
+	tools/lguest:lguest
 	tools/power/x86/turbostat:turbostat
 	tools/power/x86/x86_energy_perf_policy:x86_energy_perf_policy
 	Documentation/misc-devices/mei:mei-amt-version
@@ -76,6 +76,7 @@ TARGET_MAKE_SIMPLE=(
 # tools/perf - covered by dev-utils/perf
 # tools/usb - testcases only
 # tools/virtio - testcaes only
+USBIP=tools/usb/usbip
 
 src_unpack() {
 	unpack ${LINUX_SOURCES}
@@ -94,13 +95,17 @@ src_prepare() {
 		epatch "${DISTDIR}"/${LINUX_PATCH}
 	fi
 
+	pushd ${USBIP} >/dev/null || die "Cannot chdir into '${USBIP}'"
+	eautoreconf -i -f -v
+	popd || die
+
 	sed -i \
 		-e '/^nosy-dump.*LDFLAGS/d' \
 		-e '/^nosy-dump.*CFLAGS/d' \
 		-e '/^nosy-dump.*CPPFLAGS/s,CPPFLAGS =,CPPFLAGS +=,g' \
 		"${S}"/tools/firewire/Makefile
 
-	epatch "${FILESDIR}"/${PN}-turbostat-Makefile.patch
+	epatch "${FILESDIR}"/${PN}-4.0-lguest-Makefile.patch
 }
 
 kernel_asm_arch() {
@@ -116,7 +121,11 @@ kernel_asm_arch() {
 }
 
 src_configure() {
-	:
+	cd ${USBIP} || die "Cannot chdir into '${USBIP}'"
+	econf \
+		$(use_enable static-libs static) \
+		$(use tcpd || echo --without-tcp-wrappers) \
+		--with-usbids-dir=/usr/share/misc
 }
 
 src_compile() {
@@ -138,6 +147,8 @@ src_compile() {
 		einfo "Building $dir => $target"
 		emake -C $dir ARCH=${karch} $target
 	done
+
+	emake -C ${USBIP}
 }
 
 src_install() {
@@ -153,6 +164,14 @@ src_install() {
 		einfo "Installing $dir => $target"
 		dosbin ${dir}/${target}
 	done
+
+	pushd ${USBIP} >/dev/null || die "Missing usbip/userspace"
+	emake DESTDIR="${D%/}" install
+
+	newdoc README README.usbip
+	newdoc AUTHORS AUTHORS.usbip
+	popd >/dev/null || die
+	dodoc drivers/usb/usbip/usbip_protocol.txt
 
 	newconfd "${FILESDIR}"/freefall.confd freefall
 	newinitd "${FILESDIR}"/freefall.initd freefall
