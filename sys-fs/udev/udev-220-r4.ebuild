@@ -11,7 +11,7 @@ if [[ ${PV} = 9999* ]]; then
 	inherit git-2
 	patchset=
 else
-	patchset=3
+	patchset=4
 	FIXUP_PATCH="${PN}-220-revert-systemd-messup.patch.xz"
 	SRC_URI="http://www.freedesktop.org/software/systemd/systemd-${PV}.tar.xz
 		http://dev.gentoo.org/~polynomial-c/${PN}/${FIXUP_PATCH}"
@@ -65,7 +65,8 @@ DEPEND="${COMMON_DEPEND}
 
 RDEPEND="${COMMON_DEPEND}
 	!<sys-fs/lvm2-2.02.103
-	!<sec-policy/selinux-base-2.20120725-r10"
+	!<sec-policy/selinux-base-2.20120725-r10
+	gudev? ( !dev-libs/libgudev )"
 
 PDEPEND=">=sys-apps/hwids-20140304[udev]
 	>=sys-fs/udev-init-scripts-26"
@@ -127,6 +128,9 @@ src_prepare() {
 
 	epatch "${DISTDIR}"/${FIXUP_PATCH}
 	rm man/systemd-{hwdb,udevd}.8 man/systemd-hwdb.xml || die
+
+	# Fix for https://github.com/systemd/systemd/issues/340
+	epatch "${FILESDIR}"/udev-220-issue340.patch
 
 	cat <<-EOF > "${T}"/40-gentoo.rules
 	# Gentoo specific floppy and usb groups
