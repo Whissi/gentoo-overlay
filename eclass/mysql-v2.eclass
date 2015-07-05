@@ -293,6 +293,10 @@ else
 	fi
 fi
 
+if [[ ${PN} == "mysql" || ${PN} == "percona-server" ]] ; then
+	mysql_version_is_at_least "5.7.5" && DEPEND="${DEPEND} dev-libs/boost"
+fi
+
 if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 	mysql_check_version_range "5.1.38 to 5.3.99" && DEPEND="${DEPEND} libevent? ( >=dev-libs/libevent-1.4 )"
 	mysql_version_is_at_least "5.2" && DEPEND="${DEPEND} oqgraph? ( >=dev-libs/boost-1.40.0 )"
@@ -359,8 +363,11 @@ if [[ ${PN} == "mariadb-galera" ]] ; then
 	# The wsrep API version must match between the ebuild and sys-cluster/galera.
 	# This will be indicated by WSREP_REVISION in the ebuild and the first number
 	# in the version of sys-cluster/galera
+	#
+	# lsof is required as of 5.5.38 and 10.0.11 for the rsync sst
 	RDEPEND="${RDEPEND}
 		=sys-cluster/galera-${WSREP_REVISION}*
+		sys-process/lsof
 	"
 fi
 
@@ -511,7 +518,8 @@ mysql-v2_pkg_setup() {
 		mysql_version_is_at_least "7.2.9" && java-pkg-opt-2_pkg_setup
 	fi
 
-	if use_if_iuse tokudb && [[ $(gcc-major-version) -lt 4 || $(gcc-major-version) -eq 4 && $(gcc-minor-version) -lt 7 ]] ; then
+	if use_if_iuse tokudb && [[ "${MERGE_TYPE}" != "binary" && $(gcc-major-version) -lt 4 || \
+		$(gcc-major-version) -eq 4 && $(gcc-minor-version) -lt 7 ]] ; then
 		eerror "${PN} with tokudb needs to be built with gcc-4.7 or later."
 		eerror "Please use gcc-config to switch to gcc-4.7 or later version."
 		die
@@ -818,8 +826,7 @@ mysql-v2_pkg_config() {
 		mysql_version_is_at_least "5.6" || options="${options} --loose-skip-innodb"
 	fi
 
-	einfo "Creating the mysql database and setting proper"
-	einfo "permissions on it ..."
+	einfo "Creating the mysql database and setting proper permissions on it ..."
 
 	# Now that /var/run is a tmpfs mount point, we need to ensure it exists before using it
 	PID_DIR="${EROOT}/var/run/mysqld"
