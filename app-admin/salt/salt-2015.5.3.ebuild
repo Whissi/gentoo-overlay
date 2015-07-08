@@ -81,7 +81,6 @@ REQUIRED_USE="|| ( raet zeromq )"
 PATCHES=(
 	"${FILESDIR}/${PN}-2014.7.1-pydsl-includes-test-workaround.patch"
 	"${FILESDIR}/${PN}-2015.5.0-archive-test.patch"
-	"${FILESDIR}/${PN}-2015.5.1-skip-libvirt-test-on-nonroot.patch"
 )
 
 python_prepare() {
