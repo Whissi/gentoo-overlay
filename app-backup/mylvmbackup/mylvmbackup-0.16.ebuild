@@ -17,6 +17,7 @@ RDEPEND="dev-perl/Config-IniFiles
 		dev-perl/DBD-mysql
 		virtual/mysql
 		dev-perl/TimeDate
+		dev-perl/File-Copy-Recursive
 		snmp? ( dev-perl/Net-SNMP )"
 
 src_prepare() {
