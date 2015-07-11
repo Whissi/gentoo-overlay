@@ -30,7 +30,7 @@
 
 #--- END OF EXAMPLES ---
 
-# Thomas D. <whissi@whissi.de> (12 June 2015)
-# Masked because pkg.refresh_db is at least broken
-# (see https://github.com/saltstack/salt/issues/24617)
-=app-admin/salt-2015.5.2
+# Thomas D. <whissi@whissi.de> (11 Juli 2015)
+# Masked due net.sh error
+# (see https://bugs.gentoo.org/554510)
+=sys-fs/udev-222
