@@ -14,7 +14,7 @@ HOMEPAGE="http://www.liblognorm.com"
 SRC_URI="http://www.liblognorm.com/files/download/${P}.tar.gz"
 
 LICENSE="LGPL-2.1"
-SLOT="0/1"
+SLOT="0/2"
 KEYWORDS="~amd64 ~arm ~hppa ~x86 ~amd64-linux"
 IUSE="debug doc pcre static-libs test"
 
@@ -27,6 +27,7 @@ RDEPEND="
 DEPEND="
 	${RDEPEND}
 	virtual/pkgconfig
+	doc? ( >=dev-python/sphinx-1.2.2 )
 "
 
 DOCS=( ChangeLog )
