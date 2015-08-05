@@ -173,7 +173,6 @@ multilib_src_configure() {
 		$(multilib_native_use_enable static-libs static)
 		--disable-nls
 		$(multilib_native_use_enable hwdb)
-		--disable-python-devel
 		--disable-dbus
 		$(multilib_native_use_enable kmod)
 		--disable-xkbcommon
@@ -188,13 +187,13 @@ multilib_src_configure() {
 		--disable-libcryptsetup
 		--disable-qrencode
 		--disable-microhttpd
+		--disable-gnuefi
 		--disable-gnutls
 		--disable-libcurl
 		--disable-libidn
 		--disable-quotacheck
 		--disable-logind
 		--disable-polkit
-		--disable-terminal
 		--disable-myhostname
 		$(multilib_is_native_abi || echo "--disable-manpages")
 		--enable-split-usr

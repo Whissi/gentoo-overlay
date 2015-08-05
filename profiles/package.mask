@@ -29,8 +29,3 @@
 ## app-misc/some-package
 
 #--- END OF EXAMPLES ---
-
-# Thomas D. <whissi@whissi.de> (11 Juli 2015)
-# Masked due net.sh error
-# (see https://bugs.gentoo.org/554510)
-=sys-fs/udev-222
