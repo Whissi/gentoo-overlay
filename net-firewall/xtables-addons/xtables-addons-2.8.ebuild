@@ -1,6 +1,6 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
+# $Id$
 
 EAPI="5"
 
@@ -119,9 +119,26 @@ XA_get_module_name() {
 	done
 }
 
+# Die on modules known to fail on certain kernel version.
+XA_known_failure() {
+	local module_name=$1
+	local KV_max=$2
+
+	if use xtables_addons_${module_name} && kernel_is ge ${KV_max//./ }; then
+		eerror
+		eerror "XTABLES_ADDONS=${module_name} fails to build on linux ${KV_max} or above."
+		eerror "Either remove XTABLES_ADDONS=${module_name} or use an earlier version of the kernel."
+		eerror
+		die
+	fi
+}
+
 src_prepare() {
 	XA_qa_check
 	XA_has_something_to_build
+
+	# Bug #553630#c2.  echo fails on linux-4 and above.
+	XA_known_failure "echo" 4
 
 	local mod module_name
 	if use modules; then
