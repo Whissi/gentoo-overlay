@@ -1,6 +1,6 @@
 # Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
+# $Id$
 
 EAPI="5"
 
@@ -217,7 +217,7 @@ src_prepare() {
 		ln -s ../shorewallrc.gentoo ${MY_PN_INIT}/shorewallrc.gentoo || die "Failed to symlink shorewallrc.gentoo"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-init.confd "${S}"/${MY_PN_INIT}/default.gentoo || die "Copying shorewall-init.confd failed"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-init.initd "${S}"/${MY_PN_INIT}/init.gentoo.sh || die "Copying shorewall-init.initd failed"
-		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-init.systemd-r1 "${S}"/${MY_PN_INIT}/gentoo.service || die "Copying shorewall-init.systemd failed"
+		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-init.systemd-r2 "${S}"/${MY_PN_INIT}/gentoo.service || die "Copying shorewall-init.systemd failed"
 		cp "${FILESDIR}"/${MY_MAJOR_RELEASE_NUMBER}/shorewall-init.readme "${S}"/${MY_PN_INIT}/shorewall-init.README.Gentoo.txt || die "Copying shorewall-init.systemd failed"
 		eend 0
 
@@ -438,5 +438,10 @@ pkg_postinst() {
 		elog ""
 		elog "Your Shorewall firewall can utilize \"conntrack\" from the \"net-firewall/conntrack-tools\""
 		elog "package. if you want to use this feature, you need to install \"net-firewall/conntrack-tools\"!"
+	fi
+
+	if ! has_version "dev-perl/Devel-NYTProf"; then
+		elog ""
+		elog "If you want to profile your Shorewall firewall you need to install \"dev-perl/Devel-NYTProf\"!"
 	fi
 }
