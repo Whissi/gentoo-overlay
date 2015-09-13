@@ -1,6 +1,6 @@
 # Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
+# $Id$
 
 EAPI=5
 PYTHON_COMPAT=(python2_7)
@@ -27,7 +27,7 @@ SRC_URI+=" vim-syntax? ( https://github.com/${PN}stack/${PN}-vim/archive/${SALT_
 LICENSE="Apache-2.0"
 SLOT="0"
 IUSE="cherrypy ldap libcloud libvirt gnupg keyring mako mongodb mysql neutron nova"
-IUSE+=" openssl redis selinux test +timelib raet +zeromq vim-syntax"
+IUSE+=" openssl profile redis selinux test +timelib raet +zeromq vim-syntax"
 
 RDEPEND="sys-apps/pciutils
 	dev-python/jinja[${PYTHON_USEDEP}]
@@ -36,7 +36,8 @@ RDEPEND="sys-apps/pciutils
 	dev-python/markupsafe[${PYTHON_USEDEP}]
 	>=dev-python/requests-1.0.0[${PYTHON_USEDEP}]
 	dev-python/setuptools[${PYTHON_USEDEP}]
-	>=www-servers/tornado-4.0[${PYTHON_USEDEP}]
+	>=www-servers/tornado-4.2.1[${PYTHON_USEDEP}]
+	virtual/python-futures[${PYTHON_USEDEP}]
 	libcloud? ( >=dev-python/libcloud-0.14.0[${PYTHON_USEDEP}] )
 	mako? ( dev-python/mako[${PYTHON_USEDEP}] )
 	ldap? ( dev-python/python-ldap[${PYTHON_USEDEP}] )
@@ -49,8 +50,7 @@ RDEPEND="sys-apps/pciutils
 	)
 	zeromq? (
 		>=dev-python/pyzmq-2.2.0[${PYTHON_USEDEP}]
-		>=dev-python/m2crypto-0.22.3[${PYTHON_USEDEP}]
-		dev-python/pycrypto[${PYTHON_USEDEP}]
+		>=dev-python/pycrypto-2.6.1[${PYTHON_USEDEP}]
 	)
 	cherrypy? ( >=dev-python/cherrypy-3.2.2[${PYTHON_USEDEP}] )
 	mongodb? ( dev-python/pymongo[${PYTHON_USEDEP}] )
@@ -61,7 +61,8 @@ RDEPEND="sys-apps/pciutils
 	timelib? ( dev-python/timelib[${PYTHON_USEDEP}] )
 	nova? ( >=dev-python/python-novaclient-2.17.0[${PYTHON_USEDEP}] )
 	neutron? ( >=dev-python/python-neutronclient-2.3.6[${PYTHON_USEDEP}] )
-	gnupg? ( dev-python/python-gnupg[${PYTHON_USEDEP}] )"
+	gnupg? ( dev-python/python-gnupg[${PYTHON_USEDEP}] )
+	profile? ( dev-python/yappi[${PYTHON_USEDEP}] )"
 DEPEND="dev-python/setuptools[${PYTHON_USEDEP}]
 	test? (
 		dev-python/pip[${PYTHON_USEDEP}]
@@ -79,13 +80,21 @@ DOCS=(README.rst AUTHORS)
 REQUIRED_USE="|| ( raet zeromq )"
 
 PATCHES=(
-	"${FILESDIR}/${PN}-2014.7.1-pydsl-includes-test-workaround.patch"
-	"${FILESDIR}/${PN}-2015.5.0-archive-test.patch"
+	"${FILESDIR}/${PN}-2015.8.0-pydsl-includes-test-workaround.patch"
+	"${FILESDIR}/${PN}-2015.8.0-remove-buggy-tests.patch"
+	"${FILESDIR}/${PN}-2015.5.5-auth-tests.patch"
+	"${FILESDIR}/${PN}-2015.5.5-cron-tests.patch"
+	"${FILESDIR}/${PN}-2015.5.5-remove-buggy-tests.patch"
 )
 
 python_prepare() {
 	# this test fails because it trys to "pip install distribute"
 	rm tests/unit/{modules,states}/zcbuildout_test.py tests/unit/modules/{rh_ip,win_network}_test.py
+
+	if has network-sandbox ${FEATURES}; then
+		einfo "Removing tests for salt.modules.mod_random which require network access because FEATURES=network-sandbox is set"
+		rm tests/unit/modules/random_org_test.py || die
+	fi
 }
 
 python_install_all() {
