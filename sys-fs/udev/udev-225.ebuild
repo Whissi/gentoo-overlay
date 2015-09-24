@@ -9,16 +9,15 @@ inherit autotools bash-completion-r1 eutils linux-info multilib multilib-minimal
 if [[ ${PV} = 9999* ]]; then
 	EGIT_REPO_URI="git://anongit.freedesktop.org/systemd/systemd"
 	inherit git-r3
-	patchset=
 else
 	patchset=
 	FIXUP_PATCH="${PN}-221-revert-systemd-messup.patch.xz"
 	SRC_URI="https://github.com/systemd/systemd/archive/v${PV}.tar.gz -> systemd-${PV}.tar.gz
-		http://dev.gentoo.org/~polynomial-c/${PN}/${FIXUP_PATCH}"
+		https://dev.gentoo.org/~polynomial-c/${PN}/${FIXUP_PATCH}"
 	if [[ -n "${patchset}" ]]; then
 		SRC_URI="${SRC_URI}
-			http://dev.gentoo.org/~ssuominen/${P}-patches-${patchset}.tar.xz
-			http://dev.gentoo.org/~williamh/dist/${P}-patches-${patchset}.tar.xz"
+			https://dev.gentoo.org/~ssuominen/${P}-patches-${patchset}.tar.xz
+			https://dev.gentoo.org/~williamh/dist/${P}-patches-${patchset}.tar.xz"
 	fi
 	KEYWORDS="~amd64 ~x86"
 fi
@@ -33,6 +32,7 @@ IUSE="acl hwdb +kmod selinux static-libs"
 RESTRICT="test"
 
 COMMON_DEPEND=">=sys-apps/util-linux-2.24
+	sys-libs/libcap[${MULTILIB_USEDEP}]
 	acl? ( sys-apps/acl )
 	kmod? ( >=sys-apps/kmod-16 )
 	selinux? ( >=sys-libs/libselinux-2.1.9 )
@@ -50,7 +50,6 @@ DEPEND="${COMMON_DEPEND}
 	dev-util/gperf
 	>=dev-util/intltool-0.50
 	>=sys-apps/coreutils-8.16
-	sys-libs/libcap
 	virtual/os-headers
 	virtual/pkgconfig
 	>=sys-devel/make-3.82-r4
@@ -156,6 +155,12 @@ src_prepare() {
 	fi
 }
 
+src_configure() {
+	# Prevent conflicts with i686 cross toolchain, bug 559726
+	tc-export AR CC NM OBJCOPY RANLIB
+	multilib-minimal_src_configure
+}
+
 multilib_src_configure() {
 	tc-export CC #463846
 	export cc_cv_CFLAGS__flto=no #502950
@@ -165,7 +170,6 @@ multilib_src_configure() {
 	# when *required* to avoid external deps or unnecessary compile
 	local econf_args
 	econf_args=(
-		ac_cv_search_cap_init=
 		--bindir=/bin
 		--sbindir=/sbin
 		--libdir=/usr/$(get_libdir)
@@ -201,6 +205,7 @@ multilib_src_configure() {
 		--with-bashcompletiondir="$(get_bashcompdir)"
 		--with-rootprefix=
 		$(multilib_is_native_abi && echo "--with-rootlibdir=/$(get_libdir)")
+		--disable-elfutils
 	)
 
 	if ! multilib_is_native_abi ; then
@@ -386,7 +391,7 @@ pkg_postinst() {
 		if [[ ${path} == /dev && ${fstype} != devtmpfs ]]; then
 			ewarn "You need to edit your /dev line in ${fstab} to have devtmpfs"
 			ewarn "filesystem. Otherwise udev won't be able to boot."
-			ewarn "See, http://bugs.gentoo.org/453186"
+			ewarn "See, https://bugs.gentoo.org/453186"
 		fi
 	done < "${fstab}"
 
@@ -430,12 +435,12 @@ pkg_postinst() {
 	elog
 	elog "For more information on udev on Gentoo, upgrading, writing udev rules, and"
 	elog "fixing known issues visit:"
-	elog "http://wiki.gentoo.org/wiki/Udev"
-	elog "http://wiki.gentoo.org/wiki/Udev/upgrade"
+	elog "https://wiki.gentoo.org/wiki/Udev"
+	elog "https://wiki.gentoo.org/wiki/Udev/upgrade"
 
 	# http://cgit.freedesktop.org/systemd/systemd/commit/rules/50-udev-default.rules?id=3dff3e00e044e2d53c76fa842b9a4759d4a50e69
-	# http://bugs.gentoo.org/246847
-	# http://bugs.gentoo.org/514174
+	# https://bugs.gentoo.org/246847
+	# https://bugs.gentoo.org/514174
 	enewgroup input
 
 	# Update hwdb database in case the format is changed by udev version.
