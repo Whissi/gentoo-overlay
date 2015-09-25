@@ -1,18 +1,18 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
+# $Id$
 
 EAPI="5"
 MODULES_OPTIONAL_USE=modules
-inherit autotools linux-info linux-mod
+inherit linux-info linux-mod
 
 DESCRIPTION="IPset tool for iptables, successor to ippool."
 HOMEPAGE="http://ipset.netfilter.org/"
 SRC_URI="http://ipset.netfilter.org/${P}.tar.bz2"
 
 LICENSE="GPL-2"
-SLOT="0"
-KEYWORDS="~amd64 ~ppc ~x86"
+SLOT="0/3.6.0"
+KEYWORDS="~amd64 ~x86"
 
 DEPEND=""
 RDEPEND="
@@ -29,19 +29,9 @@ IP_NF_SET_MAX=${IP_NF_SET_MAX:-256}
 BUILD_TARGETS="modules"
 MODULE_NAMES_ARG="kernel/net/netfilter/ipset/:${S}/kernel/net/netfilter/ipset"
 MODULE_NAMES="xt_set(kernel/net/netfilter/ipset/:${S}/kernel/net/netfilter/)"
-for i in ip_set{,_bitmap_{ip{,mac},port},_hash_{ip{,port{,ip,net}},net,net{port,iface}},_list_set}; do
+for i in ip_set{,_bitmap_{ip{,mac},port},_hash_{ip{,port{,ip,net}},net{,port{,net},iface,net}},_list_set}; do
 	MODULE_NAMES+=" ${i}(${MODULE_NAMES_ARG})"
 done
-
-check_header_patch() {
-	if ! $(grep -q NFNL_SUBSYS_IPSET "${KV_DIR}/include/linux/netfilter/nfnetlink.h"); then
-		eerror "Sorry, but you have to patch kernel sources with the following patch:"
-		eerror " # cd ${KV_DIR}"
-		eerror " # patch -i ${S}/netlink.patch -p1"
-		eerror "You should recompile and run new kernel to avoid runtime errors."
-		die "Unpatched kernel"
-	fi
-}
 
 pkg_setup() {
 	get_version
@@ -72,10 +62,9 @@ pkg_setup() {
 	[[ ${build_modules} -eq 1 ]] && linux-mod_pkg_setup
 }
 
-src_prepare() {
-	[[ ${build_modules} -eq 1 ]] && check_header_patch
-	eautoreconf
-}
+#src_prepare() {
+#	eautoreconf
+#}
 
 src_configure() {
 	econf \
