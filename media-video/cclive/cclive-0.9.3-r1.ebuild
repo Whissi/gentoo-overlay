@@ -1,6 +1,6 @@
 # Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/media-video/cclive/cclive-0.9.3-r1.ebuild,v 1.5 2014/02/23 16:09:28 pacho Exp $
+# $Id$
 
 EAPI=5
 
