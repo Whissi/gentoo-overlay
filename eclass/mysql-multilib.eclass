@@ -107,8 +107,8 @@ fi
 # We also strip off upstream's trailing letter that they use to respin tarballs
 MYSQL_VERSION_ID=""
 tpv="${PV%[a-z]}"
-tpv=( ${tpv//[-._]/ } ) ; tpv[3]="${PVR:${#PV}}" ; tpv[3]="${tpv[3]##*-r}"
-for vatom in 0 1 2 3 ; do
+tpv=( ${tpv//[-._]/ } ) ; tpv[4]="${PVR:${#PV}}" ; tpv[4]="${tpv[4]##*-r}"
+for vatom in 0 1 2 3 4 ; do
 	# pad to length 2
 	tpv[${vatom}]="00${tpv[${vatom}]}"
 	MYSQL_VERSION_ID="${MYSQL_VERSION_ID}${tpv[${vatom}]:0-2}"
@@ -176,9 +176,9 @@ SRC_URI="${SERVER_URI}"
 if [[ ${MY_EXTRAS_VER} != "live" && ${MY_EXTRAS_VER} != "none" ]]; then
 	SRC_URI="${SRC_URI}
 		mirror://gentoo/mysql-extras-${MY_EXTRAS_VER}.tar.bz2
-		http://dev.gentoo.org/~robbat2/distfiles/mysql-extras-${MY_EXTRAS_VER}.tar.bz2
-		http://dev.gentoo.org/~jmbsvicetto/distfiles/mysql-extras-${MY_EXTRAS_VER}.tar.bz2
-		http://dev.gentoo.org/~grknight/distfiles/mysql-extras-${MY_EXTRAS_VER}.tar.bz2"
+		https://dev.gentoo.org/~robbat2/distfiles/mysql-extras-${MY_EXTRAS_VER}.tar.bz2
+		https://dev.gentoo.org/~jmbsvicetto/distfiles/mysql-extras-${MY_EXTRAS_VER}.tar.bz2
+		https://dev.gentoo.org/~grknight/distfiles/mysql-extras-${MY_EXTRAS_VER}.tar.bz2"
 fi
 
 DESCRIPTION="A fast, multi-threaded, multi-user SQL database server"

@@ -3,22 +3,28 @@
 # $Id$
 
 EAPI="5"
-MY_EXTRAS_VER="20150717-1707Z"
+MY_EXTRAS_VER="20150930-2113Z"
 HAS_TOOLS_PATCH="1"
 SUBSLOT="18"
 
 inherit toolchain-funcs mysql-multilib
 # only to make repoman happy. it is really set in the eclass
-IUSE="$IUSE"
+IUSE="$IUSE tokudb tokudb-backup-plugin"
 
 # REMEMBER: also update eclass/mysql*.eclass before committing!
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~alpha ~amd64 ~arm ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~x86-linux"
+
+SRC_URI="${SRC_URI} http://mirror.deutschmann.io/distfiles/mysql/mysql-extras-${MY_EXTRAS_VER}.tar.bz2"
 
 # When MY_EXTRAS is bumped, the index should be revised to exclude these.
 EPATCH_EXCLUDE=''
 
-DEPEND="|| ( >=sys-devel/gcc-3.4.6 >=sys-devel/gcc-apple-4.0 )"
+DEPEND="|| ( >=sys-devel/gcc-3.4.6 >=sys-devel/gcc-apple-4.0 )
+	tokudb? ( app-arch/snappy )
+	tokudb-backup-plugin? ( dev-util/valgrind )"
 RDEPEND="${RDEPEND}"
+
+REQUIRED_USE="tokudb? ( jemalloc ) tokudb-backup-plugin? ( tokudb )"
 
 # Please do not add a naive src_unpack to this ebuild
 # If you want to add a single patch, copy the ebuild to an overlay
@@ -30,7 +36,6 @@ RDEPEND="${RDEPEND}"
 # ebuild percona-server-X.X.XX.ebuild \
 # digest clean package
 multilib_src_test() {
-
 	if ! multilib_is_native_abi ; then
 		einfo "Server tests not available on non-native abi".
 		return 0;
@@ -116,7 +121,7 @@ multilib_src_test() {
 		if ! use extraengine ; then
 			# bug 401673, 530766
 			for t in federated.federated_plugin ; do
-				mysql-multilib_disable_test  "$t" "Test $t requires USE=extraengine (Need federated engine)"
+				mysql-multilib_disable_test "$t" "Test $t requires USE=extraengine (Need federated engine)"
 			done
 		fi
 
@@ -128,7 +133,7 @@ multilib_src_test() {
 
 		# run mysql-test tests
 		perl mysql-test-run.pl --force --vardir="${T}/var-tests" \
-			--testcase-timeout=30
+			--testcase-timeout=30 --reorder
 		retstatus_tests=$?
 		[[ $retstatus_tests -eq 0 ]] || eerror "tests failed"
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
@@ -146,7 +151,6 @@ multilib_src_test() {
 
 		[[ -z "$failures" ]] || die "Test failures: $failures"
 		einfo "Tests successfully completed"
-
 	else
 
 		einfo "Skipping server tests due to minimal build."
