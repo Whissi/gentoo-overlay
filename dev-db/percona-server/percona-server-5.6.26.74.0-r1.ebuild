@@ -14,7 +14,7 @@ IUSE="$IUSE tokudb tokudb-backup-plugin"
 # REMEMBER: also update eclass/mysql*.eclass before committing!
 KEYWORDS="~alpha ~amd64 ~arm ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~x86-linux"
 
-SRC_URI="${SRC_URI} http://mirror.deutschmann.io/distfiles/mysql/mysql-extras-${MY_EXTRAS_VER}.tar.bz2"
+SRC_URI="${SRC_URI} https://mirror.deutschmann.io/distfiles/mysql/mysql-extras-${MY_EXTRAS_VER}.tar.bz2"
 
 # When MY_EXTRAS is bumped, the index should be revised to exclude these.
 EPATCH_EXCLUDE=''

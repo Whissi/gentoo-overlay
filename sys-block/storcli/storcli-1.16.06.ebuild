@@ -7,7 +7,7 @@ EAPI="5"
 DESCRIPTION="SAS MegaRAID StorCLI"
 HOMEPAGE="http://www.lsi.com/support/pages/download-results.aspx?keyword=storcli"
 #SRC_URI="http://www.lsi.com/downloads/Public/RAID%20Controllers/RAID%20Controllers%20Common%20Files/MR_SAS_StorCLI_${PV}.zip -> storcli-${PV}.zip"
-SRC_URI="http://mirror.deutschmann.io/distfiles/lsi/storcli/storcli-1.16.06.zip"
+SRC_URI="https://mirror.deutschmann.io/distfiles/lsi/storcli/storcli-1.16.06.zip"
 
 LICENSE="LSI"
 SLOT="6.8"

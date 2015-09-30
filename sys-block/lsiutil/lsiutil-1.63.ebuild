@@ -6,7 +6,7 @@ EAPI="5"
 
 DESCRIPTION="LSI Logic Fusion MPT Command Line Interface management tool"
 HOMEPAGE="http://www.lsi.com/"
-SRC_URI="http://mirror.deutschmann.io/distfiles/lsi/LSIUTIL-${PV}.zip"
+SRC_URI="https://mirror.deutschmann.io/distfiles/lsi/LSIUTIL-${PV}.zip"
 
 LICENSE="LSI"
 SLOT="0"
