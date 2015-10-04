@@ -32,6 +32,8 @@ else
 		doc? ( http://www.rsyslog.com/files/download/${PN}/${PN}-doc-${PV}.tar.gz )
 	"
 	KEYWORDS="~amd64 ~arm ~hppa ~x86"
+
+	PATCHES+=( "${FILESDIR}"/${BRANCH}/50-${PN}-8.12.0-fix-re_extract.patch )
 fi
 
 LICENSE="GPL-3 LGPL-3 Apache-2.0"
@@ -224,6 +226,11 @@ src_compile() {
 
 src_test() {
 	local _has_increased_ulimit=
+
+	# When adding new tests via patches we have to make them executable
+	einfo "Adjusting permissions of test scripts ..."
+	find "${S}"/tests -type f -name '*.sh' \! -perm -111 -exec chmod a+x '{}' \; || \
+		die "Failed to adjust test scripts permission"
 
 	if ulimit -n 3072; then
 		_has_increased_ulimit="true"

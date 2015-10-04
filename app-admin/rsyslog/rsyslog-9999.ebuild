@@ -225,6 +225,11 @@ src_compile() {
 src_test() {
 	local _has_increased_ulimit=
 
+	# When adding new tests via patches we have to make them executable
+	einfo "Adjusting permissions of test scripts ..."
+	find "${S}"/tests -type f -name '*.sh' \! -perm -111 -exec chmod a+x '{}' \; || \
+		die "Failed to adjust test scripts permission"
+
 	if ulimit -n 3072; then
 		_has_increased_ulimit="true"
 	fi
