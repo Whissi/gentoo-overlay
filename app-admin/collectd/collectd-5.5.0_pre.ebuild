@@ -7,12 +7,12 @@ EAPI="5"
 GENTOO_DEPEND_ON_PERL="no"
 PYTHON_COMPAT=( python2_7 )
 
-inherit autotools base eutils linux-info multilib perl-app python-single-r1 systemd user
+inherit autotools base eutils linux-info multilib perl-app python-single-r1 systemd user whissi_ebuilds
 
 DESCRIPTION="A a daemon which collects system statistic and provides mechanisms to store the values"
 
 HOMEPAGE="http://collectd.org"
-SRC_URI="${HOMEPAGE}/files/${P}.tar.bz2"
+SRC_URI="${HOMEPAGE}/files/${MY_P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -22,25 +22,25 @@ IUSE="contrib debug kernel_linux kernel_FreeBSD kernel_Darwin perl selinux stati
 # The plugin lists have to follow here since they extend IUSE
 
 # Plugins that to my knowledge cannot be supported (eg. dependencies not in gentoo)
-COLLECTD_IMPOSSIBLE_PLUGINS="aquaero mic netapp pinba sigrok xmms"
+COLLECTD_IMPOSSIBLE_PLUGINS="aquaero mic netapp pinba sigrok xmms pf"
 
 # Plugins that still need some work
-COLLECTD_UNTESTED_PLUGINS="amqp apple_sensors genericjmx ipvs lpar modbus redis
-	tape write_redis zfs_arc"
+COLLECTD_UNTESTED_PLUGINS="amqp apple_sensors barometer ceph drbd genericjmx ipvs lpar modbus redis
+	tape write_kafka write_redis write_riemann write_sensu write_tsdb zfs_arc"
 
 # Plugins that have been (compile) tested and can be enabled via COLLECTD_PLUGINS
-COLLECTD_TESTED_PLUGINS="aggregation apache apcups ascent battery bind cgroups
-	conntrack contextswitch cpu cpufreq csv curl curl_json curl_xml dbi df disk dns
-	email entropy ethstat exec filecount fscache gmond hddtemp interface ipmi
-	iptables irq java libvirt load logfile lvm madwifi match_empty_counter
+COLLECTD_TESTED_PLUGINS="aggregation apache apcups ascent battery bind
+	conntrack contextswitch cpu cpufreq csv curl curl_json curl_xml cgroups dbi df disk dns
+	email entropy ethstat exec fhcount filecount fscache gmond hddtemp interface ipc ipmi
+	iptables irq java libvirt load logfile log_logstash lvm madwifi match_empty_counter
 	match_hashed match_regex match_timediff match_value mbmon md memcachec memcached
 	memory multimeter mysql netlink network network nfs nginx notify_desktop
-	notify_email ntpd numa nut olsrd onewire openvpn oracle perl perl ping postgresql
-	powerdns processes protocols python python routeros rrdcached rrdcached rrdtool
-	sensors serial snmp statsd swap syslog table tail target_notification
+	notify_email ntpd numa nut olsrd onewire openldap openvpn oracle perl perl ping postgresql
+	powerdns processes protocols python python routeros rrdcached rrdtool
+	sensors serial smart snmp statsd swap syslog table tail tail_csv target_notification
 	target_replace target_scale target_set tcpconns teamspeak2 ted thermal threshold
-	tokyotyrant unixsock uptime users uuid varnish vmem vserver wireless
-	write_graphite write_http write_mongodb"
+	tokyotyrant turbostat unixsock uptime users uuid varnish vmem vserver wireless
+	write_graphite write_http write_log write_mongodb zookeeper"
 
 COLLECTD_DISABLED_PLUGINS="${COLLECTD_IMPOSSIBLE_PLUGINS} ${COLLECTD_UNTESTED_PLUGINS}"
 
@@ -88,6 +88,7 @@ COMMON_DEPEND="
 	collectd_plugins_rrdcached?		( net-analyzer/rrdtool )
 	collectd_plugins_rrdtool?		( net-analyzer/rrdtool )
 	collectd_plugins_sensors?		( sys-apps/lm_sensors )
+	collectd_plugins_smart?			( dev-libs/libatasmart )
 	collectd_plugins_snmp?			( net-analyzer/net-snmp )
 	collectd_plugins_tokyotyrant?		( net-misc/tokyotyrant )
 	collectd_plugins_varnish?		( www-servers/varnish )
@@ -118,8 +119,7 @@ REQUIRED_USE="
 
 PATCHES=(
 	"${FILESDIR}/${PN}-4.10.3"-werror.patch
-	"${FILESDIR}/${PN}-5.4.1"-{nohal,libocci,libperl,lt}.patch
-	"${FILESDIR}/${PN}-5.4.1-upstream-bug553.patch"
+	"${FILESDIR}/${PN}-5.4.2"-{nohal,libocci,lt}.patch
 )
 
 # @FUNCTION: collectd_plugin_kernel_linux
@@ -185,6 +185,9 @@ collectd_linux_kernel_checks() {
 	# thermal.c:/sys/class/thermal
 	collectd_plugin_kernel_linux thermal "PROC_FS SYSFS" warn
 	collectd_plugin_kernel_linux thermal ACPI_THERMAL warn
+
+	# turbostat.c:/dev/cpu/%d/msr
+	collectd_plugin_kernel_linux turbostat X86_MSR warn
 
 	# vmem.c:/proc/vmstat
 	collectd_plugin_kernel_linux vmem VM_EVENT_COUNTERS warn
@@ -328,7 +331,7 @@ src_configure() {
 }
 
 src_install() {
-	emake DESTDIR="${D}" install
+	emake DESTDIR="${D%/}" install
 
 	perl_delete_localpod
 
@@ -350,17 +353,17 @@ src_install() {
 	keepdir /var/lib/${PN}
 	fowners collectd:collectd /var/lib/${PN}
 
-	newinitd "${FILESDIR}/${PN}.initd" ${PN}
-	newconfd "${FILESDIR}/${PN}.confd" ${PN}
+	newinitd "${FILESDIR}/${PN}.initd-r1" ${PN}
+	newconfd "${FILESDIR}/${PN}.confd-r1" ${PN}
 	systemd_dounit "contrib/${PN}.service"
 
 	insinto /etc/logrotate.d
 	newins "${FILESDIR}/${PN}.logrotate" collectd
 
-	sed -i -e 's:^.*PIDFile     "/var/run/collectd.pid":PIDFile     "/run/collectd/collectd.pid":' "${D}"/etc/collectd.conf || die
-	sed -i -e 's:^#	SocketFile "/var/run/collectd-unixsock":#	SocketFile "/run/collectd/collectd.socket":' "${D}"/etc/collectd.conf || die
-	sed -i -e 's:^.*LoadPlugin perl$:# The new, correct way to load the perl plugin -- \n# <LoadPlugin perl>\n#   Globals true\n# </LoadPlugin>:' "${D}"/etc/collectd.conf || die
-	sed -i -e 's:^.*LoadPlugin python$:# The new, correct way to load the python plugin -- \n# <LoadPlugin python>\n#   Globals true\n# </LoadPlugin>:' "${D}"/etc/collectd.conf || die
+	sed -i -e 's:^.*PIDFile     "/var/run/collectd.pid":PIDFile     "/run/collectd/collectd.pid":' "${D}"etc/collectd.conf || die
+	sed -i -e 's:^#	SocketFile "/var/run/collectd-unixsock":#	SocketFile "/run/collectd/collectd.socket":' "${D}"etc/collectd.conf || die
+	sed -i -e 's:^.*LoadPlugin perl$:# The new, correct way to load the perl plugin -- \n# <LoadPlugin perl>\n#   Globals true\n# </LoadPlugin>:' "${D}"etc/collectd.conf || die
+	sed -i -e 's:^.*LoadPlugin python$:# The new, correct way to load the python plugin -- \n# <LoadPlugin python>\n#   Globals true\n# </LoadPlugin>:' "${D}"etc/collectd.conf || die
 }
 
 collectd_rdeps() {
