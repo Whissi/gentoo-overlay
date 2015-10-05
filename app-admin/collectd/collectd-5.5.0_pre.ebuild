@@ -120,6 +120,7 @@ REQUIRED_USE="
 PATCHES=(
 	"${FILESDIR}/${PN}-4.10.3"-werror.patch
 	"${FILESDIR}/${PN}-5.4.2"-{nohal,libocci,lt}.patch
+	"${FILESDIR}"/${PN}-5.5.0-upstream-bug1146.patch
 )
 
 # @FUNCTION: collectd_plugin_kernel_linux

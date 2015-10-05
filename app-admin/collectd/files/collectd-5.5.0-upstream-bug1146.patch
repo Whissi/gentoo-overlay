@@ -1,0 +1,24 @@
+From 780e6a76021a240e95007a04b723d827120afa95 Mon Sep 17 00:00:00 2001
+From: Gustavo Zacarias <gustavo@zacarias.com.ar>
+Date: Mon, 6 Jul 2015 09:59:30 -0300
+Subject: [PATCH] build: add libavltree, libcommon & libheap dependencies
+
+Otherwise it can break on very parallel builds since collectd link time
+arrives before one or more of these were built.
+
+Signed-off-by: Gustavo Zacarias <gustavo@zacarias.com.ar>
+
+Bug: https://github.com/collectd/collectd/issues/1146
+
+diff -rupN old/collectd-5.5.0/src/daemon/Makefile.am new/collectd-5.5.0/src/daemon/Makefile.am
+--- old/collectd-5.5.0/src/daemon/Makefile.am	2015-05-26 21:38:31.425174694 +0200
++++ new/collectd-5.5.0/src/daemon/Makefile.am	2015-10-05 02:24:24.777258173 +0200
+@@ -49,7 +49,7 @@ collectd_CPPFLAGS =  $(AM_CPPFLAGS) $(LT
+ collectd_CFLAGS = $(AM_CFLAGS)
+ collectd_LDFLAGS = -export-dynamic
+ collectd_LDADD = libavltree.la libcommon.la libheap.la -lm
+-collectd_DEPENDENCIES =
++collectd_DEPENDENCIES = libavltree.la libcommon.la libheap.la
+ 
+ # Link to these libraries..
+ if BUILD_WITH_LIBRT
