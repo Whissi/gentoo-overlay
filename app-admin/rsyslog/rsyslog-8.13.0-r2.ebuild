@@ -34,6 +34,7 @@ else
 	KEYWORDS="~amd64 ~arm ~hppa ~x86"
 
 	PATCHES+=( "${FILESDIR}"/${BRANCH}/50-${PN}-8.12.0-fix-re_extract.patch )
+	PATCHES+=( "${FILESDIR}"/${BRANCH}/50-${PN}-8.13.0-lookup-table-reload-bugfix.patch )
 fi
 
 LICENSE="GPL-3 LGPL-3 Apache-2.0"
@@ -255,8 +256,8 @@ src_install() {
 	use doc && HTML_DOCS=( "${S}/docs/build/" )
 	autotools-utils_src_install
 
-	newconfd "${FILESDIR}/${BRANCH}/${PN}.confd" ${PN}
-	newinitd "${FILESDIR}/${BRANCH}/${PN}.initd" ${PN}
+	newconfd "${FILESDIR}/${BRANCH}/${PN}.confd-r1" ${PN}
+	newinitd "${FILESDIR}/${BRANCH}/${PN}.initd-r1" ${PN}
 
 	keepdir /var/empty/dev
 	keepdir /var/spool/${PN}
