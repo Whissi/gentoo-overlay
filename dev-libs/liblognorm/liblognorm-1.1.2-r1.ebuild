@@ -16,12 +16,11 @@ SRC_URI="http://www.liblognorm.com/files/download/${P}.tar.gz"
 LICENSE="LGPL-2.1"
 SLOT="0/2"
 KEYWORDS="~amd64 ~arm ~hppa ~x86 ~amd64-linux"
-IUSE="debug doc pcre static-libs test"
+IUSE="debug doc static-libs test"
 
 RDEPEND="
 	>=dev-libs/libestr-0.1.3
 	>=dev-libs/json-c-0.11:=
-	pcre? ( >=dev-libs/libpcre-8.35 )
 "
 
 DEPEND="
@@ -42,7 +41,7 @@ src_configure() {
 		$(use_enable doc docs)
 		$(use_enable test testbench)
 		$(use_enable debug)
-		$(use_enable pcre regexp)
+		--disable-regexp
 	)
 
 	autotools-utils_src_configure
