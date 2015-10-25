@@ -95,6 +95,9 @@ python_prepare() {
 		einfo "Removing tests for salt.modules.mod_random which require network access because FEATURES=network-sandbox is set"
 		rm tests/unit/modules/random_org_test.py || die
 	fi
+
+	einfo "Removing tests for salt.modules.mysql (upstream issue #28002) ..."
+	rm tests/unit/modules/mysql_test.py || die "Failed to remove test for salt.modules.mysql"
 }
 
 python_install_all() {
