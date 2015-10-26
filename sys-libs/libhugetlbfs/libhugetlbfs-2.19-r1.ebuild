@@ -39,7 +39,7 @@ src_prepare() {
 	if [ "$(get_libdir)" == "lib64" ]; then
 		sed -i \
 			-e "/^LIB\(32\)/s:=.*:= lib32:" \
-				Makefile
+				Makefile || die "sed failed"
 	fi
 }
 
@@ -55,10 +55,10 @@ src_install() {
 }
 
 src_test_alloc_one() {
-	hugeadm="$1"
-	sign="$2"
-	pagesize="$3"
-	pagecount="$4"
+	local hugeadm="$1"
+	local sign="$2"
+	local pagesize="$3"
+	local pagecount="$4"
 	${hugeadm} \
 		--pool-pages-max ${pagesize}:${sign}${pagecount} \
 	&& \
@@ -74,18 +74,19 @@ src_test() {
 	einfo "Building testsuite"
 	emake -j1 tests || die "Failed to build tests"
 
-	hugeadm='obj/hugeadm'
-	allocated=''
-	rc=0
+	local hugeadm='obj/hugeadm'
+	local allocated=''
+	local rc=0
 	# the testcases need 64MiB per pagesize.
-	MIN_HUGEPAGE_RAM=$((64*1024*1024))
+	local MIN_HUGEPAGE_RAM=$((64*1024*1024))
 
 	einfo "Planning allocation"
-	PAGESIZES="$(${hugeadm} --page-sizes-all)"
+	local PAGESIZES="$(${hugeadm} --page-sizes-all)"
 
 	addwrite /var/lib/
 
 	# Need to do this before we can create the mountpoints.
+	local pagesize=
 	for pagesize in ${PAGESIZES} ; do
 		# The kernel depends on the location :-(
 		mkdir -p /var/lib/hugetlbfs/pagesize-${pagesize} || die "Failed to create directory"
@@ -143,6 +144,7 @@ src_test() {
 	einfo "Cleaning up memory"
 	cd "${S}"
 	# Cleanup memory allocation
+	local alloc=
 	for alloc in ${allocated} ; do
 		pagesize="${alloc/:*}"
 		pagecount="${alloc/*:}"
