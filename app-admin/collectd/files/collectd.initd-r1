@@ -13,22 +13,22 @@ COLLECTD_TERMTIMEOUT=${COLLECTD_TERMTIMEOUT:-"TERM/25/KILL/5"}
 COLLECTD_OPTS=${COLLECTD_OPTS:-""}
 
 command="/usr/sbin/collectd"
-command_args="-C ${COLLECTD_CONFIGFILE} -P ${COLLECTD_PIDFILE} ${COLLECTD_OPTS}"
-start_stop_daemon_args="--nice ${COLLECTD_NICELEVEL} --user ${COLLECTD_USER}:${COLLECTD_GROUP} ${COLLECTD_SSDARGS}"
-pidfile=${COLLECTD_PIDFILE}
+command_args="${COLLECTD_OPTS} -C \"${COLLECTD_CONFIGFILE}\" -P \"${COLLECTD_PIDFILE}\""
+start_stop_daemon_args="${COLLECTD_SSDARGS} --nice ${COLLECTD_NICELEVEL} --user ${COLLECTD_USER}:${COLLECTD_GROUP}"
+pidfile="${COLLECTD_PIDFILE}"
 retry="${COLLECTD_TERMTIMEOUT}"
 
 extra_commands="configtest"
 description_configtest="Run collectd's internal config check."
 
-required_files="${COLLECTD_CONFIGFILE}"
+required_files="\"${COLLECTD_CONFIGFILE}\""
 
 depend() {
 	use dns
 }
 
 _checkconfig() {
-	if [ $(sed '/^$\|^#/d' ${COLLECTD_CONFIGFILE} | grep --count 'LoadPlugin\w\+oracle') != 0 ] ; then
+	if [ $(eval sed '/^$\|^#/d' \"${COLLECTD_CONFIGFILE}\" | grep --count 'LoadPlugin[[:space:]]\+oracle') -ge 1 ] ; then
 		if [ -e /etc/env.d/50oracle-instantclient-basic ] ; then
 			. /etc/env.d/50oracle-instantclient-basic
 			export ORACLE_HOME
@@ -38,13 +38,13 @@ _checkconfig() {
 		fi
 	fi
 
-	local test_command="${command} -t -C ${COLLECTD_CONFIGFILE}"
+	local test_command="${command} -t -C \"${COLLECTD_CONFIGFILE}\""
 
-	${test_command} 1>/dev/null 2>&1
+	eval ${test_command} 1>/dev/null 2>&1
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		eerror "${SVCNAME} has detected an error in your configuration:"
-		${test_command}
+		eval ${test_command}
 	fi
 
 	return $ret
