@@ -17,10 +17,10 @@ InnoDB and XtraDB databases"
 HOMEPAGE="http://www.percona.com/software/percona-xtrabackup"
 SRC_URI="
 	amd64? (
-		http://www.percona.com/downloads/XtraBackup/Percona-XtraBackup-${MY_PV}/binary/tarball/${MY_PF}-Linux-x86_64.tar.gz -> ${MY_P}-x86_64.tar.gz
+		https://www.percona.com/downloads/XtraBackup/Percona-XtraBackup-${MY_PV}/binary/tarball/${MY_PF}-Linux-x86_64.tar.gz -> ${MY_P}-x86_64.tar.gz
 	)
 	x86? (
-		http://www.percona.com/downloads/XtraBackup/Percona-XtraBackup-${MY_PV}/binary/tarball/${MY_PF}-Linux-i686.tar.gz -> ${MY_P}-x86_32.tar.gz
+		https://www.percona.com/downloads/XtraBackup/Percona-XtraBackup-${MY_PV}/binary/tarball/${MY_PF}-Linux-i686.tar.gz -> ${MY_P}-x86_32.tar.gz
 	)"
 
 LICENSE="GPL-2"
@@ -51,11 +51,14 @@ src_prepare() {
 }
 
 src_install() {
-	for bin in innobackupex xbcrypt xbstream xtrabackup; do
+	for bin in innobackupex xbcloud xbcloud_osenv xbcrypt xbstream xtrabackup; do
 		dobin bin/${bin}
+		if [ -f man/man1/${bin}.1 ]; then
+			doman man/man1/${bin}.1
+		fi
 	done
 }
 
 pkg_postinst() {
-	einfo "xtrabackup 2.2.x is for MySQL 5.6+"
+	einfo "xtrabackup 2.3.x is for MySQL 5.6+"
 }
