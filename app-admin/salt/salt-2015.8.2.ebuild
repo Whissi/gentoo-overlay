@@ -80,9 +80,14 @@ DOCS=(README.rst AUTHORS)
 
 REQUIRED_USE="|| ( raet zeromq )"
 
-DOCS=(README.rst AUTHORS)
-
-REQUIRED_USE="|| ( raet zeromq )"
+PATCHES=(
+	"${FILESDIR}/${PN}-2015.8.0-pydsl-includes-test-workaround.patch"
+	"${FILESDIR}/${PN}-2015.8.0-remove-buggy-tests.patch"
+	"${FILESDIR}/${PN}-2015.5.5-auth-tests.patch"
+	"${FILESDIR}/${PN}-2015.5.5-cron-tests.patch"
+	"${FILESDIR}/${PN}-2015.5.5-remove-buggy-tests.patch"
+	"${FILESDIR}/${PN}-2015.8.2-tmpdir.patch"
+)
 
 python_prepare() {
 	# this test fails because it trys to "pip install distribute"
@@ -93,6 +98,9 @@ python_prepare() {
 		einfo "Removing tests for salt.modules.mod_random which require network access because FEATURES=network-sandbox is set"
 		rm tests/unit/modules/random_org_test.py || die
 	fi
+
+	einfo "Removing tests for salt.modules.mysql (upstream issue #28002) ..."
+	rm tests/unit/modules/mysql_test.py || die "Failed to remove test for salt.modules.mysql"
 }
 
 python_install_all() {
@@ -110,11 +118,24 @@ python_install_all() {
 }
 
 python_test() {
+	local tempdir
 	# testsuite likes lots of files
 	ulimit -n 3072
 
-	# using ${T} for the TMPDIR makes some tests needs paths that exceed PATH_MAX
-	USE_SETUPTOOLS=1 SHELL="/bin/bash" TMPDIR="/tmp" \
-		${EPYTHON} tests/runtests.py \
-		--unit-tests --no-report --verbose || die "testing failed"
+	# ${T} is too long a path for the tests to work
+	tempdir="$(mktemp -dup /tmp salt-XXXXXX)"
+	mkdir "${T}/$(basename "${tempdir}")"
+
+	(
+		cleanup() { rm -f "${tempdir}"; }
+		trap cleanup EXIT
+
+		addwrite "${tempdir}"
+		ln -s "$(realpath --relative-to=/tmp "${T}/$(basename "${tempdir}")")" "${tempdir}"
+
+		USE_SETUPTOOLS=1 SHELL="/bin/bash" TMPDIR="${tempdir}" \
+			${EPYTHON} tests/runtests.py \
+			--unit-tests --no-report --verbose
+
+	) || die "testing failed"
 }
