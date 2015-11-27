@@ -36,10 +36,9 @@ DEPEND="${DEPEND}
 
 SKIP_MODULES=""
 
-# XA_kernel_check tee "2 6 32"
 XA_check4internal_module() {
 	local mod=${1}
-	local version=${2}
+	local version=${3}
 	local kconfigname=${3}
 
 	if use xtables_addons_${mod} && kernel_is -gt ${version}; then
@@ -70,7 +69,7 @@ pkg_setup()	{
 	fi
 }
 
-# Helper for maintainer: checks if all possible MODULES are listed.
+# Helper for maintainer: cheks if all possible MODULES are listed.
 XA_qa_check() {
 	local all_modules
 	all_modules=$(sed -n '/^build_/{s/build_\(.*\)=.*/\L\1/;G;s/\n/ /;s/ $//;h}; ${x;p}' "${S}/mconfig")
@@ -138,7 +137,8 @@ src_prepare() {
 	XA_has_something_to_build
 
 	# Bug #553630#c2.  echo fails on linux-4 and above.
-	XA_known_failure "echo" 4
+	# This appears to be fixed, at least as of linux-4.2
+	# XA_known_failure "echo" 4
 
 	local mod module_name
 	if use modules; then
