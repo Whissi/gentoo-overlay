@@ -4,7 +4,7 @@
 
 EAPI=5
 
-inherit eutils systemd
+inherit eutils systemd udev
 
 DESCRIPTION="Gentoo Network Interface Management Scripts"
 HOMEPAGE="https://wiki.gentoo.org/wiki/Project:OpenRC"
