@@ -2,7 +2,8 @@
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
 	<maintainer>
-		<email>netifrc@gentoo.org</email>
+		<email>whissi@whissi.de</email>
+		<name>Thomas D.</name>
 	</maintainer>
 	<longdescription lang="en">
 		This package contains the Gentoo network interface management
