@@ -4,9 +4,7 @@
 
 EAPI=5
 
-AUTOTOOLS_IN_SOURCE_BUILD=1
-
-inherit autotools-utils
+inherit eutils flag-o-matic
 
 DESCRIPTION="Command line tool for extracting videos from various websites"
 HOMEPAGE="http://cclive.sourceforge.net/"
@@ -16,7 +14,7 @@ LICENSE="AGPL-3"
 SLOT="0"
 KEYWORDS="amd64 ~ppc ~ppc64 x86"
 
-RDEPEND=">=media-libs/libquvi-0.4.0:=
+RDEPEND=">=media-libs/libquvi-0.4.0:0=
 	>=dev-cpp/glibmm-2.24:2
 	>=dev-libs/boost-1.49
 	>=dev-libs/glib-2.24:2
@@ -26,8 +24,14 @@ DEPEND="${RDEPEND}
 	app-arch/xz-utils
 	virtual/pkgconfig"
 
-PATCHES=( "${FILESDIR}"/cclive-boost-1.56.patch )
+src_prepare() {
+	epatch "${FILESDIR}"/${P}-iostream.patch #527658
+	epatch "${FILESDIR}"/${P}-boost-ver-check.patch #548310
+}
 
 src_configure() {
+	# enable c++11 as needed for sigc++-2.6, #5567174
+	append-cxxflags "-std=c++11"
+
 	econf --disable-ccl
 }
