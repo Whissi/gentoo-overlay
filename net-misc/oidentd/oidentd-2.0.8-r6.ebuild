@@ -4,7 +4,7 @@
 
 EAPI=5
 
-inherit eutils systemd
+inherit eutils systemd flag-o-matic
 
 DESCRIPTION="Another (RFC1413 compliant) ident daemon"
 HOMEPAGE="http://ojnk.sourceforge.net/"
@@ -17,11 +17,13 @@ IUSE="debug ipv6 masquerade"
 
 src_prepare() {
 	epatch "${FILESDIR}/${P}-masquerading.patch" \
-		"${FILESDIR}/${P}-bind-to-ipv6-too.patch" \
-		"${FILESDIR}/${P}-gcc5.patch"
+		"${FILESDIR}/${P}-bind-to-ipv6-too.patch"
+	#	"${FILESDIR}/${P}-gcc5.patch"
 }
 
 src_configure() {
+	append-cflags -std=gnu89
+
 	econf \
 		$(use_enable debug) \
 		$(use_enable ipv6) \
