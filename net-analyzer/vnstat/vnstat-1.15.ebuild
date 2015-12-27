@@ -3,7 +3,7 @@
 # $Id$
 
 EAPI=5
-inherit toolchain-funcs user systemd
+inherit eutils toolchain-funcs user systemd
 
 DESCRIPTION="Console-based network traffic monitor that keeps statistics of network usage"
 HOMEPAGE="http://humdi.net/vnstat/"
@@ -44,12 +44,12 @@ src_prepare() {
 }
 
 src_compile() {
-	emake CFLAGS="${CFLAGS}" $(usex gd all '')
+	emake ${PN} ${PN}d $(usex gd ${PN}i '')
 }
 
 src_install() {
-	use gd && dobin src/vnstati
-	dobin src/vnstat src/vnstatd
+	use gd && dobin vnstati
+	dobin vnstat vnstatd
 
 	exeinto /usr/share/${PN}
 	newexe "${FILESDIR}"/vnstat-r1.cron vnstat.cron
