@@ -3,11 +3,12 @@
 # $Id$
 
 EAPI="5"
+AUTOTOOLS_AUTORECONF="yes"
 
 GENTOO_DEPEND_ON_PERL="no"
 PYTHON_COMPAT=( python2_7 )
 
-inherit autotools eutils linux-info multilib perl-app python-single-r1 systemd user
+inherit autotools-utils eutils linux-info multilib perl-app python-single-r1 systemd user
 
 DESCRIPTION="Collects system statistic and provides mechanisms to store the values"
 
@@ -218,10 +219,6 @@ pkg_setup() {
 }
 
 src_prepare() {
-	default
-
-	epatch_user
-
 	# There's some strange prefix handling in the default config file, resulting in
 	# paths like "/usr/var/..."
 	sed -i -e "s:@prefix@/var:/var:g" src/collectd.conf.in || die
@@ -233,7 +230,7 @@ src_prepare() {
 
 	rm -r libltdl || die
 
-	eautoreconf
+	autotools-utils_src_prepare
 }
 
 src_configure() {
