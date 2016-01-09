@@ -1,4 +1,4 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
@@ -6,7 +6,7 @@ EAPI="5"
 MODULES_OPTIONAL_USE=modules
 inherit linux-info linux-mod
 
-DESCRIPTION="IPset tool for iptables, successor to ippool."
+DESCRIPTION="IPset tool for iptables, successor to ippool"
 HOMEPAGE="http://ipset.netfilter.org/"
 SRC_URI="http://ipset.netfilter.org/${P}.tar.bz2"
 
