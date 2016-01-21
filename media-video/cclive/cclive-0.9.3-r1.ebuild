@@ -1,4 +1,4 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
@@ -16,7 +16,7 @@ KEYWORDS="amd64 ~ppc ~ppc64 x86"
 
 RDEPEND=">=media-libs/libquvi-0.4.0:0=
 	>=dev-cpp/glibmm-2.24:2
-	>=dev-libs/boost-1.49
+	>=dev-libs/boost-1.49:0=
 	>=dev-libs/glib-2.24:2
 	>=net-misc/curl-7.20
 	>=dev-libs/libpcre-8.02[cxx]"
