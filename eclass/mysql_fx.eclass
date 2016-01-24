@@ -96,7 +96,11 @@ _mysql_test_patch_ver_pn() {
 	local flags=$1 pname=$2
 	if [[ $(( $flags & $(( 1 + 4 + 16 )) )) -eq 21 ]] ; then
 		einfo "using '${pname}'"
-		ln -sf "${filesdir}/${pname}" "${EPATCH_SOURCE}" || die "Couldn't move ${pname}"
+		if [[ -f "${filesdir}/${pname}" ]] ; then
+			ln -sf "${filesdir}/${pname}" "${EPATCH_SOURCE}" || die "Couldn't move ${pname}"
+		else
+			die "Selected patch '${filesdir}/${pname}' does not exist!"
+		fi
 		return 0
 	fi
 
