@@ -134,6 +134,8 @@ SRC_URI="${SERVER_URI}"
 if [[ ${MY_EXTRAS_VER} != "live" && ${MY_EXTRAS_VER} != "none" ]]; then
 	SRC_URI="${SRC_URI}
 		mirror://gentoo/mysql-extras-${MY_EXTRAS_VER}.tar.bz2
+		https://gitweb.gentoo.org/proj/mysql-extras.git/snapshot/mysql-extras-${MY_EXTRAS_VER}.tar.bz2
+		https://mirror.deutschmann.io/distfiles/mysql/mysql-extras-${MY_EXTRAS_VER}.tar.bz2
 		https://dev.gentoo.org/~grknight/distfiles/mysql-extras-${MY_EXTRAS_VER}.tar.bz2
 		https://dev.gentoo.org/~robbat2/distfiles/mysql-extras-${MY_EXTRAS_VER}.tar.bz2
 		https://dev.gentoo.org/~jmbsvicetto/distfiles/mysql-extras-${MY_EXTRAS_VER}.tar.bz2"
@@ -152,7 +154,7 @@ REQUIRED_USE="^^ ( yassl openssl libressl )"
 # Tests always fail when libressl is enabled due to hard-coded ciphers in the tests
 RESTRICT="libressl? ( test )"
 
-REQUIRED_USE="!server? ( !extraengine !embedded )
+REQUIRED_USE="${REQUIRED_USE} !server? ( !extraengine !embedded )
 	 ?? ( tcmalloc jemalloc )
 	 static? ( !libressl !openssl yassl )"
 
