@@ -1,4 +1,4 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
@@ -149,7 +149,7 @@ src_configure() {
 	local myeconfargs=(
 		--disable-debug-symbols
 		--disable-generate-man-pages
-		--with-valgrind-testbench
+		--without-valgrind-testbench
 		$(use_enable test testbench)
 		# Input Plugins without depedencies
 		--enable-imdiag
