@@ -1,4 +1,4 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
@@ -16,11 +16,11 @@ KEYWORDS="amd64 ~arm hppa ~sparc x86"
 IUSE="debug doc +ssl static-libs"
 
 RDEPEND="
-	ssl? ( >=net-libs/gnutls-2.12.23-r1 )
+	ssl? ( >=net-libs/gnutls-2.12.23-r1:0= )
 "
 
 DEPEND="
-	ssl? ( >=net-libs/gnutls-2.12.23-r1 )
+	ssl? ( >=net-libs/gnutls-2.12.23-r1:0= )
 	virtual/pkgconfig
 "
 

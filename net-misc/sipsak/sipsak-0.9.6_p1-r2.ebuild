@@ -1,4 +1,4 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
@@ -15,7 +15,7 @@ SLOT="0"
 KEYWORDS="~amd64 ~ppc ~sparc ~x86 ~x86-fbsd"
 IUSE="gnutls"
 
-RDEPEND="gnutls? ( net-libs/gnutls )
+RDEPEND="gnutls? ( net-libs/gnutls:0= )
 	net-dns/c-ares"
 DEPEND="${RDEPEND}"
 

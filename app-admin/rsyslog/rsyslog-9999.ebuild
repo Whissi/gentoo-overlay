@@ -70,7 +70,7 @@ RDEPEND="
 		libressl? ( dev-libs/libressl:= )
 	)
 	snmp? ( >=net-analyzer/net-snmp-5.7.2 )
-	ssl? ( >=net-libs/gnutls-2.12.23 )
+	ssl? ( >=net-libs/gnutls-2.12.23:0= )
 	systemd? ( >=sys-apps/systemd-208 )
 	zeromq? ( >=net-libs/czmq-1.2.0 )"
 DEPEND="${RDEPEND}
