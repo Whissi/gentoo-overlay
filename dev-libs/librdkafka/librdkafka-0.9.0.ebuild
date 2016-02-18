@@ -8,14 +8,7 @@ inherit eutils
 
 DESCRIPTION="Apache Kafka C/C++ client library"
 HOMEPAGE="https://github.com/edenhill/librdkafka"
-
-if [[ ${PV} == "9999" ]]; then
-	inherit git-r3
-
-	EGIT_REPO_URI="https://github.com/edenhill/${PN}.git"
-else
-	SRC_URI="https://github.com/edenhill/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
-fi
+SRC_URI="https://github.com/edenhill/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="BSD-2"
 SLOT="0/1"
