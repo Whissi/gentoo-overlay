@@ -177,8 +177,6 @@ collectd_plugin_kernel_linux() {
 }
 
 collectd_linux_kernel_checks() {
-	linux-info_pkg_setup
-
 	if ! linux_chkconfig_present PROC_FS; then
 		ewarn "/proc file system support is disabled, many plugins will not be able to read any statistics from your system unless you enable PROC_FS in your kernel"
 	fi
@@ -243,6 +241,8 @@ collectd_linux_kernel_checks() {
 
 pkg_setup() {
 	if use kernel_linux; then
+		linux-info_pkg_setup
+
 		if linux_config_exists; then
 			einfo "Checking your linux kernel configuration:"
 			collectd_linux_kernel_checks
