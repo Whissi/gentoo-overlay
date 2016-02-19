@@ -6,7 +6,7 @@ EAPI="6"
 
 PYTHON_COMPAT=( python{2_7,3_4,3_5} )
 
-inherit autotools eutils fcaps java-pkg-2 linux-info multilib perl-functions python-single-r1 systemd user
+inherit autotools eutils fcaps java-utils-2 linux-info multilib perl-functions python-single-r1 systemd user
 
 DESCRIPTION="Collects system statistics and provides mechanisms to store the values"
 
@@ -250,7 +250,7 @@ pkg_setup() {
 	fi
 
 	if use collectd_plugins_java || use collectd_plugins_genericjmx; then
-		java-pkg-2_pkg_setup
+		java-pkg_init
 	fi
 
 	use collectd_plugins_python && python-single-r1_pkg_setup
@@ -271,6 +271,11 @@ src_prepare() {
 
 	# fix installdirs for perl, bug 444360
 	sed -i -e 's/INSTALL_BASE=$(DESTDIR)$(prefix) //' bindings/Makefile.am || die
+
+	if use collectd_plugins_java || use collectd_plugins_genericjmx; then
+		# Set javac -source and -target flags according to (R)DEPEND.
+		sed -i -e "s/\$(JAVAC)/\0 $(java-pkg_javac-args)/g" bindings/java/Makefile.am || die
+	fi
 
 	rm -r libltdl || die
 
@@ -353,9 +358,9 @@ src_configure() {
 		myconf+=" --without-libstatgrab"
 	fi
 
-	# Need JAVA_HOME for java.
-	if use collectd_plugins_java; then
-		myconf+=" --with-java=$(java-config -g JAVA_HOME)"
+	# JAVA_HOME is set by eclasses.
+	if use collectd_plugins_java || use collectd_plugins_genericjmx; then
+		myconf+=" --with-java"
 	fi
 
 	# Need libiptc ONLY for iptables. If we try to use it otherwise bug 340109 happens.
@@ -387,6 +392,10 @@ src_install() {
 	perl_delete_localpod
 
 	find "${ED}"usr/ -name "*.la" -delete || die
+
+	if use collectd_plugins_java || use collectd_plugins_genericjmx; then
+		java-pkg_regjar "${ED}"usr/share/${PN}/java/*.jar
+	fi
 
 	fowners root:collectd /etc/collectd.conf
 	fperms u=rw,g=r,o= /etc/collectd.conf
