@@ -2,47 +2,56 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI="5"
+EAPI="6"
 
-GENTOO_DEPEND_ON_PERL="no"
-PYTHON_COMPAT=( python2_7 )
+PYTHON_COMPAT=( python{2_7,3_4,3_5} )
 
-inherit autotools base eutils linux-info multilib perl-app python-single-r1 systemd user
+inherit autotools eutils fcaps java-pkg-2 linux-info multilib perl-functions python-single-r1 systemd user
 
 DESCRIPTION="Collects system statistics and provides mechanisms to store the values"
 
-HOMEPAGE="http://collectd.org"
+HOMEPAGE="http://collectd.org/"
 SRC_URI="${HOMEPAGE}/files/${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="contrib debug kernel_linux kernel_FreeBSD kernel_Darwin perl selinux static-libs"
+IUSE="contrib debug kernel_Darwin kernel_FreeBSD kernel_linux perl selinux static-libs"
 
 # The plugin lists have to follow here since they extend IUSE
 
-# Plugins that to my knowledge cannot be supported (eg. dependencies not in gentoo)
-COLLECTD_IMPOSSIBLE_PLUGINS="aquaero mic netapp pinba sigrok xmms"
-
-# Plugins that still need some work
-COLLECTD_UNTESTED_PLUGINS="amqp apple_sensors genericjmx ipvs lpar modbus redis
-	tape write_redis zfs_arc"
+# Plugins that don't build (e.g. dependencies not in Gentoo)
+# apple_sensors: Requires libIOKit
+# aquaero:       Requires aerotools-ng/libaquaero5
+# barometer:     Requires libi2c (i2c_smbus_read_i2c_block_data)
+# lpar:          Requires libperfstat (AIX only)
+# mic:           Requires Intel Many Integrated Core Architecture API
+#                (part of Intel's  Xeon Phi software)
+# netapp:        Requires libnetapp (http://communities.netapp.com/docs/DOC-1110)
+# pf:            Requires BSD packet filter
+# pinba:         Requires MySQL Pinba engine (http://pinba.org/)
+# tape:          Requires libkstat (Solaris only)
+# write_kafka:   Requires librdkafka
+# write_mongodb: https://github.com/collectd/collectd/issues/492
+# xmms:          Requires libxmms (v1)
+COLLECTD_IMPOSSIBLE_PLUGINS="apple_sensors aquaero mic netapp pf pinba tape write_kafka write_mongodb xmms"
 
 # Plugins that have been (compile) tested and can be enabled via COLLECTD_PLUGINS
-COLLECTD_TESTED_PLUGINS="aggregation apache apcups ascent battery bind cgroups
-	conntrack contextswitch cpu cpufreq csv curl curl_json curl_xml dbi df disk dns
-	email entropy ethstat exec filecount fscache gmond hddtemp interface ipmi
-	iptables irq java libvirt load logfile lvm madwifi match_empty_counter
-	match_hashed match_regex match_timediff match_value mbmon md memcachec memcached
-	memory multimeter mysql netlink network network nfs nginx notify_desktop
-	notify_email ntpd numa nut olsrd onewire openvpn oracle perl perl ping postgresql
-	powerdns processes protocols python python routeros rrdcached rrdcached rrdtool
-	sensors serial snmp statsd swap syslog table tail target_notification
-	target_replace target_scale target_set tcpconns teamspeak2 ted thermal threshold
-	tokyotyrant unixsock uptime users uuid varnish vmem wireless
-	write_graphite write_http write_mongodb"
+COLLECTD_TESTED_PLUGINS="amqp aggregation apache apcups ascent battery bind ceph
+	cgroups conntrack contextswitch cpu cpufreq csv curl curl_json curl_xml dbi df
+	disk dns drbd email entropy ethstat exec fhcount filecount fscache genericjmx
+	gmond hddtemp interface ipc ipmi iptables ipvs irq java load logfile log_logstash
+	lvm madwifi match_empty_counter match_hashed match_regex match_timediff match_value
+	mbmon md memcachec memcached memory modbus multimeter mysql netlink network network
+	nfs nginx notify_desktop notify_email ntpd numa nut olsrd onewire openldap openvpn
+	oracle perl ping postgresql powerdns processes protocols python python redis
+	routeros rrdcached rrdtool sensors serial sigrok smart snmp statsd swap syslog
+	table tail tail_csv target_notification target_replace target_scale target_set
+	tcpconns teamspeak2 ted thermal threshold tokyotyrant turbostat unixsock uptime
+	users uuid varnish virt vmem vserver wireless write_graphite write_http
+	write_log write_redis write_riemann write_sensu write_tsdb zfs_arc zookeeper"
 
-COLLECTD_DISABLED_PLUGINS="${COLLECTD_IMPOSSIBLE_PLUGINS} ${COLLECTD_UNTESTED_PLUGINS}"
+COLLECTD_DISABLED_PLUGINS="${COLLECTD_IMPOSSIBLE_PLUGINS}"
 
 COLLECTD_ALL_PLUGINS=${COLLECTD_TESTED_PLUGINS}
 
@@ -57,53 +66,66 @@ COMMON_DEPEND="
 	dev-libs/libgcrypt:=
 	sys-devel/libtool
 	perl?					( dev-lang/perl:=[ithreads] )
+	collectd_plugins_amqp?			( net-libs/rabbitmq-c )
 	collectd_plugins_apache?		( net-misc/curl )
 	collectd_plugins_ascent?		( net-misc/curl dev-libs/libxml2 )
-	collectd_plugins_bind?			( dev-libs/libxml2 )
+	collectd_plugins_bind?			( dev-libs/libxml2:= )
+	collectd_plugins_ceph?			( dev-libs/yajl )
 	collectd_plugins_curl?			( net-misc/curl )
 	collectd_plugins_curl_json?		( net-misc/curl dev-libs/yajl )
-	collectd_plugins_curl_xml?		( net-misc/curl dev-libs/libxml2 )
+	collectd_plugins_curl_xml?		( net-misc/curl dev-libs/libxml2:= )
 	collectd_plugins_dbi?			( dev-db/libdbi )
+	collectd_plugins_disk?			( virtual/udev )
 	collectd_plugins_dns?			( net-libs/libpcap )
+	collectd_plugins_genericjmx?		( virtual/jre:= dev-java/java-config-wrapper )
 	collectd_plugins_gmond?			( sys-cluster/ganglia )
 	collectd_plugins_ipmi?			( >=sys-libs/openipmi-2.0.16-r1 )
-	collectd_plugins_iptables?		( >=net-firewall/iptables-1.4.13 )
+	collectd_plugins_iptables?		( >=net-firewall/iptables-1.4.13:= )
 	collectd_plugins_java?			( virtual/jre:= dev-java/java-config-wrapper )
-	collectd_plugins_libvirt?		( app-emulation/libvirt dev-libs/libxml2 )
+	collectd_plugins_log_logstash?		( dev-libs/yajl )
 	collectd_plugins_lvm?			( sys-fs/lvm2 )
 	collectd_plugins_memcachec?		( dev-libs/libmemcached )
+	collectd_plugins_modbus?		( dev-libs/libmodbus )
 	collectd_plugins_mysql?			( >=virtual/mysql-5.0 )
 	collectd_plugins_netlink?		( net-libs/libmnl )
 	collectd_plugins_nginx?			( net-misc/curl )
 	collectd_plugins_notify_desktop?	( x11-libs/libnotify )
-	collectd_plugins_notify_email?		( net-libs/libesmtp dev-libs/openssl:= )
+	collectd_plugins_notify_email?		( net-libs/libesmtp )
 	collectd_plugins_nut?			( sys-power/nut )
-	collectd_plugins_onewire?		( sys-fs/owfs )
+	collectd_plugins_openldap?		( net-nds/openldap )
+	collectd_plugins_onewire?		( >=sys-fs/owfs-3.1 )
 	collectd_plugins_oracle?		( dev-db/oracle-instantclient-basic )
 	collectd_plugins_perl?			( dev-lang/perl:=[ithreads] )
 	collectd_plugins_ping?			( net-libs/liboping )
 	collectd_plugins_postgresql?		( dev-db/postgresql:= )
 	collectd_plugins_python?		( ${PYTHON_DEPS} )
+	collectd_plugins_redis?			( dev-libs/hiredis:= )
 	collectd_plugins_routeros?		( net-libs/librouteros )
 	collectd_plugins_rrdcached?		( net-analyzer/rrdtool )
 	collectd_plugins_rrdtool?		( net-analyzer/rrdtool )
 	collectd_plugins_sensors?		( sys-apps/lm_sensors )
+	collectd_plugins_sigrok?		( sci-libs/libsigrok )
+	collectd_plugins_smart?			( virtual/udev dev-libs/libatasmart )
 	collectd_plugins_snmp?			( net-analyzer/net-snmp )
 	collectd_plugins_tokyotyrant?		( net-misc/tokyotyrant )
 	collectd_plugins_varnish?		( www-servers/varnish )
+	collectd_plugins_virt?			( app-emulation/libvirt dev-libs/libxml2:= )
 	collectd_plugins_write_http?		( net-misc/curl )
-	collectd_plugins_write_mongodb?		( dev-libs/mongo-c-driver )
+	collectd_plugins_write_redis?		( dev-libs/hiredis:= )
+	collectd_plugins_write_riemann?		( dev-libs/protobuf-c )
 
 	kernel_FreeBSD? (
-		collectd_plugins_disk?		( sys-libs/libstatgrab )
-		collectd_plugins_interface?	( sys-libs/libstatgrab )
-		collectd_plugins_load?		( sys-libs/libstatgrab )
-		collectd_plugins_memory?	( sys-libs/libstatgrab )
-		collectd_plugins_swap?		( sys-libs/libstatgrab )
-		collectd_plugins_users?		( sys-libs/libstatgrab )
+		collectd_plugins_disk?		( sys-libs/libstatgrab:= )
+		collectd_plugins_interface?	( sys-libs/libstatgrab:= )
+		collectd_plugins_load?		( sys-libs/libstatgrab:= )
+		collectd_plugins_memory?	( sys-libs/libstatgrab:= )
+		collectd_plugins_swap?		( sys-libs/libstatgrab:= )
+		collectd_plugins_users?		( sys-libs/libstatgrab:= )
 	)"
 
 DEPEND="${COMMON_DEPEND}
+	collectd_plugins_genericjmx?		( >=virtual/jdk-1.6 )
+	collectd_plugins_java?			( >=virtual/jdk-1.6 )
 	virtual/pkgconfig"
 
 RDEPEND="${COMMON_DEPEND}
@@ -115,12 +137,12 @@ REQUIRED_USE="
 
 PATCHES=(
 	"${FILESDIR}/${PN}-4.10.3"-werror.patch
-	"${FILESDIR}/${PN}-5.4.2"-{nohal,libocci,lt}.patch
+	"${FILESDIR}/${PN}-5.5.1"-{libocci,lt,nohal}.patch
 )
 
 # @FUNCTION: collectd_plugin_kernel_linux
 # @DESCRIPTION:
-# USAGE: <plug-in name> <kernel_options> <severity>
+# USAGE: <plugin name> <kernel_options> <severity>
 # kernel_options is a list of kernel configurations options; the check tests whether at least
 #   one of them is enabled. If no, depending on the third argument an elog, ewarn, or eerror message
 #   is emitted.
@@ -136,13 +158,13 @@ collectd_plugin_kernel_linux() {
 			multi_opt=${2//\ /\ or\ }
 			case ${3} in
 				(info)
-					elog "The ${1} plug-in can use kernel features that are disabled now; enable ${multi_opt} in your kernel"
+					elog "The ${1} plugin can use kernel features that are disabled now; enable ${multi_opt} in your kernel"
 				;;
 				(warn)
-					ewarn "The ${1} plug-in uses kernel features that are disabled now; enable ${multi_opt} in your kernel"
+					ewarn "The ${1} plugin uses kernel features that are disabled now; enable ${multi_opt} in your kernel"
 				;;
 				(error)
-					eerror "The ${1} plug-in needs kernel features that are disabled now; enable ${multi_opt} in your kernel"
+					eerror "The ${1} plugin needs kernel features that are disabled now; enable ${multi_opt} in your kernel"
 				;;
 				(*)
 					die "function collectd_plugin_kernel_linux called with invalid third argument"
@@ -155,41 +177,66 @@ collectd_plugin_kernel_linux() {
 collectd_linux_kernel_checks() {
 	linux-info_pkg_setup
 
-	# battery.c:/proc/pmu/battery_%i
-	# battery.c:/proc/acpi/battery
+	if ! linux_chkconfig_present PROC_FS; then
+		ewarn "/proc file system support is disabled, many plugins will not be able to read any statistics from your system unless you enable PROC_FS in your kernel"
+	fi
+
+	if ! linux_chkconfig_present SYSFS; then
+		ewarn "/sys file system support is disabled, many plugins will not be able to read any statistics from your system unless you enable SYSFS in your kernel"
+	fi
+
+	# battery.c: /proc/pmu/battery_%i
+	# battery.c: /proc/acpi/battery
 	collectd_plugin_kernel_linux battery ACPI_BATTERY warn
 
-	# cgroups.c:/sys/fs/cgroup/
+	# cgroups.c: /sys/fs/cgroup/
 	collectd_plugin_kernel_linux cgroups CONFIG_CGROUPS warn
 
-	# cpufreq.c:/sys/devices/system/cpu/cpu%d/cpufreq/
+	# cpufreq.c: /sys/devices/system/cpu/cpu%d/cpufreq/
 	collectd_plugin_kernel_linux cpufreq SYSFS warn
 	collectd_plugin_kernel_linux cpufreq CPU_FREQ_STAT warn
 
-	# nfs.c:/proc/net/rpc/nfs
-	# nfs.c:/proc/net/rpc/nfsd
+	# drbd.c: /proc/drbd
+	collectd_plugin_kernel_linux drbd BLK_DEV_DRBD warn
+
+	# conntrack.c: /proc/sys/net/netfilter/*
+	collectd_plugin_kernel_linux conntrack NETFILTER warn
+
+	# fscache.c: /proc/fs/fscache/stats
+	collectd_plugin_kernel_linux fscache FSCACHE warn
+
+	# nfs.c: /proc/net/rpc/nfs
+	# nfs.c: /proc/net/rpc/nfsd
 	collectd_plugin_kernel_linux nfs NFS_COMMON warn
 
-	# serial.c:/proc/tty/driver/serial
-	# serial.c:/proc/tty/driver/ttyS
+	# serial.c: /proc/tty/driver/serial
+	# serial.c: /proc/tty/driver/ttyS
 	collectd_plugin_kernel_linux serial SERIAL_CORE warn
 
-	# swap.c:/proc/meminfo
+	# swap.c: /proc/meminfo
 	collectd_plugin_kernel_linux swap SWAP warn
 
-	# thermal.c:/proc/acpi/thermal_zone
-	# thermal.c:/sys/class/thermal
-	collectd_plugin_kernel_linux thermal "PROC_FS SYSFS" warn
+	# thermal.c: /proc/acpi/thermal_zone
+	# thermal.c: /sys/class/thermal
 	collectd_plugin_kernel_linux thermal ACPI_THERMAL warn
 
-	# vmem.c:/proc/vmstat
+	# turbostat.c: /dev/cpu/%d/msr
+	collectd_plugin_kernel_linux turbostat X86_MSR warn
+
+	# vmem.c: /proc/vmstat
 	collectd_plugin_kernel_linux vmem VM_EVENT_COUNTERS warn
 
-	# uuid.c:/sys/hypervisor/uuid
+	# vserver.c: /proc/virtual
+	collectd_plugin_kernel_linux vserver VSERVER warn
+
+	# uuid.c: /sys/hypervisor/uuid
 	collectd_plugin_kernel_linux uuid SYSFS info
 
-	# wireless.c:/proc/net/wireless
-	collectd_plugin_kernel_linux wireless "MAC80211 IEEE80211" warn
+	# wireless.c: /proc/net/wireless
+	collectd_plugin_kernel_linux wireless "WIRELESS MAC80211 IEEE80211" warn
+
+	# zfs_arc.c: /proc/spl/kstat/zfs/arcstats
+	collectd_plugin_kernel_linux zfs_arc "SPL ZFS" warn
 }
 
 pkg_setup() {
@@ -202,6 +249,10 @@ pkg_setup() {
 		fi
 	fi
 
+	if use collectd_plugins_java || use collectd_plugins_genericjmx; then
+		java-pkg-2_pkg_setup
+	fi
+
 	use collectd_plugins_python && python-single-r1_pkg_setup
 
 	enewgroup collectd
@@ -209,7 +260,8 @@ pkg_setup() {
 }
 
 src_prepare() {
-	base_src_prepare
+	epatch ${PATCHES[@]}
+	eapply_user
 
 	# There's some strange prefix handling in the default config file, resulting in
 	# paths like "/usr/var/..."
@@ -229,13 +281,14 @@ src_configure() {
 	# Now come the lists of os-dependent plugins. Any plugin that is not listed anywhere here
 	# should work independent of the operating system.
 
-	local linux_plugins="battery cpu cpufreq disk entropy ethstat interface iptables ipvs irq load
-		memory md netlink nfs numa processes serial swap tcpconns thermal users vmem
-		wireless"
+	local linux_plugins="barometer battery cpu cpufreq disk drbd entropy
+		ethstat interface iptables ipvs irq ipc load memory md netlink nfs
+		numa processes serial swap tcpconns thermal turbostat users vmem
+		wireless zfc_arc"
 
 	local need_libstatgrab=0
 	local libstatgrab_plugins="cpu disk interface load memory swap users"
-	local bsd_plugins="cpu tcpconns ${libstatgrab_plugins}"
+	local bsd_plugins="cpu tcpconns ${libstatgrab_plugins} zfc_arc"
 
 	local darwin_plugins="apple_sensors battery cpu disk interface memory processes tcpconns"
 
@@ -306,9 +359,12 @@ src_configure() {
 	fi
 
 	# Need libiptc ONLY for iptables. If we try to use it otherwise bug 340109 happens.
-	if ! use collectd_plugins_iptables; then
-		myconf+=" --with-libiptc=no"
-	fi
+	# lots of libs are only needed for plugins, if they are disabled, also disable the lib
+	use collectd_plugins_iptables || myconf+=" --with-libiptc=no"
+	use collectd_plugins_openldap || myconf+=" --with-libldap=no"
+	use collectd_plugins_redis    || use collectd_plugins_write_redis || myconf+=" --with-libhiredis=no"
+	use collectd_plugins_smart    || myconf+=" --with-libatasmart=no"
+	use collectd_plugins_virt     || myconf+=" --with-libvirt=no"
 
 	if use perl; then
 		myconf+=" --with-perl-bindings=INSTALLDIRS=vendor"
@@ -320,7 +376,9 @@ src_configure() {
 	myconf+=" --disable-target_v5upgrade"
 
 	# Finally, run econf.
-	KERNEL_DIR="${KERNEL_DIR}" econf --config-cache --without-included-ltdl $(use_enable static-libs static) --localstatedir=/var ${myconf}
+	KERNEL_DIR="${KERNEL_DIR}" econf --config-cache --disable-ltdl-install \
+		--without-included-ltdl $(use_enable static-libs static) \
+		--localstatedir=/var ${myconf}
 }
 
 src_install() {
@@ -328,10 +386,7 @@ src_install() {
 
 	perl_delete_localpod
 
-	find "${D}/usr/" -name "*.la" -delete
-
-	# use collectd_plugins_ping && setcap cap_net_raw+ep ${D}/usr/sbin/collectd
-	# we cannot do this yet
+	find "${ED}"usr/ -name "*.la" -delete || die
 
 	fowners root:collectd /etc/collectd.conf
 	fperms u=rw,g=r,o= /etc/collectd.conf
@@ -346,42 +401,46 @@ src_install() {
 	keepdir /var/lib/${PN}
 	fowners collectd:collectd /var/lib/${PN}
 
-	newinitd "${FILESDIR}/${PN}.initd" ${PN}
-	newconfd "${FILESDIR}/${PN}.confd" ${PN}
+	newinitd "${FILESDIR}/${PN}.initd-r1" ${PN}
+	newconfd "${FILESDIR}/${PN}.confd-r1" ${PN}
 	systemd_dounit "contrib/${PN}.service"
 
 	insinto /etc/logrotate.d
 	newins "${FILESDIR}/${PN}.logrotate" collectd
 
-	sed -i -e 's:^.*PIDFile     "/var/run/collectd.pid":PIDFile     "/run/collectd/collectd.pid":' "${D}"etc/collectd.conf || die
-	sed -i -e 's:^#	SocketFile "/var/run/collectd-unixsock":#	SocketFile "/run/collectd/collectd.socket":' "${D}"etc/collectd.conf || die
-	sed -i -e 's:^.*LoadPlugin perl$:# The new, correct way to load the perl plugin -- \n# <LoadPlugin perl>\n#   Globals true\n# </LoadPlugin>:' "${D}"etc/collectd.conf || die
-	sed -i -e 's:^.*LoadPlugin python$:# The new, correct way to load the python plugin -- \n# <LoadPlugin python>\n#   Globals true\n# </LoadPlugin>:' "${D}"etc/collectd.conf || die
-}
-
-collectd_rdeps() {
-	if (use collectd_plugins_${1} && ! has_version "${2}"); then
-		elog "The ${1} plug-in needs ${2} to be installed locally or remotely to work."
-	fi
+	sed -i -e 's:^.*PIDFile     "/var/run/collectd.pid":PIDFile     "/run/collectd/collectd.pid":' "${ED}"etc/collectd.conf || die
+	sed -i -e 's:^#	SocketFile "/var/run/collectd-unixsock":#	SocketFile "/run/collectd/collectd.socket":' "${ED}"etc/collectd.conf || die
+	sed -i -e 's:^.*LoadPlugin perl$:# The new, correct way to load the perl plugin -- \n# <LoadPlugin perl>\n#   Globals true\n# </LoadPlugin>:' "${ED}"etc/collectd.conf || die
+	sed -i -e 's:^.*LoadPlugin python$:# The new, correct way to load the python plugin -- \n# <LoadPlugin python>\n#   Globals true\n# </LoadPlugin>:' "${ED}"etc/collectd.conf || die
 }
 
 pkg_postinst() {
-	collectd_rdeps apcups sys-power/apcupsd
-	collectd_rdeps hddtemp app-admin/hddtemp
-	collectd_rdeps mbmon sys-apps/xmbmon
-	collectd_rdeps memcached ">=net-misc/memcached-1.2.2-r2"
-	collectd_rdeps ntpd net-misc/ntp
-	collectd_rdeps openvpn ">=net-misc/openvpn-2.0.9"
-	collectd_rdeps write_mongodb "dev-db/mongodb"
+	local caps=()
+	use collectd_plugins_ping      && caps+=('cap_net_raw')
+	use collectd_plugins_iptables  && caps+=('cap_net_admin')
+	use collectd_plugins_filecount && caps+=('cap_dac_read_search')
 
-	echo
-	elog "collectd is now started as unprivileged user by default."
+	if [ ${#caps[@]} -gt 0 ]; then
+		local caps_str=$(IFS=","; echo "${caps[*]}")
+		fcaps ${caps_str} usr/sbin/collectd
+		elog "Capabilities for ${EROOT}usr/sbin/collectd set to:"
+		elog "  ${caps_str}+ep"
+		elog
+	fi
+
+	elog "Note: Collectd is only the collector."
+	elog "      You need to install 'data' sources (applications) locally or"
+	elog "      remotely on your own."
+
+	elog
+	elog "Collectd is configured to run as unprivileged user by default."
 	elog "You may want to revisit the configuration."
 	elog
 
 	if use collectd_plugins_email; then
 		ewarn "The email plug-in is deprecated. To submit statistics please use the unixsock plugin."
 	fi
+
 	if use contrib; then
 		elog "The scripts in /usr/share/doc/${PF}/collection3 for generating graphs need dev-perl/HTML-Parser,"
 		elog "dev-perl/config-general, dev-perl/regexp-common, and net-analyzer/rrdtool[perl] to be installed."
