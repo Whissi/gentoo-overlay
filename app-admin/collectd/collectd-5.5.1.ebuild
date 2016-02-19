@@ -6,7 +6,7 @@ EAPI="6"
 
 PYTHON_COMPAT=( python{2_7,3_4,3_5} )
 
-inherit autotools eutils fcaps java-utils-2 linux-info multilib perl-functions python-single-r1 systemd user
+inherit autotools eutils fcaps java-pkg-opt-2 linux-info multilib perl-functions python-single-r1 systemd user
 
 DESCRIPTION="Collects system statistics and provides mechanisms to store the values"
 
@@ -16,7 +16,7 @@ SRC_URI="${HOMEPAGE}/files/${P}.tar.bz2"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="contrib debug kernel_Darwin kernel_FreeBSD kernel_linux perl selinux static-libs"
+IUSE="contrib debug java kernel_Darwin kernel_FreeBSD kernel_linux perl selinux static-libs"
 
 # The plugin lists have to follow here since they extend IUSE
 
@@ -133,6 +133,8 @@ RDEPEND="${COMMON_DEPEND}
 	selinux?				( sec-policy/selinux-collectd )"
 
 REQUIRED_USE="
+	collectd_plugins_genericjmx?		( java )
+	collectd_plugins_java?			( java )
 	collectd_plugins_python?		( ${PYTHON_REQUIRED_USE} )"
 
 PATCHES=(
@@ -250,7 +252,7 @@ pkg_setup() {
 	fi
 
 	if use collectd_plugins_java || use collectd_plugins_genericjmx; then
-		java-pkg_init
+		java-pkg-opt-2_pkg_setup
 	fi
 
 	use collectd_plugins_python && python-single-r1_pkg_setup
