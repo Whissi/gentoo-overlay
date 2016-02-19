@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-	<herd>net-dialup</herd>
-	<maintainer>
-		<email>whissi@whissi.de</email>
-		<name>Thomas D.</name>
-		<description>Proxied Maintainer</description>
-	</maintainer>
-	<longdescription>The Layer 2 Tunneling Protocol (L2TP) daemon mantained by Xelerance Corporation.</longdescription>
+	<longdescription lang="en">The Layer 2 Tunneling Protocol (L2TP) daemon mantained by Xelerance Corporation.</longdescription>
 	<upstream>
 		<bugs-to>https://github.com/xelerance/xl2tpd/issues</bugs-to>
 	</upstream>

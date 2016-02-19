@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-	<herd>proxy-maintainers</herd>
-	<maintainer>
+	<maintainer type="person">
 		<email>whissi@whissi.de</email>
 		<name>Thomas D. (Whissi)</name>
 	</maintainer>
 
 	<upstream>
-		<maintainer>
+		<maintainer type="person">
 			<email>sustrik@fastmq.com</email>
 			<name>Martin Sustrik</name>
 			<description>iMatrix Corporation</description>

@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-	<herd>mysql</herd>
+	<maintainer type="person">
+		<email>whissi@whissi.de</email>
+		<name>Thomas D.</name>
+		<description>Proxied Maintainer</description>
+	</maintainer>
 	<use>
 		<flag name='client-libs'>Build the libmysqlclient libraries</flag>
 		<flag name='embedded'>Build embedded server (libmysqld)</flag>

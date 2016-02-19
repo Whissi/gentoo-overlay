@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-	<herd>proxy-maintainers</herd>
-	<maintainer>
-		<email>whissi@whissi.de</email>
-		<name>Thomas D.</name>
-	</maintainer>
 	<use>
 		<flag name='smtp'>Build witch SMTP (E-Mail) support</flag>
 		<flag name='lognorm'>Add support for log/rules normalizations via <pkg>dev-libs/liblognorm</pkg></flag>

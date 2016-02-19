@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-	<herd>proxy-maintainers</herd>
-	<maintainer>
-		<email>whissi@whissi.de</email>
-		<name>Thomas D. (Whissi)</name>
-	</maintainer>
 	<longdescription lang="en">
 		The aim of the PolarSSL project is to provide a quality, open-source
 		cryptographic library written in C and targeted at embedded systems.

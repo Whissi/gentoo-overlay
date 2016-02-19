@@ -1,10 +1,10 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
 EAPI=5
 
-DESCRIPTION="mylvmbackup is a tool for quickly creating backups of MySQL server's data files using LVM snapshots"
+DESCRIPTION="Tool for quickly creating backups of MySQL servers using LVM snapshots"
 HOMEPAGE="http://lenzg.net/mylvmbackup/"
 SRC_URI="http://lenzg.net/${PN}/${P}.tar.gz"
 LICENSE="GPL-2"
