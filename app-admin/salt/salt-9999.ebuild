@@ -1,4 +1,4 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
@@ -71,7 +71,7 @@ DEPEND="dev-python/setuptools[${PYTHON_USEDEP}]
 		dev-python/mock[${PYTHON_USEDEP}]
 		dev-python/timelib[${PYTHON_USEDEP}]
 		>=dev-python/boto-2.32.1[${PYTHON_USEDEP}]
-		>=dev-python/moto-0.3.6[${PYTHON_USEDEP}]
+		>=dev-python/moto-0.4.21[${PYTHON_USEDEP}]
 		>=dev-python/SaltTesting-2015.2.16[${PYTHON_USEDEP}]
 		${RDEPEND}
 	)"
@@ -93,6 +93,9 @@ python_prepare() {
 		einfo "Removing tests for salt.modules.mod_random which require network access because FEATURES=network-sandbox is set"
 		rm tests/unit/modules/random_org_test.py || die
 	fi
+
+	einfo "Removing tests for salt.modules.mysql (upstream issue #28002) ..."
+	rm tests/unit/modules/mysql_test.py || die "Failed to remove test for salt.modules.mysql"
 }
 
 python_install_all() {

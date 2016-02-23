@@ -71,7 +71,7 @@ DEPEND="dev-python/setuptools[${PYTHON_USEDEP}]
 		dev-python/mock[${PYTHON_USEDEP}]
 		dev-python/timelib[${PYTHON_USEDEP}]
 		>=dev-python/boto-2.32.1[${PYTHON_USEDEP}]
-		>=dev-python/moto-0.3.6[${PYTHON_USEDEP}]
+		>=dev-python/moto-0.4.21[${PYTHON_USEDEP}]
 		>=dev-python/SaltTesting-2015.2.16[${PYTHON_USEDEP}]
 		${RDEPEND}
 	)"
@@ -87,7 +87,6 @@ PATCHES=(
 	"${FILESDIR}/${PN}-2015.5.5-cron-tests.patch"
 	"${FILESDIR}/${PN}-2015.5.5-remove-buggy-tests.patch"
 	"${FILESDIR}/${PN}-2015.8.2-tmpdir.patch"
-	"${FILESDIR}/${PN}-2015.8.4-boto-vpc-test.patch"
 )
 
 python_prepare() {
