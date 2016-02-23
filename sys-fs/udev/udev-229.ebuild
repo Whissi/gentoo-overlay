@@ -1,8 +1,8 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI=5
+EAPI=6
 
 inherit autotools bash-completion-r1 eutils linux-info multilib multilib-minimal toolchain-funcs udev user versionator
 
@@ -15,11 +15,11 @@ else
 	SRC_URI="https://github.com/systemd/systemd/archive/v${PV}.tar.gz -> systemd-${PV}.tar.gz
 		https://dev.gentoo.org/~polynomial-c/${PN}/${FIXUP_PATCH}"
 	if [[ -n "${patchset}" ]]; then
-		SRC_URI="${SRC_URI}
+		SRC_URI+="
 			https://dev.gentoo.org/~ssuominen/${P}-patches-${patchset}.tar.xz
 			https://dev.gentoo.org/~williamh/dist/${P}-patches-${patchset}.tar.xz"
 	fi
-	KEYWORDS="~amd64 ~x86"
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
 fi
 
 DESCRIPTION="Linux dynamic and persistent device naming support (aka userspace devfs)"
@@ -31,7 +31,7 @@ IUSE="acl hwdb +kmod selinux static-libs"
 
 RESTRICT="test"
 
-COMMON_DEPEND=">=sys-apps/util-linux-2.24
+COMMON_DEPEND=">=sys-apps/util-linux-2.27.1[${MULTILIB_USEDEP}]
 	sys-libs/libcap[${MULTILIB_USEDEP}]
 	acl? ( sys-apps/acl )
 	kmod? ( >=sys-apps/kmod-16 )
@@ -109,7 +109,7 @@ pkg_setup() {
 src_prepare() {
 	if ! [[ ${PV} = 9999* ]]; then
 		# secure_getenv() disable for non-glibc systems wrt bug #443030
-		if ! [[ $(grep -r secure_getenv * | wc -l) -eq 25 ]]; then
+		if ! [[ $(grep -r secure_getenv * | wc -l) -eq 26 ]]; then
 			eerror "The line count for secure_getenv() failed, see bug #443030"
 			die
 		fi
@@ -117,11 +117,10 @@ src_prepare() {
 
 	# backport some patches
 	if [[ -n "${patchset}" ]]; then
-		EPATCH_SUFFIX=patch EPATCH_FORCE=yes epatch
+		eapply *.patch
 	fi
 
-	epatch "${DISTDIR}"/${FIXUP_PATCH}
-	rm man/systemd-hwdb.xml || die
+	eapply "${WORKDIR}"/${FIXUP_PATCH/.xz}
 
 	cat <<-EOF > "${T}"/40-gentoo.rules
 	# Gentoo specific floppy and usb groups
@@ -135,8 +134,7 @@ src_prepare() {
 	# stub out the am_path_libcrypt function
 	echo 'AC_DEFUN([AM_PATH_LIBGCRYPT],[:])' > m4/gcrypt.m4
 
-	# apply user patches
-	epatch_user
+	default
 
 	eautoreconf
 
@@ -165,6 +163,7 @@ multilib_src_configure() {
 	tc-export CC #463846
 	export cc_cv_CFLAGS__flto=no #502950
 	export cc_cv_CFLAGS__Werror_shadow=no #554454
+	export cc_cv_LDFLAGS__Wl__fuse_ld_gold=no #573874
 
 	# Keep sorted by ./configure --help and only pass --disable flags
 	# when *required* to avoid external deps or unnecessary compile
