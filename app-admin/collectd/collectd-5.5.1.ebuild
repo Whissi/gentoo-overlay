@@ -6,7 +6,7 @@ EAPI="6"
 
 PYTHON_COMPAT=( python{2_7,3_4,3_5} )
 
-inherit autotools eutils fcaps java-pkg-opt-2 linux-info multilib perl-functions python-single-r1 systemd user
+inherit autotools fcaps java-pkg-opt-2 linux-info multilib perl-functions python-single-r1 systemd user
 
 DESCRIPTION="Collects system statistics and provides mechanisms to store the values"
 
@@ -262,8 +262,7 @@ pkg_setup() {
 }
 
 src_prepare() {
-	epatch ${PATCHES[@]}
-	eapply_user
+	default
 
 	# There's some strange prefix handling in the default config file, resulting in
 	# paths like "/usr/var/..."
@@ -279,7 +278,9 @@ src_prepare() {
 		sed -i -e "s/\$(JAVAC)/\0 $(java-pkg_javac-args)/g" bindings/java/Makefile.am || die
 	fi
 
+	ebegin "Removing bundled libltdl"
 	rm -r libltdl || die
+	eend 0
 
 	eautoreconf
 }
