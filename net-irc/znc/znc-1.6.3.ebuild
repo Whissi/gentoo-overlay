@@ -1,11 +1,11 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI=5
+EAPI=6
 
-PYTHON_COMPAT=( python{3_3,3_4} )
-inherit eutils python-single-r1 systemd user
+PYTHON_COMPAT=( python{3_3,3_4,3_5} )
+inherit python-single-r1 systemd user
 
 MY_PV=${PV/_/-}
 GTEST_VER="1.7.0"
@@ -50,7 +50,6 @@ S=${WORKDIR}/${PN}-${MY_PV}
 PATCHES=(
 	"${FILESDIR}"/${PN}-1.6.1-systemwideconfig.patch
 	"${FILESDIR}"/${PN}-1.6.1-create-pidfile-per-default.patch
-	"${FILESDIR}"/${PN}-1.6.1-libressl.patch
 )
 
 ZNC_DATADIR="${ZNC_DATADIR:-"/var/lib/znc"}"
@@ -76,13 +75,9 @@ src_unpack() {
 	fi
 }
 
-src_prepare() {
-	epatch ${PATCHES[@]}
-}
-
 src_configure() {
 	econf \
-		--with-systemdsystemunitdir=$(systemd_get_unitdir) \
+		--with-systemdsystemunitdir=$(systemd_get_systemunitdir) \
 		$(use_enable debug) \
 		$(use_enable ipv6) \
 		$(use_enable perl) \
@@ -138,7 +133,7 @@ pkg_postinst() {
 			elog "Please make sure that your existing configuration contains"
 			elog "  PidFile = /run/znc/znc.pid"
 			elog "or that PidFile value matches the one in /etc/conf.d/znc"
-			if [[ -d "${EROOT}"/etc/znc ]]; then
+			if [[ -d "${EROOT}"etc/znc ]]; then
 				elog
 				ewarn "/etc/znc exists on your system."
 				ewarn "Due to the nature of the contents of that folder,"
@@ -170,8 +165,10 @@ pkg_config() {
 		mkdir -p "${EROOT}${ZNC_DATADIR}" || die
 		chown -R ${PN}:${PN} "${EROOT}${ZNC_DATADIR}" ||
 			die "Setting permissions failed"
-		"${EROOT}"/usr/bin/znc --system-wide-config-as znc -c -r -d "${EROOT}${ZNC_DATADIR}" ||
+
+		"${EROOT}"usr/bin/znc --system-wide-config-as znc -c -r -d "${EROOT}${ZNC_DATADIR}" ||
 			die "Config failed"
+
 		echo
 		einfo "To start znc, run '/etc/init.d/znc start'"
 		einfo "or add znc to a runlevel:"
