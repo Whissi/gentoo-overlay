@@ -223,7 +223,7 @@ src_prepare() {
 		eprefixify "${S}"/${MY_PN_INIT}/init.gentoo.sh
 
 		cd "${S}"/${MY_PN_INIT}
-		epatch "${FILESDIR}"/shorewall-init-01_remove-ipset-functionality.patch
+		eapply -p2 "${FILESDIR}"/shorewall-init-01_remove-ipset-functionality.patch
 		cd "${S}"
 	fi
 
