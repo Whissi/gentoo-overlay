@@ -125,6 +125,7 @@ src_prepare() {
 	if [[ ! ${PV} == "9999" ]]; then
 		eapply -p1 "${FILESDIR}"/8-stable/50-rsyslog-8.17.0-fix-logctl-memleak.patch
 		eapply -p1 "${FILESDIR}"/8-stable/50-rsyslog-8.17.0-fix-impstats-cee-json-format.patch
+		eapply -p1 "${FILESDIR}"/8-stable/50-rsyslog-8.17.0-issue873.patch
 	fi
 
 	default
