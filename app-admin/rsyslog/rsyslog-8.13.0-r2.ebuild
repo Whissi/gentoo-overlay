@@ -39,7 +39,7 @@ fi
 
 LICENSE="GPL-3 LGPL-3 Apache-2.0"
 SLOT="0"
-IUSE="dbi debug doc elasticsearch +gcrypt jemalloc kafka kerberos libressl mongodb mysql normalize omudpspoof"
+IUSE="dbi debug doc elasticsearch +gcrypt jemalloc kerberos libressl mongodb mysql normalize omudpspoof"
 IUSE+=" postgres rabbitmq redis relp rfc3195 rfc5424hmac snmp ssl systemd test usertools zeromq"
 
 RDEPEND="
@@ -51,7 +51,6 @@ RDEPEND="
 	elasticsearch? ( >=net-misc/curl-7.35.0 )
 	gcrypt? ( >=dev-libs/libgcrypt-1.5.3:= )
 	jemalloc? ( >=dev-libs/jemalloc-3.3.1 )
-	kafka? ( >=dev-libs/librdkafka-0.8.5:= )
 	kerberos? ( virtual/krb5 )
 	mongodb? ( >=dev-libs/libmongo-client-0.1.4 )
 	mysql? ( virtual/mysql )
