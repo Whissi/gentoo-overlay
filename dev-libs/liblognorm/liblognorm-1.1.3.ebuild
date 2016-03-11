@@ -23,7 +23,6 @@ fi
 
 LICENSE="LGPL-2.1"
 SLOT="0/2"
-KEYWORDS="~amd64 ~arm ~hppa ~x86 ~amd64-linux"
 IUSE="debug doc static-libs test"
 
 RDEPEND="
@@ -42,7 +41,7 @@ DOCS=( ChangeLog )
 src_prepare() {
 	eapply -p0 "${FILESDIR}"/respect_CFLAGS.patch
 
-	eapply_user
+	default
 
 	eautoreconf
 }
