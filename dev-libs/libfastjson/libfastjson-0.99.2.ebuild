@@ -41,7 +41,7 @@ src_configure() {
 }
 
 src_install() {
-	local DOCS=( ChangeLog )
+	local DOCS=( AUTHORS ChangeLog )
 	default
 
 	find "${ED}"usr/lib* -name '*.la' -delete
