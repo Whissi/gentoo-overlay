@@ -301,7 +301,7 @@ src_install() {
 		doins plugins/ompgsql/createDB.sql
 	fi
 
-	find "${ED}"usr/lib* -name '*.la' -delete
+	find "${ED}"usr/lib* -name '*.la' -delete || die
 }
 
 pkg_postinst() {
