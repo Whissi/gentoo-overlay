@@ -1,0 +1,21 @@
+[PATCH 4/4] Add AC_GNU_SOURCE needed for xfs/xqhm.h
+
+Bug: https://github.com/collectd/collectd/issues/1637
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index 0a71244..d70e1d6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1,5 +1,6 @@
+ dnl Process this file with autoconf to produce a configure script.
+ AC_INIT([collectd],[m4_esyscmd(./version-gen.sh)])
++AC_GNU_SOURCE
+ AC_CONFIG_SRCDIR(src/)
+ AC_CONFIG_HEADERS(src/config.h)
+ 
+-- 
+2.7.4
+
