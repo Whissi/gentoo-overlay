@@ -141,7 +141,7 @@ REQUIRED_USE="
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-4.10.3-werror.patch
-	"${FILESDIR}"/${PN}-5.5.1-{libocci,lt,nohal,_GNU_SOURCE}.patch
+	"${FILESDIR}"/${PN}-5.5.1-{libocci,lt,nohal,issue-1637}.patch
 )
 
 # @FUNCTION: collectd_plugin_kernel_linux
