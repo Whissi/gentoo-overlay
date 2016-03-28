@@ -123,10 +123,12 @@ COMMON_DEPEND="
 		collectd_plugins_users?		( sys-libs/libstatgrab:= )
 	)"
 
+# Enforcing <=sys-kernel/linux-headers-4.4 due to #577846
 DEPEND="${COMMON_DEPEND}
 	collectd_plugins_cgroups?		( sys-fs/xfsprogs )
 	collectd_plugins_df?			( sys-fs/xfsprogs )
 	collectd_plugins_genericjmx?		( >=virtual/jdk-1.6 )
+	collectd_plugins_iptables?		( <=sys-kernel/linux-headers-4.4 )
 	collectd_plugins_java?			( >=virtual/jdk-1.6 )
 	virtual/pkgconfig"
 
