@@ -16,7 +16,7 @@ SRC_URI="${HOMEPAGE}/files/${P}.tar.bz2"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="contrib debug java kernel_Darwin kernel_FreeBSD kernel_linux perl selinux static-libs"
+IUSE="contrib debug java kernel_Darwin kernel_FreeBSD kernel_linux perl selinux static-libs udev"
 
 # The plugin lists have to follow here since they extend IUSE
 
@@ -65,6 +65,7 @@ COMMON_DEPEND="
 	dev-libs/libgcrypt:=
 	sys-devel/libtool
 	perl?					( dev-lang/perl:=[ithreads] )
+	udev?					( virtual/udev )
 	collectd_plugins_amqp?			( net-libs/rabbitmq-c )
 	collectd_plugins_apache?		( net-misc/curl )
 	collectd_plugins_ascent?		( net-misc/curl dev-libs/libxml2 )
@@ -74,7 +75,6 @@ COMMON_DEPEND="
 	collectd_plugins_curl_json?		( net-misc/curl dev-libs/yajl )
 	collectd_plugins_curl_xml?		( net-misc/curl dev-libs/libxml2:= )
 	collectd_plugins_dbi?			( dev-db/libdbi )
-	collectd_plugins_disk?			( virtual/udev )
 	collectd_plugins_dns?			( net-libs/libpcap )
 	collectd_plugins_genericjmx?		( virtual/jre:= dev-java/java-config-wrapper )
 	collectd_plugins_gmond?			( sys-cluster/ganglia )
@@ -104,7 +104,7 @@ COMMON_DEPEND="
 	collectd_plugins_rrdtool?		( net-analyzer/rrdtool )
 	collectd_plugins_sensors?		( sys-apps/lm_sensors )
 	collectd_plugins_sigrok?		( sci-libs/libsigrok )
-	collectd_plugins_smart?			( virtual/udev dev-libs/libatasmart )
+	collectd_plugins_smart?			( dev-libs/libatasmart )
 	collectd_plugins_snmp?			( net-analyzer/net-snmp )
 	collectd_plugins_tokyotyrant?		( net-misc/tokyotyrant )
 	collectd_plugins_varnish?		( www-servers/varnish )
@@ -139,7 +139,8 @@ RDEPEND="${COMMON_DEPEND}
 REQUIRED_USE="
 	collectd_plugins_genericjmx?		( java )
 	collectd_plugins_java?			( java )
-	collectd_plugins_python?		( ${PYTHON_REQUIRED_USE} )"
+	collectd_plugins_python?		( ${PYTHON_REQUIRED_USE} )
+	collectd_plugins_smart			( udev )"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-4.10.3-werror.patch
@@ -320,6 +321,14 @@ src_configure() {
 	# Do we debug?
 	local myconf="$(use_enable debug)"
 
+	# udev support in disk/smart plugins?
+	if use udev; then
+		myconf+=" --with-libudev"
+	else
+		myconf+=" --without-libudev"
+	fi
+
+
 	local plugin
 
 	# Disable what needs to be disabled.
@@ -422,7 +431,7 @@ src_install() {
 	systemd_dounit "contrib/${PN}.service"
 
 	insinto /etc/logrotate.d
-	newins "${FILESDIR}/${PN}.logrotate" collectd
+	newins "${FILESDIR}/${PN}.logrotate" ${PN}
 
 	sed -i -e 's:^.*PIDFile     "/var/run/collectd.pid":PIDFile     "/run/collectd/collectd.pid":' "${ED}"etc/collectd.conf || die
 	sed -i -e 's:^#	SocketFile "/var/run/collectd-unixsock":#	SocketFile "/run/collectd/collectd.socket":' "${ED}"etc/collectd.conf || die
