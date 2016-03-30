@@ -27,7 +27,7 @@ IUSE="debug doc static-libs test"
 
 RDEPEND="
 	>=dev-libs/libestr-0.1.3
-	|| ( >=dev-libs/json-c-0.11:= >=dev-libs/libfastjson-0.99.2 )
+	|| ( >=dev-libs/json-c-0.11:= >=dev-libs/libfastjson-0.99.2:= )
 "
 
 DEPEND="
@@ -71,5 +71,5 @@ src_test() {
 src_install() {
 	default
 
-	find "${ED}"usr/lib* -name '*.la' -delete
+	find "${ED}"usr/lib* -name '*.la' -delete || die
 }
