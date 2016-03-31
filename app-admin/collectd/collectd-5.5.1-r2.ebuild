@@ -140,7 +140,7 @@ REQUIRED_USE="
 	collectd_plugins_genericjmx?		( java )
 	collectd_plugins_java?			( java )
 	collectd_plugins_python?		( ${PYTHON_REQUIRED_USE} )
-	collectd_plugins_smart			( udev )"
+	collectd_plugins_smart?			( udev )"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-4.10.3-werror.patch
@@ -321,13 +321,13 @@ src_configure() {
 	# Do we debug?
 	local myconf="$(use_enable debug)"
 
-	# udev support in disk/smart plugins?
+	# udev support?
+	# Required for smart plugin via REQUIRED_USE; Optional for disk plugin
 	if use udev; then
 		myconf+=" --with-libudev"
 	else
 		myconf+=" --without-libudev"
 	fi
-
 
 	local plugin
 
