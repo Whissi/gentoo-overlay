@@ -27,6 +27,7 @@ else
 	MY_PV=${PV%_rc*}
 	MY_FILENAME="${PN}-${PV}.tar.gz"
 	MY_FILENAME_DOCS="${PN}-docs-${PV}.tar.gz"
+	S="${WORKDIR}/${PN}-${MY_PV}"
 
 	# Upstream URL schema:
 	# RC:      http://www.rsyslog.com/files/download/rsyslog/rc/rsyslog-8.18.0.tar.gz
