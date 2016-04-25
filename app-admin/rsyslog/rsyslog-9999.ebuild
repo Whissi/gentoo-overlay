@@ -24,11 +24,35 @@ if [[ ${PV} == "9999" ]]; then
 
 	inherit git-r3
 else
+	MY_PV=${PV%_rc*}
+	MY_FILENAME="${PN}-${PV}.tar.gz"
+	MY_FILENAME_DOCS="${PN}-docs-${PV}.tar.gz"
+	S="${WORKDIR}/${PN}-${MY_PV}"
+
+	# Upstream URL schema:
+	# RC:      http://www.rsyslog.com/files/download/rsyslog/rc/rsyslog-8.18.0.tar.gz
+	#          http://www.rsyslog.com/files/download/rsyslog/rc2/rsyslog-8.18.0.tar.gz
+	# Release: http://www.rsyslog.com/files/download/rsyslog/rsyslog-8.18.0.tar.gz
+
+	MY_URL_PREFIX=
+	if [[ ${PV} = *_rc* ]]; then
+		_tmp_last_index=$(($(get_last_version_component_index ${PV})+1))
+		_tmp_suffix=$(get_version_component_range ${_tmp_last_index} ${PV})
+		if [[ ${_tmp_suffix} = *rc* ]]; then
+			MY_URL_PREFIX="${_tmp_suffix}/"
+		fi
+
+		# Cleaning up temporary variables
+		unset _tmp_last_index
+		unset _tmp_suffix
+	else
+		KEYWORDS="~arm ~amd64 ~x86"
+	fi
+
 	SRC_URI="
-		http://www.rsyslog.com/files/download/${PN}/${P}.tar.gz
-		doc? ( http://www.rsyslog.com/files/download/${PN}/${PN}-doc-${PV}.tar.gz )
+		http://www.rsyslog.com/files/download/${PN}/${MY_URL_PREFIX}${PN}-${MY_PV}.tar.gz -> ${MY_FILENAME}
+		doc? ( http://www.rsyslog.com/files/download/${PN}/${MY_URL_PREFIX}${PN}-doc-${MY_PV}.tar.gz -> ${MY_FILENAME_DOCS} )
 	"
-	KEYWORDS="~amd64 ~arm ~hppa ~x86"
 fi
 
 LICENSE="GPL-3 LGPL-3 Apache-2.0"
@@ -45,7 +69,7 @@ RDEPEND="
 	elasticsearch? ( >=net-misc/curl-7.35.0 )
 	gcrypt? ( >=dev-libs/libgcrypt-1.5.3:= )
 	grok? ( >=dev-libs/grok-0.9.2 )
-	jemalloc? ( >=dev-libs/jemalloc-3.3.1 )
+	jemalloc? ( >=dev-libs/jemalloc-3.3.1:= )
 	kafka? ( >=dev-libs/librdkafka-0.9.0.99:= )
 	kerberos? ( virtual/krb5 )
 	mongodb? ( >=dev-libs/libmongo-client-0.1.4 )
@@ -59,7 +83,7 @@ RDEPEND="
 	postgres? ( >=dev-db/postgresql-8.4.20:= )
 	rabbitmq? ( >=net-libs/rabbitmq-c-0.3.0 )
 	redis? ( >=dev-libs/hiredis-0.11.0 )
-	relp? ( >=dev-libs/librelp-1.2.5 )
+	relp? ( >=dev-libs/librelp-1.2.5:= )
 	rfc3195? ( >=dev-libs/liblogging-1.0.1:=[rfc3195] )
 	rfc5424hmac? (
 		!libressl? ( >=dev-libs/openssl-0.9.8y:0= )
@@ -122,13 +146,9 @@ src_unpack() {
 }
 
 src_prepare() {
-	eapply -p2 "${FILESDIR}"/8-stable/50-rsyslog-8.15.0-imtcp-tls-basic-vg-test-workaround.patch
-	eapply -p2 "${FILESDIR}"/8-stable/50-rsyslog-8.15.0-imfile-readmode2-vg-test-workaround.patch
-
 	if [[ ! ${PV} == "9999" ]]; then
-		eapply -p1 "${FILESDIR}"/8-stable/50-rsyslog-8.17.0-fix-logctl-memleak.patch
-		eapply -p1 "${FILESDIR}"/8-stable/50-rsyslog-8.17.0-fix-impstats-cee-json-format.patch
-		eapply -p1 "${FILESDIR}"/8-stable/50-rsyslog-8.17.0-issue873.patch
+		eapply -p1 "${FILESDIR}"/8-stable/50-rsyslog-8.18.0-issue964.patch
+		eapply -p1 "${FILESDIR}"/8-stable/50-rsyslog-8.18.0-issue963.patch
 	fi
 
 	default
@@ -301,7 +321,7 @@ src_install() {
 		doins plugins/ompgsql/createDB.sql
 	fi
 
-	find "${ED}"usr/lib* -name '*.la' -delete
+	find "${ED}"usr/lib* -name '*.la' -delete || die
 }
 
 pkg_postinst() {

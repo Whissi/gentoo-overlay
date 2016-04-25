@@ -46,7 +46,7 @@ else
 		unset _tmp_last_index
 		unset _tmp_suffix
 	else
-		KEYWORDS="~amd64 ~x86"
+		KEYWORDS="~arm ~amd64 ~x86"
 	fi
 
 	SRC_URI="
@@ -69,7 +69,7 @@ RDEPEND="
 	elasticsearch? ( >=net-misc/curl-7.35.0 )
 	gcrypt? ( >=dev-libs/libgcrypt-1.5.3:= )
 	grok? ( >=dev-libs/grok-0.9.2 )
-	jemalloc? ( >=dev-libs/jemalloc-3.3.1 )
+	jemalloc? ( >=dev-libs/jemalloc-3.3.1:= )
 	kafka? ( >=dev-libs/librdkafka-0.9.0.99:= )
 	kerberos? ( virtual/krb5 )
 	mongodb? ( >=dev-libs/libmongo-client-0.1.4 )
@@ -83,7 +83,7 @@ RDEPEND="
 	postgres? ( >=dev-db/postgresql-8.4.20:= )
 	rabbitmq? ( >=net-libs/rabbitmq-c-0.3.0 )
 	redis? ( >=dev-libs/hiredis-0.11.0 )
-	relp? ( >=dev-libs/librelp-1.2.5 )
+	relp? ( >=dev-libs/librelp-1.2.5:= )
 	rfc3195? ( >=dev-libs/liblogging-1.0.1:=[rfc3195] )
 	rfc5424hmac? (
 		!libressl? ( >=dev-libs/openssl-0.9.8y:0= )
@@ -146,12 +146,10 @@ src_unpack() {
 }
 
 src_prepare() {
-	#eapply -p2 "${FILESDIR}"/8-stable/50-rsyslog-8.15.0-imtcp-tls-basic-vg-test-workaround.patch
-	#eapply -p2 "${FILESDIR}"/8-stable/50-rsyslog-8.15.0-imfile-readmode2-vg-test-workaround.patch
-
-	#if [[ ! ${PV} == "9999" ]]; then
-	#	eapply -p1 "${FILESDIR}"/8-stable/
-	#fi
+	if [[ ! ${PV} == "9999" ]]; then
+		eapply -p1 "${FILESDIR}"/8-stable/50-rsyslog-8.18.0-issue964.patch
+		eapply -p1 "${FILESDIR}"/8-stable/50-rsyslog-8.18.0-issue963.patch
+	fi
 
 	default
 
