@@ -4,6 +4,8 @@
 
 EAPI=6
 
+inherit toolchain-funcs
+
 DESCRIPTION="Apache Kafka C/C++ client library"
 HOMEPAGE="https://github.com/edenhill/librdkafka"
 
@@ -16,7 +18,7 @@ if [[ ${PV} == "9999" ]]; then
 	inherit git-r3
 else
 	SRC_URI="https://github.com/edenhill/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm ~x86"
+	KEYWORDS="~amd64 ~arm ~hppa ~x86"
 fi
 
 LICENSE="BSD-2"
@@ -38,6 +40,8 @@ DEPEND="
 "
 
 src_configure() {
+	tc-export CC CXX
+
 	local myeconf=(
 		--no-cache
 		--no-download
