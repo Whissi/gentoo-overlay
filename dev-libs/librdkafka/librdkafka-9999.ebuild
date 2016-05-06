@@ -40,11 +40,12 @@ DEPEND="
 "
 
 src_configure() {
-	tc-export CC CXX
+	tc-export CC CXX LD NM OBJDUMP PKG_CONFIG STRIP
 
 	local myeconf=(
 		--no-cache
 		--no-download
+		--disable-debug-symbols
 		$(use_enable sasl)
 		$(usex static-libs '--enable-static' '')
 		$(use_enable ssl)
