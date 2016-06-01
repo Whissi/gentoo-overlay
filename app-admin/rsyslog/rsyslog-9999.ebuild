@@ -46,7 +46,7 @@ else
 		unset _tmp_last_index
 		unset _tmp_suffix
 	else
-		KEYWORDS="~arm ~amd64 ~x86"
+		KEYWORDS="~amd64 ~arm ~hppa ~x86"
 	fi
 
 	SRC_URI="
@@ -121,7 +121,7 @@ src_unpack() {
 	if use doc; then
 		if [[ ${PV} == "9999" ]]; then
 			local _EGIT_BRANCH=
-			if [ -n "${EGIT_BRANCH}" ]; then
+			if [[ -n "${EGIT_BRANCH}" ]]; then
 				# Cannot use rsyslog commits/branches for documentation repository
 				_EGIT_BRANCH=${EGIT_BRANCH}
 				unset EGIT_BRANCH
@@ -130,17 +130,15 @@ src_unpack() {
 			git-r3_fetch "${DOC_REPO_URI}"
 			git-r3_checkout "${DOC_REPO_URI}" "${S}"/docs
 
-			if [ -n "${_EGIT_BRANCH}" ]; then
+			if [[ -n "${_EGIT_BRANCH}" ]]; then
 				# Restore previous EGIT_BRANCH information
 				EGIT_BRANCH=${_EGIT_BRANCH}
 			fi
 		else
-			local doc_tarball="${PN}-doc-${PV}.tar.gz"
-
 			cd "${S}" || die "Cannot change dir into '${S}'"
 			mkdir docs || die "Failed to create docs directory"
 			cd docs || die "Failed to change dir into '${S}/docs'"
-			unpack ${doc_tarball}
+			unpack ${MY_FILENAME_DOCS}
 		fi
 	fi
 }
@@ -271,7 +269,7 @@ src_test() {
 	if ! emake --jobs 1 check; then
 		eerror "Test suite failed! :("
 
-		if [ -z "${_has_increased_ulimit}" ]; then
+		if [[ -z "${_has_increased_ulimit}" ]]; then
 			eerror "Probably because open file limit couldn't be set to 3072."
 		fi
 
@@ -290,7 +288,7 @@ src_install() {
 		"${FILESDIR}"/${BRANCH}/README.gentoo
 	)
 
-	use doc && local HTML_DOCS=( "${S}/docs/build/" )
+	use doc && local HTML_DOCS=( "${S}/docs/build/." )
 
 	default
 
@@ -378,13 +376,13 @@ pkg_config() {
 
 	# Make sure the certificates directory exists
 	local CERTDIR="${EROOT}/etc/ssl/${PN}"
-	if [ ! -d "${CERTDIR}" ]; then
+	if [[ ! -d "${CERTDIR}" ]]; then
 		mkdir "${CERTDIR}" || die
 	fi
 	einfo "Your certificates will be stored in ${CERTDIR}"
 
 	# Create a default CA if needed
-	if [ ! -f "${CERTDIR}/${PN}_ca.cert.pem" ]; then
+	if [[ ! -f "${CERTDIR}/${PN}_ca.cert.pem" ]]; then
 		einfo "No CA key and certificate found in ${CERTDIR}, creating them for you..."
 		certtool --generate-privkey \
 			--outfile "${CERTDIR}/${PN}_ca.privkey.pem" &>/dev/null
