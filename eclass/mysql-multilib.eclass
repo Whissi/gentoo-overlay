@@ -513,9 +513,19 @@ mysql-multilib_disable_test() {
 # Perform some basic tests and tasks during pkg_pretend phase:
 mysql-multilib_pkg_pretend() {
 	if [[ ${MERGE_TYPE} != binary ]] ; then
-		if use_if_iuse tokudb && [[ $(gcc-major-version) -lt 4 || \
-			$(gcc-major-version) -eq 4 && $(gcc-minor-version) -lt 7 ]] ; then
+		local GCC_MAJOR_SET=$(gcc-major-version)
+		local GCC_MINOR_SET=$(gcc-minor-version)
+		if use_if_iuse tokudb && [[ ${GCC_MAJOR_SET} -lt 4 || \
+			${GCC_MAJOR_SET} -eq 4 && ${GCC_MINOR_SET} -lt 7 ]] ; then
 			eerror "${PN} with tokudb needs to be built with gcc-4.7 or later."
+			eerror "Please use gcc-config to switch to gcc-4.7 or later version."
+			die
+		fi
+		# Bug 565584.  InnoDB now requires atomic functions introduced with gcc-4.7 on
+		# non x86{,_64} arches
+		if ! use amd64 && ! use x86 && [[ ${GCC_MAJOR_SET} -lt 4 || \
+			${GCC_MAJOR_SET} -eq 4 && ${GCC_MINOR_SET} -lt 7 ]] ; then
+			eerror "${PN} needs to be built with gcc-4.7 or later."
 			eerror "Please use gcc-config to switch to gcc-4.7 or later version."
 			die
 		fi
@@ -1144,7 +1154,7 @@ mysql-multilib_pkg_config() {
 
 	ebegin "Setting root password"
 	# Do this from memory, as we don't want clear text passwords in temp files
-	local sql="UPDATE mysql.user SET Password = PASSWORD('${MYSQL_ROOT_PASSWORD}') WHERE USER='root'"
+	local sql="UPDATE mysql.user SET Password = PASSWORD('${MYSQL_ROOT_PASSWORD}') WHERE USER='root'; FLUSH PRIVILEGES"
 	"${EROOT}/usr/bin/mysql" \
 		--socket=${socket} \
 		-hlocalhost \
