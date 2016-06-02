@@ -10,6 +10,11 @@
     <name>Johan Bergström</name>
     <description>Co-maintainer, CC on bugs.</description>
   </maintainer>
+  <maintainer type="person">
+    <email>whissi@whissi.de</email>
+    <name>Thomas D.</name>
+    <description>Co-maintainer, CC on bugs.</description>
+  </maintainer>
   <maintainer type="project">
     <email>proxy-maint@gentoo.org</email>
     <name>Proxy Maintainers</name>
