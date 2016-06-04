@@ -14,11 +14,10 @@ LICENSE="GPL-2"
 SLOT="0/3.6.0"
 KEYWORDS="~amd64 ~x86"
 
-DEPEND=""
+DEPEND="net-libs/libmnl"
 RDEPEND="
 	${DEPEND}
 	>=net-firewall/iptables-1.4.7
-	net-libs/libmnl
 "
 
 DOCS=( ChangeLog INSTALL README UPGRADE )
