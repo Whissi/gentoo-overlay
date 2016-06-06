@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-	<maintainer>
+	<maintainer type="project">
 		<email>udev-bugs@gentoo.org</email>
 	</maintainer>
 	<use>
-		<flag name='hwdb'>Install systemd's hardware management tools</flag>
-		<flag name='kmod'>Enable kernel module loading/unloading support using <pkg>sys-apps/kmod</pkg></flag>
+		<flag name="hwdb">Install systemd's hardware management tools</flag>
+		<flag name="kmod">Enable kernel module loading/unloading support using <pkg>sys-apps/kmod</pkg></flag>
 	</use>
 	<upstream>
 		<remote-id type="cpe">cpe:/a:kernel:udev</remote-id>
+		<remote-id type="github">systemd/systemd</remote-id>
 	</upstream>
 </pkgmetadata>

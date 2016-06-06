@@ -1,29 +1,29 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI=5
+EAPI=6
 
-inherit autotools bash-completion-r1 eutils linux-info multilib multilib-minimal toolchain-funcs udev user versionator
+inherit autotools bash-completion-r1 linux-info multilib-minimal toolchain-funcs udev user versionator
 
 if [[ ${PV} = 9999* ]]; then
 	EGIT_REPO_URI="git://anongit.freedesktop.org/systemd/systemd"
 	inherit git-r3
 else
 	patchset=
-	FIXUP_PATCH="${PN}-221-revert-systemd-messup.patch.xz"
+	FIXUP_PATCH="${PN}-230-revert-systemd-messup.patch.xz"
 	SRC_URI="https://github.com/systemd/systemd/archive/v${PV}.tar.gz -> systemd-${PV}.tar.gz
 		https://dev.gentoo.org/~polynomial-c/${PN}/${FIXUP_PATCH}"
 	if [[ -n "${patchset}" ]]; then
 		SRC_URI+="
-			https://dev.gentoo.org/~ssuominen/${P}-patches-${patchset}.tar.xz
-			https://dev.gentoo.org/~williamh/dist/${P}-patches-${patchset}.tar.xz"
+			https://dev.gentoo.org/~williamh/dist/${P}-patches-${patchset}.tar.xz
+			https://dev.gentoo.org/~ssuominen/${P}-patches-${patchset}.tar.xz"
 	fi
 	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
 fi
 
 DESCRIPTION="Linux dynamic and persistent device naming support (aka userspace devfs)"
-HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
+HOMEPAGE="https://www.freedesktop.org/wiki/Software/systemd"
 
 LICENSE="LGPL-2.1 MIT GPL-2"
 SLOT="0"
@@ -87,7 +87,7 @@ check_default_rules() {
 
 pkg_setup() {
 	if [[ ${MERGE_TYPE} != buildonly ]]; then
-		CONFIG_CHECK="~BLK_DEV_BSG ~DEVTMPFS ~!IDE ~INOTIFY_USER ~!SYSFS_DEPRECATED ~!SYSFS_DEPRECATED_V2 ~SIGNALFD ~EPOLL ~FHANDLE ~NET ~!FW_LOADER_USER_HELPER"
+		CONFIG_CHECK="~BLK_DEV_BSG ~DEVTMPFS ~!IDE ~INOTIFY_USER ~!SYSFS_DEPRECATED ~!SYSFS_DEPRECATED_V2 ~SIGNALFD ~EPOLL ~FHANDLE ~NET ~!FW_LOADER_USER_HELPER ~UNIX"
 		linux-info_pkg_setup
 
 		# CONFIG_FHANDLE was introduced by 2.6.39
@@ -109,7 +109,7 @@ pkg_setup() {
 src_prepare() {
 	if ! [[ ${PV} = 9999* ]]; then
 		# secure_getenv() disable for non-glibc systems wrt bug #443030
-		if ! [[ $(grep -r secure_getenv * | wc -l) -eq 25 ]]; then
+		if ! [[ $(grep -r secure_getenv * | wc -l) -eq 26 ]]; then
 			eerror "The line count for secure_getenv() failed, see bug #443030"
 			die
 		fi
@@ -117,16 +117,15 @@ src_prepare() {
 
 	# backport some patches
 	if [[ -n "${patchset}" ]]; then
-		EPATCH_SUFFIX=patch EPATCH_FORCE=yes epatch
+		eapply "${WORKDIR}"/patch
 	fi
 
-	epatch "${DISTDIR}"/${FIXUP_PATCH}
-	rm man/systemd-hwdb.xml || die
+	eapply "${WORKDIR}"/${FIXUP_PATCH/.xz}
 
 	cat <<-EOF > "${T}"/40-gentoo.rules
 	# Gentoo specific floppy and usb groups
-	SUBSYSTEM=="block", KERNEL=="fd[0-9]", GROUP="floppy"
-	SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", GROUP="usb"
+	ACTION=="add", SUBSYSTEM=="block", KERNEL=="fd[0-9]", GROUP="floppy"
+	ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", GROUP="usb"
 	EOF
 
 	# change rules back to group uucp instead of dialout for now wrt #454556
@@ -136,7 +135,7 @@ src_prepare() {
 	echo 'AC_DEFUN([AM_PATH_LIBGCRYPT],[:])' > m4/gcrypt.m4
 
 	# apply user patches
-	epatch_user
+	eapply_user
 
 	eautoreconf
 
@@ -165,6 +164,7 @@ multilib_src_configure() {
 	tc-export CC #463846
 	export cc_cv_CFLAGS__flto=no #502950
 	export cc_cv_CFLAGS__Werror_shadow=no #554454
+	export cc_cv_LDFLAGS__Wl__fuse_ld_gold=no #573874
 
 	# Keep sorted by ./configure --help and only pass --disable flags
 	# when *required* to avoid external deps or unnecessary compile
@@ -297,8 +297,8 @@ multilib_src_install() {
 			MANPAGES="man/udev.link.5 man/udev.7 man/udevadm.8 man/udevd.8 $(usex hwdb 'man/hwdb.7 man/udev-hwdb.8' '')"
 			MANPAGES_ALIAS="man/systemd-udevd.8 $(usex hwdb 'man/systemd-hwdb.8' '')"
 			pkgconfiglib_DATA="${pkgconfiglib_DATA}"
-			INSTALL_DIRS='$(sysconfdir)/udev/rules.d \
-					$(sysconfdir)/udev/hwdb.d \
+			INSTALL_DIRS='$(sysconfdir)/udev/rules.d
+					$(sysconfdir)/udev/hwdb.d
 					$(sysconfdir)/udev/network'
 			dist_bashcompletion_DATA="shell-completion/bash/udevadm"
 			networkdir=/lib/udev/network
@@ -447,7 +447,7 @@ pkg_postinst() {
 	if use hwdb && has_version 'sys-apps/hwids[udev]'; then
 		udev-hwdb --root="${ROOT}" update
 		# Only reload when we are not upgrading to avoid potential race w/ incompatible hwdb.bin and the running udevd
-		# http://cgit.freedesktop.org/systemd/systemd/commit/?id=1fab57c209035f7e66198343074e9cee06718bda
+		# https://cgit.freedesktop.org/systemd/systemd/commit/?id=1fab57c209035f7e66198343074e9cee06718bda
 		[[ -z ${REPLACING_VERSIONS} ]] && udev_reload
 	fi
 }
