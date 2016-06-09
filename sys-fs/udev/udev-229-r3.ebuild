@@ -23,7 +23,7 @@ else
 fi
 
 DESCRIPTION="Linux dynamic and persistent device naming support (aka userspace devfs)"
-HOMEPAGE="http://www.freedesktop.org/wiki/Software/systemd"
+HOMEPAGE="https://www.freedesktop.org/wiki/Software/systemd"
 
 LICENSE="LGPL-2.1 MIT GPL-2"
 SLOT="0"
@@ -87,7 +87,7 @@ check_default_rules() {
 
 pkg_setup() {
 	if [[ ${MERGE_TYPE} != buildonly ]]; then
-		CONFIG_CHECK="~BLK_DEV_BSG ~DEVTMPFS ~!IDE ~INOTIFY_USER ~!SYSFS_DEPRECATED ~!SYSFS_DEPRECATED_V2 ~SIGNALFD ~EPOLL ~FHANDLE ~NET ~!FW_LOADER_USER_HELPER"
+		CONFIG_CHECK="~BLK_DEV_BSG ~DEVTMPFS ~!IDE ~INOTIFY_USER ~!SYSFS_DEPRECATED ~!SYSFS_DEPRECATED_V2 ~SIGNALFD ~EPOLL ~FHANDLE ~NET ~!FW_LOADER_USER_HELPER ~UNIX"
 		linux-info_pkg_setup
 
 		# CONFIG_FHANDLE was introduced by 2.6.39
@@ -119,6 +119,7 @@ src_prepare() {
 	if [[ -n "${patchset}" ]]; then
 		eapply "${WORKDIR}/patch"
 	fi
+	eapply "${FILESDIR}"/${PN}-229-sysmacros.patch #580200
 
 	eapply "${WORKDIR}"/${FIXUP_PATCH/.xz}
 
@@ -296,8 +297,8 @@ multilib_src_install() {
 			MANPAGES="man/udev.link.5 man/udev.7 man/udevadm.8 man/udevd.8 $(usex hwdb 'man/hwdb.7 man/udev-hwdb.8' '')"
 			MANPAGES_ALIAS="man/systemd-udevd.8 $(usex hwdb 'man/systemd-hwdb.8' '')"
 			pkgconfiglib_DATA="${pkgconfiglib_DATA}"
-			INSTALL_DIRS='$(sysconfdir)/udev/rules.d \
-					$(sysconfdir)/udev/hwdb.d \
+			INSTALL_DIRS='$(sysconfdir)/udev/rules.d
+					$(sysconfdir)/udev/hwdb.d
 					$(sysconfdir)/udev/network'
 			dist_bashcompletion_DATA="shell-completion/bash/udevadm"
 			networkdir=/lib/udev/network
