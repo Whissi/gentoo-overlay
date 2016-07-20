@@ -198,7 +198,6 @@ NGINX_MODULES_3RD="
 	http_security
 	http_push_stream
 	http_sticky
-	http_ajp
 	http_mogilefs
 	http_memc
 	http_auth_ldap"
@@ -560,7 +559,8 @@ src_configure() {
 	tc-export CC
 
 	if ! use prefix; then
-		myconf+=( --user=${PN}" "--group=${PN} )
+		myconf+=( --user=${PN} )
+		myconf+=( --group=${PN} )
 	fi
 
 	./configure \
