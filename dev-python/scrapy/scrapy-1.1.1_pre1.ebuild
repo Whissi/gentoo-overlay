@@ -21,7 +21,9 @@ IUSE="boto doc ibl test ssl"
 RDEPEND="
 	>=dev-python/six-1.5.2[${PYTHON_USEDEP}]
 	dev-libs/libxml2[python,${PYTHON_USEDEP}]
+	>=dev-python/parsel-0.9.3[${PYTHON_USEDEP}]
 	dev-python/pillow[${PYTHON_USEDEP}]
+	>=dev-python/pydispatcher-2.0.5[${PYTHON_USEDEP}]
 	dev-python/lxml[${PYTHON_USEDEP}]
 	ibl? ( dev-python/numpy[${PYTHON_USEDEP}] )
 	ssl? ( dev-python/pyopenssl[${PYTHON_USEDEP}] )
@@ -30,7 +32,7 @@ RDEPEND="
 	dev-python/twisted-conch[${PYTHON_USEDEP}]
 	dev-python/twisted-mail[${PYTHON_USEDEP}]
 	dev-python/twisted-web[${PYTHON_USEDEP}]
-	>=dev-python/w3lib-1.8.0[${PYTHON_USEDEP}]
+	>=dev-python/w3lib-1.14.2[${PYTHON_USEDEP}]
 	dev-python/queuelib[${PYTHON_USEDEP}]
 	>=dev-python/cssselect-0.9[${PYTHON_USEDEP}]
 	>=dev-python/six-1.5.2[${PYTHON_USEDEP}]
@@ -54,19 +56,17 @@ python_prepare_all() {
 	# https://github.com/scrapy/scrapy/issues/1464
 	# Disable failing tests known to pass according to upstream
 	# Awaiting a fix planned by package owner.
-	sed -e 's:test_https_connect_tunnel:_&:' \
-		-e 's:test_https_connect_tunnel_error:_&:' \
-		-e 's:test_https_tunnel_auth_error:_&:' \
-		-e 's:test_https_tunnel_without_leak_proxy_authorization_header:_&:' \
-		-i tests/test_proxy_connect.py || die
+	#sed -e 's:test_https_connect_tunnel:_&:' \
+	#	-e 's:test_https_connect_tunnel_error:_&:' \
+	#	-e 's:test_https_tunnel_auth_error:_&:' \
+	#	-e 's:test_https_tunnel_without_leak_proxy_authorization_header:_&:' \
+	#	-i tests/test_proxy_connect.py || die
 
 	distutils-r1_python_prepare_all
 }
 
 python_compile_all() {
-	if use doc; then
-		PYTHONPATH="${S}" emake -C docs html || die "emake html failed"
-	fi
+	use doc && emake -C docs html
 }
 
 python_test() {
