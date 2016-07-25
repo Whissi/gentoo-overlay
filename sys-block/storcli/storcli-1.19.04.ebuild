@@ -11,7 +11,7 @@ HOMEPAGE="http://www.avagotech.com/support/download-search"
 SRC_URI="https://mirror.deutschmann.io/distfiles/lsi/storcli/storcli-${PV}.zip"
 
 LICENSE="LSI"
-SLOT="6.11"
+SLOT="0/6.11"
 KEYWORDS="~amd64 ~x86"
 IUSE=""
 

@@ -10,7 +10,7 @@ HOMEPAGE="http://www.lsi.com/support/pages/download-results.aspx?keyword=storcli
 SRC_URI="https://mirror.deutschmann.io/distfiles/lsi/storcli/storcli-1.16.06.zip"
 
 LICENSE="LSI"
-SLOT="6.8"
+SLOT="0/6.8"
 KEYWORDS="~amd64 ~x86"
 IUSE=""
 
