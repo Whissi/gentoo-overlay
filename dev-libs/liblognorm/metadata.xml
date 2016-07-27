@@ -5,4 +5,8 @@
 		<email>whissi@whissi.de</email>
 		<name>Thomas D. (Whissi)</name>
 	</maintainer>
+	<upstream>
+		<bugs-to>https://github.com/rsyslog/liblognorm/issues</bugs-to>
+		<remote-id type="github">rsyslog/liblognorm</remote-id>
+	</upstream>
 </pkgmetadata>
