@@ -46,7 +46,7 @@ else
 		unset _tmp_last_index
 		unset _tmp_suffix
 	else
-		KEYWORDS="~amd64 ~arm ~hppa ~x86"
+		KEYWORDS="~amd64 ~arm ~arm64 ~hppa ~x86"
 	fi
 
 	SRC_URI="
@@ -83,7 +83,7 @@ RDEPEND="
 	postgres? ( >=dev-db/postgresql-8.4.20:= )
 	rabbitmq? ( >=net-libs/rabbitmq-c-0.3.0:= )
 	redis? ( >=dev-libs/hiredis-0.11.0 )
-	relp? ( >=dev-libs/librelp-1.2.5:= )
+	relp? ( >=dev-libs/librelp-1.2.12:= )
 	rfc3195? ( >=dev-libs/liblogging-1.0.1:=[rfc3195] )
 	rfc5424hmac? (
 		!libressl? ( >=dev-libs/openssl-0.9.8y:0= )
@@ -97,6 +97,7 @@ RDEPEND="
 		>=net-libs/czmq-3.0.0
 	)"
 DEPEND="${RDEPEND}
+	>=sys-devel/autoconf-archive-2015.02.04
 	virtual/pkgconfig
 	test? ( sys-libs/libfaketime )"
 
