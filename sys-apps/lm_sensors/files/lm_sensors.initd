@@ -7,7 +7,7 @@ command="/usr/bin/sensors"
 
 depend() {
 	need localmount
-	after modules
+	after modules-load
 }
 
 start() {

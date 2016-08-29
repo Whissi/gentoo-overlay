@@ -1,4 +1,4 @@
 # /etc/conf.d/lm_sensors
 
 # NOTE:
-# For module loading please use /etc/conf.d/modules
+# For module loading please use /etc/modules-load.d/lm_sensors.conf

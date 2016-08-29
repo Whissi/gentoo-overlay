@@ -30,7 +30,8 @@ COMMON_DEPS="
 	)"
 
 RDEPEND="${COMMON_DEPS}
-	dev-lang/perl"
+	dev-lang/perl
+	!<sys-apps/openrc-0.21.4"
 
 DEPEND="${COMMON_DEPS}
 	sys-devel/bison
@@ -170,28 +171,17 @@ pkg_postinst() {
 
 			elog ""
 			elog "Since version 3.4.0_p20160725 ${PN} no longer loads modules on its own"
-			elog "instead it is either using \"modules\" (OpenRC) or \"systemd-modules-load\""
-			elog "(systemd) service."
+			elog "instead it is using \"modules-load\" services provided by OpenRC or systemd."
 			elog ""
 			elog "To migrate your configuration you have 2 options:"
 			elog ""
 			elog "  a) Re-create a new configuration using \"/usr/sbin/sensors-detect\""
 			elog ""
-
-			if systemd_is_booted; then
-				elog "  b) Copy existing \"modules_<n>\", \"HWMON_MODULES\" or \"BUS_MODULES\""
-				elog "     variables from \"/etc/conf.d/lm_modules\" to"
-				elog "     \"/etc/modules-load.d/lm_sensors.conf\" and adjust format."
-				elog ""
-				elog "     For details see https://wiki.gentoo.org/wiki/Systemd#Automatic_module_loading"
-			else
-				elog "  b) Copy existing \"modules_<n>\", \"HWMON_MODULES\" or \"BUS_MODULES\""
-				elog "     variables from \"/etc/conf.d/lm_modules\" to \"/etc/conf.d/modules\" and"
-				elog "     adjust format."
-				elog ""
-				elog "     For details see https://wiki.gentoo.org/wiki/OpenRC/Baselayout_1_to_2_migration#Kernel_modules"
-			fi
-
+			elog "  b) Copy existing \"modules_<n>\", \"HWMON_MODULES\" or \"BUS_MODULES\""
+			elog "     variables from \"/etc/conf.d/lm_modules\" to"
+			elog "     \"/etc/modules-load.d/lm_sensors.conf\" and adjust format."
+			elog ""
+			elog "     For details see https://wiki.gentoo.org/wiki/Systemd#Automatic_module_loading"
 			elog ""
 			elog "     Important: Don't forget to migrate your module's argument"
 			elog "                (modules_<name>_args variable) if your are not already"
@@ -207,11 +197,7 @@ pkg_postinst() {
 
 		elog ""
 		elog "Please run \`/usr/sbin/sensors-detect' in order to setup"
-		if systemd_is_booted; then
-			elog "\"/etc/modules-load.d/lm_sensors.conf\"."
-		else
-			elog "\"/etc/conf.d/modules\"."
-		fi
+		elog "\"/etc/modules-load.d/lm_sensors.conf\"."
 		elog ""
 		elog "You might want to add ${PN} to your default runlevel to make"
 		elog "sure the sensors get initialized on the next startup."
