@@ -2,9 +2,9 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI="5"
+EAPI="6"
 MODULES_OPTIONAL_USE=modules
-inherit linux-info linux-mod
+inherit autotools eutils linux-info linux-mod
 
 DESCRIPTION="IPset tool for iptables, successor to ippool"
 HOMEPAGE="http://ipset.netfilter.org/"
@@ -14,11 +14,10 @@ LICENSE="GPL-2"
 SLOT="0/3.6.0"
 KEYWORDS="~amd64 ~x86"
 
-DEPEND="net-libs/libmnl"
-RDEPEND="
-	${DEPEND}
-	>=net-firewall/iptables-1.4.7
-"
+COMMON_DEPEND="net-libs/libmnl"
+DEPEND="${COMMON_DEPEND}"
+RDEPEND="${COMMON_DEPEND}
+	>=net-firewall/iptables-1.4.7"
 
 DOCS=( ChangeLog INSTALL README UPGRADE )
 
@@ -36,6 +35,9 @@ pkg_setup() {
 	get_version
 	CONFIG_CHECK="NETFILTER"
 	ERROR_NETFILTER="ipset requires NETFILTER support in your kernel."
+	# It does still build without NET_NS, but it may be needed in future.
+	#CONFIG_CHECK="${CONFIG_CHECK} NET_NS"
+	#ERROR_NET_NS="ipset requires NET_NS (network namespace) support in your kernel."
 
 	build_modules=0
 	if use modules; then
@@ -61,9 +63,11 @@ pkg_setup() {
 	[[ ${build_modules} -eq 1 ]] && linux-mod_pkg_setup
 }
 
-#src_prepare() {
-#	eautoreconf
-#}
+src_prepare() {
+	default
+
+	eautoreconf
+}
 
 src_configure() {
 	econf \
