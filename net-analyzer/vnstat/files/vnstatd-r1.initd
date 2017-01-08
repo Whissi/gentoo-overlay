@@ -1,7 +1,7 @@
-#!/sbin/runscript
-# Copyright 1999-2015 Gentoo Foundation
+#!/sbin/openrc-run
+# Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
+# $Id$
 
 extra_started_commands="reload"
 
@@ -10,7 +10,7 @@ VNSTATD_PIDFILE=${VNSTATD_PIDFILE:-"/run/vnstat/vnstatd.pid"}
 
 pidfile="${VNSTATD_PIDFILE}"
 command="/usr/bin/vnstatd"
-command_args="${VNSTATD_OPTS} --daemon --config ${VNSTATD_CONFIGFILE} --pidfile ${pidfile}"
+command_args="${VNSTATD_OPTS} --daemon --config \"${VNSTATD_CONFIGFILE}\" --pidfile \"${pidfile}\""
 start_stop_daemon_args="--wait ${SSD_STARTWAIT:-500}"
 name="vnStat daemon"
 
@@ -18,10 +18,6 @@ description="vnstatd updates vnStat databases."
 description_reload="Reload ${name}'s configuration"
 
 required_files="${VNSTATD_CONFIGFILE}"
-
-depend() {
-	use net
-}
 
 start_pre() {
 	checkpath --directory --mode 0775 --owner vnstat:vnstat $(dirname "${pidfile}")
