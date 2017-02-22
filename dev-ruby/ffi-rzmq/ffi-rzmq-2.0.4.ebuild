@@ -1,10 +1,10 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI=5
+EAPI="5"
 
-USE_RUBY="ruby19 ruby20 ruby21"
+USE_RUBY="ruby21 ruby22 ruby23"
 
 RUBY_FAKEGEM_TASK_TEST="spec"
 RUBY_FAKEGEM_EXTRADOC="AUTHORS.txt History.txt README.rdoc"
@@ -12,7 +12,7 @@ RUBY_FAKEGEM_GEMSPEC="${PN}.gemspec"
 
 inherit ruby-fakegem
 
-DESCRIPTION="FFI bindings for ZeroMQ so the library can be used under JRuby and other FFI-compliant ruby runtimes"
+DESCRIPTION="FFI bindings for ZeroMQ"
 HOMEPAGE="https://github.com/chuckremes/ffi-rzmq"
 SRC_URI="https://github.com/chuckremes/${PN}/archive/release-${PV}.tar.gz -> ${P}.tar.gz"
 
