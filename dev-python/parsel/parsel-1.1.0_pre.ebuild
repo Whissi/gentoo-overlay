@@ -18,6 +18,8 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE="doc test"
 
+PATCHES=( "${FILESDIR}"/${PN}-1.1.0-remove-pytest-runner-depedency.patch )
+
 RDEPEND="
 	dev-python/lxml[${PYTHON_USEDEP}]
 	>=dev-python/w3lib-1.8.0[${PYTHON_USEDEP}]
@@ -26,10 +28,10 @@ RDEPEND="
 	"
 DEPEND="${RDEPEND}
 	dev-python/setuptools[${PYTHON_USEDEP}]
-	dev-python/pytest-runner[${PYTHON_USEDEP}]
 	doc? ( dev-python/sphinx[${PYTHON_USEDEP}] )
 	test? (
 		dev-python/pytest[${PYTHON_USEDEP}]
+		dev-python/pytest-runner[${PYTHON_USEDEP}]
 		dev-python/pytest-cov[${PYTHON_USEDEP}]
 	)"
 
