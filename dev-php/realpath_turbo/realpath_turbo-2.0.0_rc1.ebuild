@@ -1,4 +1,4 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
@@ -8,7 +8,7 @@ PHP_EXT_NAME="realpath_turbo"
 PHP_EXT_INI="yes"
 PHP_EXT_ZENDEXT="no"
 
-USE_PHP="php5-5 php5-6 php7-0"
+USE_PHP="php5-6 php7-0 php7-1"
 
 inherit php-ext-source-r3
 
