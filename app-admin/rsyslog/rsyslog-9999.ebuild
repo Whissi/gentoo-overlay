@@ -1,8 +1,8 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI=6
+EAPI="6"
 
 inherit autotools eutils linux-info systemd
 
@@ -57,11 +57,11 @@ fi
 
 LICENSE="GPL-3 LGPL-3 Apache-2.0"
 SLOT="0"
-IUSE="dbi debug doc elasticsearch +gcrypt grok jemalloc kafka kerberos libressl mongodb mysql normalize omhttpfs"
-IUSE+=" omudpspoof postgres rabbitmq redis relp rfc3195 rfc5424hmac snmp ssl systemd test usertools zeromq"
+IUSE="dbi debug doc elasticsearch +gcrypt grok jemalloc kafka kerberos libressl mdblookup mongodb mysql normalize omhttpfs"
+IUSE+=" omudpspoof postgres rabbitmq redis relp rfc3195 rfc5424hmac snmp ssl systemd test usertools +uuid zeromq"
 
 RDEPEND="
-	>=dev-libs/libfastjson-0.99.2:=
+	>=dev-libs/libfastjson-0.99.3:=
 	>=dev-libs/libestr-0.1.9
 	>=dev-libs/liblogging-1.0.1:=[stdlog]
 	>=sys-libs/zlib-1.2.5
@@ -72,17 +72,18 @@ RDEPEND="
 	jemalloc? ( >=dev-libs/jemalloc-3.3.1:= )
 	kafka? ( >=dev-libs/librdkafka-0.9.0.99:= )
 	kerberos? ( virtual/krb5 )
+	mdblookup? ( dev-libs/libmaxminddb:= )
 	mongodb? ( >=dev-libs/libmongo-client-0.1.4 )
 	mysql? ( virtual/mysql )
 	normalize? (
 		>=dev-libs/libee-0.4.0
-		>=dev-libs/liblognorm-1.1.2:=
+		>=dev-libs/liblognorm-2.0.1:=
 	)
 	omhttpfs? ( >=net-misc/curl-7.35.0 )
 	omudpspoof? ( >=net-libs/libnet-1.1.6 )
 	postgres? ( >=dev-db/postgresql-8.4.20:= )
 	rabbitmq? ( >=net-libs/rabbitmq-c-0.3.0:= )
-	redis? ( >=dev-libs/hiredis-0.11.0 )
+	redis? ( >=dev-libs/hiredis-0.11.0:= )
 	relp? ( >=dev-libs/librelp-1.2.12:= )
 	rfc3195? ( >=dev-libs/liblogging-1.0.1:=[rfc3195] )
 	rfc5424hmac? (
@@ -92,12 +93,13 @@ RDEPEND="
 	snmp? ( >=net-analyzer/net-snmp-5.7.2 )
 	ssl? ( >=net-libs/gnutls-2.12.23:0= )
 	systemd? ( >=sys-apps/systemd-208 )
+	uuid? ( sys-apps/util-linux:0= )
 	zeromq? (
 		>=net-libs/zeromq-4.1.1:=
 		>=net-libs/czmq-3.0.0
 	)"
 DEPEND="${RDEPEND}
-	>=sys-devel/autoconf-archive-2015.02.04
+	>=sys-devel/autoconf-archive-2015.02.24
 	virtual/pkgconfig
 	test? ( sys-libs/libfaketime )"
 
@@ -183,6 +185,7 @@ src_configure() {
 		--enable-mmfields
 		--enable-mmjsonparse
 		--enable-mmpstrucdata
+		--enable-mmrm1stspace
 		--enable-mmsequence
 		--enable-mmutf8fix
 		# Output Modification Plugins without dependencies
@@ -216,6 +219,7 @@ src_configure() {
 		$(use_enable kafka omkafka)
 		$(use_enable kerberos gssapi-krb5)
 		$(use_enable normalize mmnormalize)
+		$(use_enable mdblookup mmdblookup)
 		$(use_enable grok mmgrok)
 		$(use_enable omhttpfs)
 		$(use_enable omudpspoof)
@@ -229,6 +233,7 @@ src_configure() {
 		$(use_enable systemd imjournal)
 		$(use_enable systemd omjournal)
 		$(use_enable usertools)
+		$(use_enable uuid)
 		$(use_enable zeromq imczmq)
 		$(use_enable zeromq imzmq3)
 		$(use_enable zeromq omczmq)
