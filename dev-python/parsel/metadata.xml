@@ -4,11 +4,7 @@
 	<maintainer type="person">
 		<email>whissi@whissi.de</email>
 	</maintainer>
-	<use>
-		<flag name="boto">Add support for Amazon S3 via <pkg>dev-python/boto</pkg></flag>
-		<flag name="ibl">Use Instace Based Learning alrogirithm for automatic extraction</flag>
-	</use>
 	<upstream>
-		<remote-id type="github">scrapy/scrapy</remote-id>
+		<remote-id type="github">scrapy/parsel</remote-id>
 	</upstream>
 </pkgmetadata>
