@@ -10,7 +10,7 @@ if [[ ${PV} = 9999* ]]; then
 	inherit git-r3
 else
 	patchset=
-	FIXUP_PATCH="${PN}-232-revert-systemd-messup.patch.xz"
+	FIXUP_PATCH="${PN}-233-revert-systemd-messup.patch.xz"
 	SRC_URI="https://github.com/systemd/systemd/archive/v${PV}.tar.gz -> systemd-${PV}.tar.gz
 		https://dev.gentoo.org/~polynomial-c/${PN}/${FIXUP_PATCH}"
 	if [[ -n "${patchset}" ]]; then
@@ -64,12 +64,12 @@ RDEPEND="${COMMON_DEPEND}
 PDEPEND=">=sys-apps/hwids-20140304[udev]
 	>=sys-fs/udev-init-scripts-26"
 
-S=${WORKDIR}/systemd-${PV}
+S="${WORKDIR}/systemd-${PV}"
 
 check_default_rules() {
 	# Make sure there are no sudden changes to upstream rules file
 	# (more for my own needs than anything else ...)
-	local udev_rules_md5=b8ad860dccae0ca51656b33c405ea2ca
+	local udev_rules_md5=c6ee9def75c5c082bf083a7248991935
 	MD5=$(md5sum < "${S}"/rules/50-udev-default.rules)
 	MD5=${MD5/  -/}
 	if [[ ${MD5} != ${udev_rules_md5} ]]; then
@@ -103,7 +103,7 @@ pkg_setup() {
 src_prepare() {
 	if ! [[ ${PV} = 9999* ]]; then
 		# secure_getenv() disable for non-glibc systems wrt bug #443030
-		if ! [[ $(grep -r secure_getenv * | wc -l) -eq 28 ]]; then
+		if ! [[ $(grep -r secure_getenv * | wc -l) -eq 30 ]]; then
 			eerror "The line count for secure_getenv() failed, see bug #443030"
 			die
 		fi
@@ -128,9 +128,6 @@ src_prepare() {
 	# stub out the am_path_libcrypt function
 	echo 'AC_DEFUN([AM_PATH_LIBGCRYPT],[:])' > m4/gcrypt.m4
 
-	eapply "${FILESDIR}/systemd-${PV}-pkgconfig.patch"
-	eapply "${FILESDIR}"/232-0002-build-sys-add-check-for-gperf-lookup-function-signat.patch
-
 	# apply user patches
 	eapply_user
 
@@ -139,6 +136,9 @@ src_prepare() {
 	if ! [[ ${PV} = 9999* ]]; then
 		check_default_rules
 	fi
+
+	# Gentoo has no dialout group
+	sed 's@dialout@uucp@' -i rules/50-udev-default.rules || die
 
 	if ! use elibc_glibc; then #443030
 		echo '#define secure_getenv(x) NULL' >> config.h.in
