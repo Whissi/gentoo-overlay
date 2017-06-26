@@ -69,7 +69,7 @@ src_install() {
 	newconfd "${FILESDIR}"/vnstatd-r1.confd vnstatd
 	newinitd "${FILESDIR}"/vnstatd-r1.initd vnstatd
 
-	systemd_newunit "${S}"/examples/systemd/vnstat.service vnstatd.service
+	systemd_newunit "${FILESDIR}"/vnstatd.systemd vnstatd.service
 	systemd_newtmpfilesd "${FILESDIR}"/vnstatd.tmpfile vnstatd.conf
 
 	use gd && doman man/vnstati.1
