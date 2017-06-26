@@ -1,1 +1,0 @@
-input(type="imuxsock" Socket="/var/lib/powerdns/dev/log")
