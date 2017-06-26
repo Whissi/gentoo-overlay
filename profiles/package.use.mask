@@ -1,6 +1,5 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
 # When you add an entry to the top of this file, add your name, the date, and
 # an explanation of why something is getting masked. Please be extremely
@@ -17,7 +16,3 @@
 #
 
 #--- END OF EXAMPLES ---
-
-# Thomas D. <whissi@whissi.de> (09 Feb 2016)
-# Masking lua due to 1.9.11 incompatibility (https://github.com/openresty/lua-nginx-module/issues/668)
-=www-servers/nginx-1.9.11_pre nginx_modules_http_lua
