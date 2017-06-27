@@ -4,7 +4,6 @@ Documentation=man:vnstatd(1) man:vnstat(1) man:vnstat.conf(5)
 After=network-online.target
 
 [Service]
-User=vnstat
 ExecStart=/usr/bin/vnstatd --nodaemon
 ExecReload=/bin/kill -HUP $MAINPID
 
