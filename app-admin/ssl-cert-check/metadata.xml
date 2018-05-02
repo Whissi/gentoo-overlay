@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>whissi@gentoo.org</email>
+		<name>Thomas Deutschmann</name>
+	</maintainer>
+	<upstream>
+		<bugs-to>https://github.com/Matty9191/ssl-cert-check/issues</bugs-to>
+		<remote-id type="github">Matty9191/ssl-cert-check</remote-id>
+	</upstream>
+</pkgmetadata>
