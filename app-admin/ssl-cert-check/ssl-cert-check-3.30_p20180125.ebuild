@@ -21,7 +21,7 @@ LICENSE="GPL-2"
 SLOT="0"
 IUSE=""
 
-RDEPEND="dev-libs/openssl:0*"
+RDEPEND="dev-libs/openssl:*"
 DEPEND=""
 
 src_install() {
