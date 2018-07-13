@@ -1,49 +1,59 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
-EAPI=6
+EAPI="6"
 
-inherit toolchain-funcs multilib
+inherit toolchain-funcs multilib-minimal
 
 DESCRIPTION="Report faked system time to programs"
-HOMEPAGE="http://www.code-wizards.com/projects/libfaketime/ https://github.com/wolfcw/libfaketime/"
+HOMEPAGE="http://www.code-wizards.com/projects/libfaketime/ https://github.com/wolfcw/libfaketime"
 
 if [[ ${PV} == "9999" ]]; then
-	EGIT_REPO_URI="
-		git://github.com/wolfcw/${PN}.git
-		https://github.com/wolfcw/${PN}.git
-		"
+	EGIT_REPO_URI="https://github.com/wolfcw/${PN}.git"
 
 	inherit git-r3
 else
-	SRC_URI="http://www.code-wizards.com/projects/${PN}/${P}.tar.gz"
-	KEYWORDS="~amd64 ~x86"
+	SRC_URI="https://github.com/wolfcw/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+	KEYWORDS="~amd64 ~arm ~arm64 ~hppa ~sparc ~x86"
 fi
 
 LICENSE="GPL-2"
 SLOT="0"
 
 src_prepare() {
-	tc-export CC
+	sed -i 's/-Werror //' "${S}/src/Makefile" || die
 
-	default
+	# Bug #617624 (GCC-6 compatibility)
+	sed -i 's/-Wno-nonnull-compare //' "${S}/src/Makefile" || die
+
+	eapply_user
+
+	multilib_copy_sources
 }
 
-src_compile() {
-	emake CC="$(tc-getCC)" LIBDIRNAME="/$(get_libdir)" PREFIX=/usr
+multilib_src_compile() {
+	local target=all
+
+	pushd src > /dev/null || die
+	multilib_is_native_abi || target="${PN}.so.1 ${PN}MT.so.1"
+	# ${target} is intentionally not quoted
+	emake CC="$(tc-getCC)" LIBDIRNAME="/$(get_libdir)" PREFIX=/usr ${target}
+	popd > /dev/null || die
 }
 
-src_check() {
-	emake test
+multilib_src_test() {
+	multilib_is_native_abi && emake test
 }
 
-src_install() {
-	dobin src/faketime
-	doman man/faketime.1
+multilib_src_install() {
+	multilib_is_native_abi && dobin src/faketime
 	exeinto /usr/$(get_libdir)
 	doexe src/${PN}*.so.*
 	dosym ${PN}.so.1 /usr/$(get_libdir)/${PN}.so
 	dosym ${PN}MT.so.1 /usr/$(get_libdir)/${PN}MT.so
+}
+
+multilib_src_install_all() {
+	doman man/faketime.1
 	dodoc NEWS README TODO
 }
