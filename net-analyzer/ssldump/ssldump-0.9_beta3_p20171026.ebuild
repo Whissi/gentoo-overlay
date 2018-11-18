@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -23,7 +23,7 @@ IUSE="+ssl"
 
 RDEPEND="
 	net-libs/libpcap
-	ssl? ( >=dev-libs/openssl-1 )
+	ssl? ( >=dev-libs/openssl-1:= )
 "
 DEPEND="
 	${RDEPEND}
