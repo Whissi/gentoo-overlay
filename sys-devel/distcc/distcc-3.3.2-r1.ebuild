@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -45,6 +45,8 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 S="${WORKDIR}/${PN}"
 
+PATCHES=( "${FILESDIR}"/${PN}-3.3.2-fix-segfault-without-libdir.patch )
+
 pkg_setup() {
 	enewuser distcc 240 -1 -1 daemon
 	python-single-r1_pkg_setup
@@ -54,11 +56,6 @@ pkg_setup() {
 }
 
 src_prepare() {
-	#eapply "${FILESDIR}/${PN}-3.0-xinetd.patch"
-	# bug #255188
-	#eapply "${FILESDIR}/${PN}-3.2_rc1-freedesktop.patch"
-	# SOCKSv5 support needed for Portage, bug #537616
-	#eapply "${FILESDIR}/${PN}-3.2_rc1-socks5.patch"
 	default
 
 	# Bugs #120001, #167844 and probably more. See patch for description.
