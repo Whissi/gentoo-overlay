@@ -1,5 +1,5 @@
-#!/usr/bin/env python2
-# Copyright 1999-2018 Gentoo Foundation
+#!/usr/bin/env python
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 import os, re, signal, subprocess, sys
