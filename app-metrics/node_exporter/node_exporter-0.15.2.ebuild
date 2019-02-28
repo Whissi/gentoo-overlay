@@ -2,13 +2,13 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-inherit user golang-build golang-vcs-snapshot systemd
+inherit user golang-build golang-vcs-snapshot
 
 EGO_PN="github.com/prometheus/node_exporter"
 EGIT_COMMIT="v${PV/_rc/-rc.}"
-NODE_EXPORTER_COMMIT="98bc64930d34878b84a0f87dfe6e1a6da61e532d"
+NODE_EXPORTER_COMMIT="98bc649"
 ARCHIVE_URI="https://${EGO_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
-KEYWORDS="~amd64"
+KEYWORDS="amd64"
 
 DESCRIPTION="Prometheus exporter for machine metrics"
 HOMEPAGE="https://github.com/prometheus/node_exporter"
@@ -17,8 +17,7 @@ LICENSE="Apache-2.0"
 SLOT="0"
 IUSE=""
 
-DEPEND=">=dev-lang/go-1.11
-	dev-util/promu"
+DEPEND="dev-util/promu"
 
 pkg_setup() {
 	enewgroup ${PN}
@@ -33,7 +32,7 @@ src_prepare() {
 src_compile() {
 	pushd src/${EGO_PN} || die
 	mkdir -p bin || die
-	GO111MODULE=on GOPATH="${S}" GOCACHE="${T}"/go-cache promu build -v --prefix node_exporter || die
+	GOPATH="${S}" promu build -v --prefix node_exporter || die
 	popd || die
 }
 
@@ -41,9 +40,6 @@ src_install() {
 	pushd src/${EGO_PN} || die
 	dobin node_exporter/node_exporter
 	dodoc {README,CHANGELOG,CONTRIBUTING}.md
-	systemd_dounit examples/systemd/node_exporter.service
-	insinto /etc/sysconfig/node_exporter
-	doins examples/systemd/sysconfig.node_exporter
 	popd || die
 	keepdir /var/lib/node_exporter /var/log/node_exporter
 	fowners ${PN}:${PN} /var/lib/node_exporter /var/log/node_exporter
