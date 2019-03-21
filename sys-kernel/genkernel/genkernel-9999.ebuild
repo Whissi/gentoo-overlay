@@ -6,7 +6,7 @@
 
 EAPI=5 # approved 2012.09.11, required by all profiles since 2014.03.12
 
-inherit bash-completion-r1 epatch
+inherit bash-completion-r1 epatch estack
 
 VERSION_BUSYBOX='1.27.2' # warning, be sure to bump patches
 VERSION_DMRAID='1.0.0.rc16-3' # warning, be sure to bump patches
