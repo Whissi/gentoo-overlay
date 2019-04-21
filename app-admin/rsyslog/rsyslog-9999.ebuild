@@ -1,8 +1,8 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="6"
-PYTHON_COMPAT=( python{2_7,3_4,3_5,3_6,3_7} )
+PYTHON_COMPAT=( python{2_7,3_5,3_6,3_7} )
 
 inherit autotools eutils linux-info python-any-r1 systemd
 
@@ -22,15 +22,13 @@ else
 		https://www.rsyslog.com/files/download/${PN}/${P}.tar.gz
 		doc? ( https://www.rsyslog.com/files/download/${PN}/${PN}-doc-${PV}.tar.gz )
 	"
-
-	PATCHES=()
 fi
 
 LICENSE="GPL-3 LGPL-3 Apache-2.0"
 SLOT="0"
 IUSE="curl dbi debug doc elasticsearch +gcrypt grok gnutls jemalloc kafka kerberos kubernetes libressl mdblookup"
-IUSE+=" mongodb mysql normalize omhttpfs omudpspoof openssl postgres rabbitmq redis relp rfc3195 rfc5424hmac"
-IUSE+=" snmp ssl systemd test usertools +uuid xxhash zeromq"
+IUSE+=" mongodb mysql normalize clickhouse omhttp omhttpfs omudpspoof openssl postgres"
+IUSE+=" rabbitmq redis relp rfc3195 rfc5424hmac snmp ssl systemd test usertools +uuid xxhash zeromq"
 RESTRICT="!test? ( test )"
 
 RDEPEND="
@@ -53,12 +51,13 @@ RDEPEND="
 		>=dev-libs/libee-0.4.0
 		>=dev-libs/liblognorm-2.0.3:=
 	)
+	clickhouse? ( >=net-misc/curl-7.35.0 )
 	omhttpfs? ( >=net-misc/curl-7.35.0 )
 	omudpspoof? ( >=net-libs/libnet-1.1.6 )
 	postgres? ( >=dev-db/postgresql-8.4.20:= )
 	rabbitmq? ( >=net-libs/rabbitmq-c-0.3.0:= )
 	redis? ( >=dev-libs/hiredis-0.11.0:= )
-	relp? ( >=dev-libs/librelp-1.2.14:= )
+	relp? ( >=dev-libs/librelp-1.2.17:= )
 	rfc3195? ( >=dev-libs/liblogging-1.0.1:=[rfc3195] )
 	rfc5424hmac? (
 		!libressl? ( >=dev-libs/openssl-0.9.8y:0= )
@@ -81,7 +80,9 @@ RDEPEND="
 DEPEND="${RDEPEND}
 	>=sys-devel/autoconf-archive-2015.02.24
 	virtual/pkgconfig
+	elibc_musl? ( sys-libs/queue-standalone )
 	test? (
+		>=dev-libs/liblogging-1.0.1[stdlog]
 		jemalloc? ( <sys-libs/libfaketime-0.9.7 )
 		!jemalloc? ( sys-libs/libfaketime )
 		${PYTHON_DEPS}
@@ -197,6 +198,9 @@ src_configure() {
 		--enable-pmciscoios
 		--enable-pmcisconames
 		--enable-pmlastmsg
+		$(use_enable normalize pmnormalize)
+		--enable-pmnull
+		--enable-pmpanngfw
 		--enable-pmsnare
 		# DB
 		$(use_enable dbi libdbi)
@@ -207,9 +211,9 @@ src_configure() {
 		# Debug
 		$(use_enable debug)
 		$(use_enable debug diagtools)
-		$(use_enable debug memcheck)
 		$(use_enable debug valgrind)
 		# Misc
+		$(use_enable clickhouse)
 		$(use_enable curl fmhttp)
 		$(use_enable elasticsearch)
 		$(use_enable gcrypt libgcrypt)
@@ -221,6 +225,7 @@ src_configure() {
 		$(use_enable normalize mmnormalize)
 		$(use_enable mdblookup mmdblookup)
 		$(use_enable grok mmgrok)
+		$(use_enable omhttp)
 		$(use_enable omhttpfs)
 		$(use_enable omudpspoof)
 		$(use_enable rabbitmq omrabbitmq)
