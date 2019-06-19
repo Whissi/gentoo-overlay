@@ -1,10 +1,10 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI="5"
+EAPI="6"
 
-USE_RUBY="ruby21 ruby22 ruby23"
+USE_RUBY="ruby24 ruby25 ruby26"
 
 RUBY_FAKEGEM_TASK_TEST="spec"
 RUBY_FAKEGEM_EXTRADOC="README.md"
@@ -14,7 +14,7 @@ inherit ruby-fakegem
 
 DESCRIPTION="FFI wrapper around the zeromq libzmq C API"
 HOMEPAGE="https://github.com/chuckremes/ffi-rzmq-core"
-SRC_URI="http://github.com/chuckremes/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/chuckremes/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 IUSE=""
 LICENSE="MIT"
