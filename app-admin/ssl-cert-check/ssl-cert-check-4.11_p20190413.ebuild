@@ -16,7 +16,10 @@ else
 	KEYWORDS="~amd64 ~x86"
 	S="${WORKDIR}"/${PN}-${MY_COMMIT}
 
-	PATCHES=( "${FILESDIR}"/${PN}-4.11-add-openssl-1-1-1-compat.patch )
+	PATCHES=(
+		"${FILESDIR}"/${PN}-4.11-add-openssl-1-1-1-compat.patch
+		"${FILESDIR}"/${PN}-4.11-fix-TLSFLAGS.patch
+	)
 fi
 
 LICENSE="GPL-2"
