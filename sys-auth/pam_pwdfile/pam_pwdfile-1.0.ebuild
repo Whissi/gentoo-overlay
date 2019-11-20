@@ -15,10 +15,6 @@ KEYWORDS="~amd64 ~x86"
 SLOT="0"
 IUSE=""
 
-DEPEND="virtual/pam"
-
-RDEPEND="${DEPEND}"
-
 S="${WORKDIR}/${P/pam_/libpam-}"
 
 DOCS=( README changelog )
