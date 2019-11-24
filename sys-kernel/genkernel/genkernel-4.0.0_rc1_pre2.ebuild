@@ -36,7 +36,7 @@ VERSION_UNIONFS_FUSE="2.0"
 VERSION_UTIL_LINUX="2.34"
 VERSION_XFSPROGS="5.3.0"
 VERSION_ZLIB="1.2.11"
-VERSION_ZSTD="1.4.3"
+VERSION_ZSTD="1.4.4"
 
 COMMON_URI="
 	https://dl.bintray.com/boostorg/release/${VERSION_BOOST}/source/boost_${VERSION_BOOST//./_}.tar.bz2
