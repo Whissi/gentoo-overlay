@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # genkernel-9999        -> latest Git branch "master"
@@ -6,45 +6,47 @@
 
 EAPI="7"
 
-inherit bash-completion-r1 mount-boot
+inherit bash-completion-r1
 
 # Whenever you bump a GKPKG, check if you have to move
 # or add new patches!
-VERSION_BOOST="1.71.0"
-VERSION_BTRFS_PROGS="5.3.1"
+VERSION_BOOST="1.73.0"
+VERSION_BTRFS_PROGS="5.6.1"
 VERSION_BUSYBOX="1.31.1"
-VERSION_CRYPTSETUP="2.2.2"
+VERSION_COREUTILS="8.32"
+VERSION_CRYPTSETUP="2.3.3"
 VERSION_DMRAID="1.0.0.rc16-3"
-VERSION_DROPBEAR="2019.78"
-VERSION_EXPAT="2.2.8"
-VERSION_E2FSPROGS="1.45.4"
+VERSION_DROPBEAR="2020.80"
+VERSION_EXPAT="2.2.9"
+VERSION_E2FSPROGS="1.45.6"
 VERSION_FUSE="2.9.9"
 VERSION_GPG="1.4.23"
 VERSION_ISCSI="2.0.878"
 VERSION_JSON_C="0.13.1"
-VERSION_KMOD="26"
+VERSION_KMOD="27"
 VERSION_LIBAIO="0.3.112"
-VERSION_LIBGCRYPT="1.8.5"
-VERSION_LIBGPGERROR="1.36"
-VERSION_LVM="2.02.186"
+VERSION_LIBGCRYPT="1.8.6"
+VERSION_LIBGPGERROR="1.38"
+VERSION_LVM="2.02.187"
 VERSION_LZO="2.10"
 VERSION_MDADM="4.1"
-VERSION_POPT="1.16"
-VERSION_STRACE="5.3"
+VERSION_POPT="1.18"
+VERSION_STRACE="5.7"
 VERSION_THIN_PROVISIONING_TOOLS="0.8.5"
 VERSION_UNIONFS_FUSE="2.0"
-VERSION_UTIL_LINUX="2.34"
-VERSION_XFSPROGS="5.3.0"
+VERSION_UTIL_LINUX="2.35.2"
+VERSION_XFSPROGS="5.6.0"
 VERSION_ZLIB="1.2.11"
-VERSION_ZSTD="1.4.4"
+VERSION_ZSTD="1.4.5"
 
 COMMON_URI="
 	https://dl.bintray.com/boostorg/release/${VERSION_BOOST}/source/boost_${VERSION_BOOST//./_}.tar.bz2
 	https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v${VERSION_BTRFS_PROGS}.tar.xz
 	https://www.busybox.net/downloads/busybox-${VERSION_BUSYBOX}.tar.bz2
+	mirror://gnu/coreutils/coreutils-${VERSION_COREUTILS}.tar.xz
 	https://www.kernel.org/pub/linux/utils/cryptsetup/v$(ver_cut 1-2 ${VERSION_CRYPTSETUP})/cryptsetup-${VERSION_CRYPTSETUP}.tar.xz
 	https://people.redhat.com/~heinzm/sw/dmraid/src/dmraid-${VERSION_DMRAID}.tar.bz2
-	https://matt.ucc.asn.au/dropbear/releases/dropbear-${VERSION_DROPBEAR}.tar.bz2
+	https://dev.gentoo.org/~whissi/dist/dropbear/dropbear-${VERSION_DROPBEAR}.tar.bz2
 	https://github.com/libexpat/libexpat/releases/download/R_${VERSION_EXPAT//\./_}/expat-${VERSION_EXPAT}.tar.xz
 	https://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${VERSION_E2FSPROGS}/e2fsprogs-${VERSION_E2FSPROGS}.tar.xz
 	https://github.com/libfuse/libfuse/releases/download/fuse-${VERSION_FUSE}/fuse-${VERSION_FUSE}.tar.gz
@@ -76,11 +78,11 @@ if [[ ${PV} == 9999* ]] ; then
 else
 	SRC_URI="https://dev.gentoo.org/~whissi/dist/genkernel/${P}.tar.xz
 		${COMMON_URI}"
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sparc ~x86"
 fi
 
 DESCRIPTION="Gentoo automatic kernel building scripts"
-HOMEPAGE="https://www.gentoo.org"
+HOMEPAGE="https://wiki.gentoo.org/wiki/Genkernel https://gitweb.gentoo.org/proj/genkernel.git/"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -103,8 +105,7 @@ RDEPEND="${DEPEND}
 	sys-devel/automake
 	sys-devel/libtool
 	virtual/pkgconfig
-	firmware? ( sys-kernel/linux-firmware )
-	!<sys-apps/openrc-0.9.9"
+	firmware? ( sys-kernel/linux-firmware )"
 
 if [[ ${PV} == 9999* ]]; then
 	DEPEND="${DEPEND} app-text/asciidoc"
@@ -141,6 +142,7 @@ src_prepare() {
 		-e "s:VERSION_BOOST:${VERSION_BOOST}:"\
 		-e "s:VERSION_BTRFS_PROGS:${VERSION_BTRFS_PROGS}:"\
 		-e "s:VERSION_BUSYBOX:${VERSION_BUSYBOX}:"\
+		-e "s:VERSION_COREUTILS:${VERSION_COREUTILS}:"\
 		-e "s:VERSION_CRYPTSETUP:${VERSION_CRYPTSETUP}:"\
 		-e "s:VERSION_DMRAID:${VERSION_DMRAID}:"\
 		-e "s:VERSION_DROPBEAR:${VERSION_DROPBEAR}:"\
@@ -233,7 +235,6 @@ pkg_postinst() {
 		fi
 	done
 
-	mount-boot_mount_boot_partition
 	if [[ $(find /boot -name 'kernel-genkernel-*' 2>/dev/null | wc -l) -gt 0 ]] ; then
 		ewarn ''
 		ewarn 'Default kernel filename was changed from "kernel-genkernel-<ARCH>-<KV>"'
@@ -242,10 +243,9 @@ pkg_postinst() {
 		ewarn 'built with genkernel before that name change, resulting in booting old'
 		ewarn 'kernel when not paying attention on boot.'
 	fi
-	mount-boot_pkg_postinst
 
 	# Show special warning for users depending on remote unlock capabilities
-	local gk_config="${EROOT%/}/etc/genkernel.conf"
+	local gk_config="${EROOT}/etc/genkernel.conf"
 	if [[ -f "${gk_config}" ]] ; then
 		if grep -q -E "^SSH=[\"\']?yes" "${gk_config}" 2>/dev/null ; then
 			if ! grep -q dosshd /proc/cmdline 2>/dev/null ; then
