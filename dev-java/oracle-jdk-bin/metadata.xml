@@ -5,7 +5,6 @@
     <email>java@gentoo.org</email>
     <name>Java</name>
   </maintainer>
-  <longdescription>Oracle Java SE Development Kit, Official Binary Distribution</longdescription>
   <use>
     <flag name="commercial">Install features requiring a commercial license for production use</flag>
     <flag name="headless-awt">Don't install the X backend for AWT, needed by some GUIs (used to be X flag)</flag>
