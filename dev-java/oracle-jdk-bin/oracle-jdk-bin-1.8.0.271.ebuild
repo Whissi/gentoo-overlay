@@ -38,7 +38,7 @@ LICENSE="Oracle-BCLA-JavaSE"
 SLOT="1.8"
 IUSE="alsa commercial cups +fontconfig headless-awt javafx jce nsplugin selinux source visualvm"
 REQUIRED_USE="javafx? ( alsa fontconfig )"
-RESTRICT="fetch preserve-libs strip"
+RESTRICT="bindist fetch preserve-libs strip"
 QA_PREBUILT="*"
 
 # NOTES:
