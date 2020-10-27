@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="7"
@@ -87,8 +87,7 @@ COMMON_DEPEND="
 	libedit? ( || ( sys-freebsd/freebsd-lib dev-libs/libedit ) )
 	mssql? ( dev-db/freetds[mssql] )
 	libmysqlclient? (
-		mysql? ( <dev-db/mysql-connector-c-8.0:0= )
-		mysqli? ( <dev-db/mysql-connector-c-8.0:0= )
+		dev-db/mysql-connector-c:0=
 	)
 	nls? ( sys-devel/gettext )
 	oci8-instant-client? ( dev-db/oracle-instantclient-basic )
