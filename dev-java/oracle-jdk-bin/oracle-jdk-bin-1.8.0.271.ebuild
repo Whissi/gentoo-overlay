@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -36,7 +36,7 @@ DESCRIPTION="Oracle's Java SE Development Kit"
 HOMEPAGE="http://www.oracle.com/technetwork/java/javase/"
 LICENSE="Oracle-BCLA-JavaSE"
 SLOT="1.8"
-IUSE="alsa commercial cups doc +fontconfig headless-awt javafx jce nsplugin selinux source visualvm"
+IUSE="alsa commercial cups +fontconfig headless-awt javafx jce nsplugin selinux source visualvm"
 REQUIRED_USE="javafx? ( alsa fontconfig )"
 RESTRICT="fetch preserve-libs strip"
 QA_PREBUILT="*"
@@ -76,7 +76,6 @@ RDEPEND="!x64-macos? (
 	)
 	alsa? ( media-libs/alsa-lib )
 	cups? ( net-print/cups )
-	doc? ( dev-java/java-sdk-docs:${SLOT} )
 	fontconfig? ( media-libs/fontconfig:1.0 )
 	!prefix? ( sys-libs/glibc:* )
 	selinux? ( sec-policy/selinux-java )"
