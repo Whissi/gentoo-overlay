@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="7"
@@ -18,7 +18,7 @@ SRC_URI="https://github.com/adulau/${PN}/archive/${COMMIT}.tar.gz -> ${P}.tar.gz
 
 LICENSE="openssl"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~ppc ~sparc ~x86 ~amd64-linux ~x86-linux ~ppc-macos"
+KEYWORDS="~amd64 ~arm ~ppc ~sparc ~x86"
 IUSE="+ssl"
 
 RDEPEND="
@@ -53,10 +53,10 @@ src_configure() {
 	tc-export CC
 
 	econf \
-		--with-pcap-inc="${EPREFIX%/}/usr/include" \
-		--with-pcap-lib="${EPREFIX%/}/usr/$(get_libdir)" \
-		$(usex ssl --with-openssl-inc="${EPREFIX%/}/usr/include" '--without-openssl') \
-		$(usex ssl --with-openssl-lib="${EPREFIX%/}/usr/$(get_libdir)" '--without-openssl')
+		--with-pcap-inc="${EPREFIX}/usr/include" \
+		--with-pcap-lib="${EPREFIX}/usr/$(get_libdir)" \
+		$(usex ssl --with-openssl-inc="${EPREFIX}/usr/include" '--without-openssl') \
+		$(usex ssl --with-openssl-lib="${EPREFIX}/usr/$(get_libdir)" '--without-openssl')
 }
 
 src_install() {
