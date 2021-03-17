@@ -1,10 +1,8 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI="6"
-
-inherit
+EAPI="7"
 
 DESCRIPTION="Tool for editing VCS repositories and translating among different systems"
 HOMEPAGE="http://www.catb.org/~esr/reposurgeon/"
@@ -33,5 +31,5 @@ DEPEND="${RDEPEND}
 #DOCS=( README.md CONFIGURATION.md INTRODUCTION.md LICENSE LICENSE.pycrc LICENSE.snappy )
 
 src_install() {
-	emake DESTDIR="${D%/}" prefix="/usr" install
+	emake DESTDIR="${D}" prefix="/usr" install
 }
