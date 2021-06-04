@@ -37,6 +37,7 @@ dev-python/dnspython
 dev-python/ecdsa
 dev-python/gmpy
 dev-python/idna
+dev-python/ply
 dev-python/pycryptodome
 dev-python/setuptools
 dev-python/six
