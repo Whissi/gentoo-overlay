@@ -29,3 +29,16 @@
 ## app-misc/some-package
 
 #--- END OF EXAMPLES ---
+
+# Thomas Deutschmann <whissi@gentoo.org> (04 Jun 2021)
+# Only unmask when you need Python 2.7
+dev-python/certifi
+dev-python/dnspython
+dev-python/ecdsa
+dev-python/gmpy
+dev-python/idna
+dev-python/pycryptodome
+dev-python/setuptools
+dev-python/six
+dev-python/typing
+virtual/python-cffi
