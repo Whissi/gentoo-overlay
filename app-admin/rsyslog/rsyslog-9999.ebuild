@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="7"
-PYTHON_COMPAT=( python3_{6..9} )
+PYTHON_COMPAT=( python3_{7..9} )
 
 inherit autotools linux-info python-any-r1 systemd
 
@@ -28,7 +28,7 @@ LICENSE="GPL-3 LGPL-3 Apache-2.0"
 SLOT="0"
 
 IUSE="clickhouse curl dbi debug doc elasticsearch +gcrypt gnutls imhttp"
-IUSE+=" impcap jemalloc kafka kerberos kubernetes libressl mdblookup"
+IUSE+=" impcap jemalloc kafka kerberos kubernetes mdblookup"
 IUSE+=" mongodb mysql normalize omhttp omhttpfs omudpspoof +openssl"
 IUSE+=" postgres rabbitmq redis relp rfc3195 rfc5424hmac snmp +ssl"
 IUSE+=" systemd test usertools +uuid xxhash zeromq"
@@ -78,15 +78,13 @@ RDEPEND="
 	relp? ( >=dev-libs/librelp-1.2.17:= )
 	rfc3195? ( >=dev-libs/liblogging-1.0.1:=[rfc3195] )
 	rfc5424hmac? (
-		!libressl? ( >=dev-libs/openssl-0.9.8y:0= )
-		libressl? ( dev-libs/libressl:= )
+		>=dev-libs/openssl-0.9.8y:0=
 	)
 	snmp? ( >=net-analyzer/net-snmp-5.7.2 )
 	ssl? (
 		gnutls? ( >=net-libs/gnutls-2.12.23:0= )
 		openssl? (
-			!libressl? ( dev-libs/openssl:0= )
-			libressl? ( dev-libs/libressl:0= )
+			dev-libs/openssl:0=
 		)
 	)
 	systemd? ( >=sys-apps/systemd-234 )
@@ -183,14 +181,14 @@ src_configure() {
 		$(use_enable test testbench)
 		$(use_enable test libfaketime)
 		$(use_enable test extended-tests)
-		# Input Plugins without depedencies
+		# Input Plugins without dependencies
 		--enable-imbatchreport
 		--enable-imdiag
 		--enable-imfile
 		--enable-improg
 		--enable-impstats
 		--enable-imptcp
-		# Message Modificiation Plugins without depedencies
+		# Message Modificiation Plugins without dependencies
 		--enable-mmanon
 		--enable-mmaudit
 		--enable-mmcount
@@ -224,6 +222,7 @@ src_configure() {
 		$(use_enable mongodb ommongodb)
 		$(use_enable mysql)
 		$(use_enable postgres pgsql)
+		$(use_enable redis imhiredis)
 		$(use_enable redis omhiredis)
 		# Debug
 		$(use_enable debug)
@@ -317,6 +316,8 @@ src_install() {
 
 	newconfd "${FILESDIR}/${PN}.confd-r1" ${PN}
 	newinitd "${FILESDIR}/${PN}.initd-r1" ${PN}
+
+	systemd_newunit "${FILESDIR}/${PN}.service" ${PN}.service
 
 	keepdir /var/empty/dev
 	keepdir /var/spool/${PN}
