@@ -2,8 +2,8 @@
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
 	<maintainer type="project">
-		<email>python@gentoo.org</email>
-		<name>Python</name>
+		<email>whissi@gentoo.org</email>
+		<name>Thomas Deutschmann</name>
 	</maintainer>
 	<longdescription>
 dnspython is a DNS toolkit for Python. It supports almost all of the record
@@ -25,4 +25,7 @@ DNSPythonはPython言語用のDNSツールキットです。ほとんどのレ�
 	<upstream>
 		<remote-id type="pypi">dnspython</remote-id>
 	</upstream>
+	<use>
+		<flag name="python_targets_python2_7">Enable Python 2.7 support</flag>
+	</use>
 </pkgmetadata>
