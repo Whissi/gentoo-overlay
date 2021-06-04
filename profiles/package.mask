@@ -33,6 +33,7 @@
 # Thomas Deutschmann <whissi@gentoo.org> (04 Jun 2021)
 # Only unmask when you need Python 2.7
 dev-python/certifi
+dev-python/cffi
 dev-python/dnspython
 dev-python/ecdsa
 dev-python/gmpy
