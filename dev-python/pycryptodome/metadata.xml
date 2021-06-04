@@ -9,4 +9,7 @@
 		<remote-id type="github">Legrandin/pycryptodome</remote-id>
 		<remote-id type="pypi">pycryptodome</remote-id>
 	</upstream>
+	<use>
+		<flag name="python_targets_python2_7">Enable Python 2.7 support</flag>
+	</use>
 </pkgmetadata>
