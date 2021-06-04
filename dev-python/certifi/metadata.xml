@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="project">
+    <email>whissi@gentoo.org</email>
+    <name>Thomas Deutschmann</name>
+  </maintainer>
+  <stabilize-allarches/>
+  <upstream>
+    <remote-id type="pypi">certifi</remote-id>
+  </upstream>
+  <use>
+    <flag name="python_targets_python2_7">Enable Python 2.7 support</flag>
+  </use>
+</pkgmetadata>
