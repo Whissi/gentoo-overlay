@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="project">
+		<email>whissi@gentoo.org</email>
+		<name>Thomas Deutschmann</name>
+	</maintainer>
+	<longdescription lang="en">
+		gmpy2 is a C-coded Python extension module that supports
+		multiple-precision arithmetic. gmpy2 supports the GMP multi-precision
+		library, the MPFR (correctly rounded real floating-point arithmetic) and MPC
+		(correctly rounded complex floating-point arithmetic) libraries.
+	</longdescription>
+	<use>
+		<flag name="mpir">Use <pkg>sci-libs/mpir</pkg> as gmp implementation</flag>
+		<flag name="python_targets_python2_7">Enable Python 2.7 support</flag>
+	</use>
+	<upstream>
+		<remote-id type="pypi">gmpy2</remote-id>
+		<remote-id type="github">aleaxit/gmpy</remote-id>
+	</upstream>
+</pkgmetadata>
