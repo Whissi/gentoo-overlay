@@ -1,11 +1,11 @@
 # Copyright 2003-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
-# $Id: 177412dc751eb3a7b0c56256635c801cf8362351 $
+# $Id: 7d3033099db34fae789630ae1aed95b990c9949a $
 
 EAPI=7
-PYTHON_COMPAT=( python3_{7..9} )
+PYTHON_COMPAT=( python3_{8..10} )
 
-inherit bash-completion-r1 linux-info meson ninja-utils multilib-minimal python-any-r1 toolchain-funcs udev usr-ldscript
+inherit bash-completion-r1 flag-o-matic linux-info meson-multilib ninja-utils python-any-r1 toolchain-funcs udev usr-ldscript
 
 if [[ ${PV} = 9999* ]] ; then
 	EGIT_REPO_URI="https://github.com/systemd/systemd.git"
@@ -16,13 +16,24 @@ else
 	else
 		MY_PN=systemd
 	fi
+
 	MY_PV="${PV/_/-}"
 	MY_P="${MY_PN}-${MY_PV}"
 	S="${WORKDIR}/${MY_P}"
 	SRC_URI="https://github.com/systemd/${MY_PN}/archive/v${MY_PV}/${MY_P}.tar.gz"
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sparc ~x86"
 
-	FIXUP_PATCH="${PN}-248-revert-systemd-messup.patch"
+	# musl patches taken from:
+	# http://cgit.openembedded.org/openembedded-core/tree/meta/recipes-core/systemd/systemd
+	MUSL_PATCHSET="249.5-r1"
+	SRC_URI+="
+		elibc_musl? (
+			https://dev.gentoo.org/~gyakovlev/distfiles/systemd-musl-patches-${MUSL_PATCHSET}.tar.xz
+			https://dev.gentoo.org/~soap/distfiles/systemd-musl-patches-${MUSL_PATCHSET}.tar.xz
+	)"
+
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86"
+
+	FIXUP_PATCH="${PN}-249-revert-systemd-messup.patch"
 	SRC_URI+=" https://dev.gentoo.org/~polynomial-c/${PN}/${FIXUP_PATCH}.xz"
 fi
 
@@ -31,24 +42,29 @@ HOMEPAGE="https://www.freedesktop.org/wiki/Software/systemd"
 
 LICENSE="LGPL-2.1 MIT GPL-2"
 SLOT="0"
-IUSE="acl hwdb +kmod selinux static-libs"
-
-RESTRICT="test"
+IUSE="acl +kmod selinux test"
+RESTRICT="!test? ( test )"
 
 BDEPEND="
 	dev-util/gperf
-	>=dev-util/intltool-0.50
 	>=sys-apps/coreutils-8.16
+	sys-devel/gettext
 	virtual/pkgconfig
 	app-text/docbook-xml-dtd:4.2
 	app-text/docbook-xml-dtd:4.5
 	app-text/docbook-xsl-stylesheets
 	dev-libs/libxslt
 	${PYTHON_DEPS}
+	$(python_gen_any_dep 'dev-python/jinja[${PYTHON_USEDEP}]')
+	test? (
+		app-text/tree
+		dev-lang/perl
+	)
 "
 COMMON_DEPEND="
 	>=sys-apps/util-linux-2.30[${MULTILIB_USEDEP}]
 	sys-libs/libcap:0=[${MULTILIB_USEDEP}]
+	virtual/libcrypt:=[${MULTILIB_USEDEP}]
 	acl? ( sys-apps/acl )
 	kmod? ( >=sys-apps/kmod-15 )
 	selinux? ( >=sys-libs/libselinux-2.1.9 )
@@ -71,9 +87,15 @@ RDEPEND="${COMMON_DEPEND}
 	acct-group/video
 	!sys-apps/gentoo-systemd-integration
 	!sys-apps/systemd
+	!sys-apps/hwids[udev]
 "
-PDEPEND=">=sys-apps/hwids-20140304[udev]
-	>=sys-fs/udev-init-scripts-34"
+PDEPEND="
+	>=sys-fs/udev-init-scripts-34
+"
+
+python_check_deps() {
+	has_version -b "dev-python/jinja[${PYTHON_USEDEP}]"
+}
 
 pkg_setup() {
 	if [[ ${MERGE_TYPE} != buildonly ]] ; then
@@ -103,35 +125,27 @@ src_prepare() {
 
 	local PATCHES=(
 	)
+	use elibc_musl && PATCHES+=( "${WORKDIR}"/musl-patches )
 
 	default
 
 	eapply "${WORKDIR}"/${FIXUP_PATCH}
 }
 
-meson_multilib_native_use() {
-	if multilib_is_native_abi && use "$1" ; then
-		echo true
-	else
-		echo false
-	fi
-}
-
 multilib_src_configure() {
 	local emesonargs=(
-		-Dacl=$(meson_multilib_native_use acl)
+		$(meson_native_use_bool acl)
 		-Defi=false
-		-Dhwdb=$(meson_multilib_native_use hwdb)
-		-Dkmod=$(meson_multilib_native_use kmod)
-		-Dselinux=$(meson_multilib_native_use selinux)
+		$(meson_native_use_bool kmod)
+		$(meson_native_use_bool selinux)
 		-Dlink-udev-shared=false
 		-Dsplit-usr=true
 		-Drootlibdir="${EPREFIX}/usr/$(get_libdir)"
-		-Dstatic-libudev=$(usex static-libs true false)
 
 		# Prevent automagic deps
 		-Dgcrypt=false
 		-Dlibcryptsetup=false
+		-Didn=false
 		-Dlibidn=false
 		-Dlibidn2=false
 		-Dlibiptc=false
@@ -140,6 +154,11 @@ multilib_src_configure() {
 		-Dlz4=false
 		-Dxz=false
 	)
+	use elibc_musl && emesonargs+=(
+		-Dgshadow=false
+		-Dsmack=false
+		-Dutmp=false
+	)
 	meson_src_configure
 }
 
@@ -147,6 +166,9 @@ src_configure() {
 	# Prevent conflicts with i686 cross toolchain, bug 559726
 	tc-export AR CC NM OBJCOPY RANLIB
 	python_setup
+
+	use elibc_musl && append-cppflags -D__UAPI_DEF_ETHHDR=0
+
 	multilib-minimal_src_configure
 }
 
@@ -156,10 +178,8 @@ multilib_src_compile() {
 
 	local targets=(
 		${libudev}
+		src/libudev/libudev.pc
 	)
-	if use static-libs ; then
-		targets+=( src/udev/libudev.a )
-	fi
 	if multilib_is_native_abi ; then
 		targets+=(
 			udevd
@@ -169,16 +189,52 @@ multilib_src_compile() {
 			src/udev/fido_id
 			src/udev/mtd_probe
 			src/udev/scsi_id
+			src/udev/udev.pc
 			src/udev/v4l_id
 			man/udev.conf.5
 			man/udev.link.5
 			man/udev.7
 			man/udevd.8
 			man/udevadm.8
+			hwdb.d/60-autosuspend-chromiumos.hwdb
+			rules.d/50-udev-default.rules
+			rules.d/64-btrfs.rules
 		)
-		use hwdb && targets+=( udev-hwdb man/hwdb.7 )
+		# former USE="hwdb"
+		targets+=(
+			udev-hwdb
+			man/hwdb.7
+			# Fixme! Convert from systemd-hwdb.8! New patchset!
+			#man/udev-hwdb.8
+		)
 	fi
 	eninja "${targets[@]}"
+}
+
+src_test() {
+	# The testsuite is *very* finicky. Don't try running it in
+	# containers or anything but a full VM or on bare metal.
+	# udev calls 'mknod' a number of times, and this interacts
+	# badly with kernel namespaces.
+
+	if [[ ! -w /dev ]]; then
+		ewarn "udev tests needs full access to /dev"
+		ewarn "Skipping tests"
+	else
+		meson-multilib_src_test
+	fi
+}
+
+multilib_src_test() {
+	# two binaries required by udev-test.pl
+	eninja systemd-detect-virt test-udev
+	local -x PATH="${PWD}:${PATH}"
+
+	# prepare ${BUILD_DIR}/test/sys, required by udev-test.pl
+	"${EPYTHON}" "${S}"/test/sys-script.py test || die
+
+	# the perl script contains all the udev tests
+	"${S}"/test/udev-test.pl || die
 }
 
 multilib_src_install() {
@@ -186,7 +242,6 @@ multilib_src_install() {
 
 	dolib.so {${libudev},libudev.so.1,libudev.so}
 	gen_usr_ldscript -a udev
-	use static-libs && dolib.a src/udev/libudev.a
 
 	insinto "/usr/$(get_libdir)/pkgconfig"
 	doins src/libudev/libudev.pc
@@ -197,14 +252,17 @@ multilib_src_install() {
 		doexe udevadm
 		dosym ../sbin/udevadm /bin/udevadm
 
-		use hwdb && doexe udev-hwdb
+		# Former USE="hwdb"
+		doexe udev-hwdb
 
 		exeinto /lib/udev
 		doexe src/udev/{ata_id,cdrom_id,fido_id,mtd_probe,scsi_id,v4l_id}
 
-		rm rules.d/99-systemd.rules || die
+		# Install generated rules (${BUILD_DIR}/rules.d/*.rules)
 		insinto /lib/udev/rules.d
 		doins rules.d/*.rules
+		insinto /lib/udev/hwdb.d
+		doins hwdb.d/*.hwdb
 
 		insinto /usr/share/pkgconfig
 		doins src/udev/udev.pc
@@ -225,10 +283,12 @@ multilib_src_install_all() {
 	insinto /lib/udev/network
 	doins network/99-default.link
 
-	# see src_prepare() for content of 40-gentoo.rules
+	# Install static rules (${S}/rules.d/*.rules)
 	insinto /lib/udev/rules.d
+	doins rules.d/*.rules
 	doins "${FILESDIR}"/40-gentoo.rules
-	doins "${S}"/rules.d/*.rules
+	insinto /lib/udev/hwdb.d
+	doins hwdb.d/*.hwdb
 
 	dobashcomp shell-completion/bash/udevadm
 
@@ -297,7 +357,7 @@ pkg_postinst() {
 	elog "https://wiki.gentoo.org/wiki/Udev/upgrade"
 
 	# Update hwdb database in case the format is changed by udev version.
-	if use hwdb && has_version 'sys-apps/hwids[udev]' ; then
+	if has_version 'sys-apps/hwids[udev]' || has_version 'sys-apps/hwdata' ; then
 		udev-hwdb --root="${ROOT}" update
 		# Only reload when we are not upgrading to avoid potential race w/ incompatible hwdb.bin and the running udevd
 		# https://cgit.freedesktop.org/systemd/systemd/commit/?id=1fab57c209035f7e66198343074e9cee06718bda
