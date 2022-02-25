@@ -1,8 +1,8 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI="5"
+EAPI="7"
 
 inherit eutils linux-info linux-mod
 
@@ -48,14 +48,16 @@ pkg_pretend() {
 
 pkg_setup() {
 	linux-mod_pkg_setup
+}
+
+src_prepare() {
+	default
 
 	MODULE_NAMES="r8168(kernel/drivers/net:"${S}":src)"
 	BUILD_TARGETS="modules"
 	BUILD_PARAMS="\
 		KERNELDIR=\"${KV_DIR}\""
-}
 
-src_prepare() {
 	convert_to_m "${S}/src/Makefile"
 }
 
