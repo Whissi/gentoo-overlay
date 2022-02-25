@@ -1,10 +1,10 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI="5"
+EAPI="7"
 
-inherit flag-o-matic pam
+inherit flag-o-matic
 
 DESCRIPTION="PAM module for authenticating against passwd-like files."
 HOMEPAGE="http://cpbotha.net/pam_pwdfile.html"
@@ -14,6 +14,9 @@ LICENSE="GPL-2"
 KEYWORDS="~amd64 ~x86"
 SLOT="0"
 IUSE=""
+
+DEPEND="virtual/libcrypt"
+RDEPEND="virtual/libcrypt:="
 
 S="${WORKDIR}/${P/pam_/libpam-}"
 
