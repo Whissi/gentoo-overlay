@@ -1,13 +1,12 @@
-# Copyright 2003-2021 Gentoo Authors
+# Copyright 2003-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
-# $Id: 7d3033099db34fae789630ae1aed95b990c9949a $
 
 EAPI=7
 PYTHON_COMPAT=( python3_{8..10} )
 
 inherit bash-completion-r1 flag-o-matic linux-info meson-multilib ninja-utils python-any-r1 toolchain-funcs udev usr-ldscript
 
-if [[ ${PV} = 9999* ]] ; then
+if [[ ${MY_PV} = 9999* ]] ; then
 	EGIT_REPO_URI="https://github.com/systemd/systemd.git"
 	inherit git-r3
 else
@@ -24,17 +23,16 @@ else
 
 	# musl patches taken from:
 	# http://cgit.openembedded.org/openembedded-core/tree/meta/recipes-core/systemd/systemd
-	MUSL_PATCHSET="249.5-r1"
+	MUSL_PATCHSET="systemd-musl-patches-250.4"
 	SRC_URI+="
 		elibc_musl? (
-			https://dev.gentoo.org/~gyakovlev/distfiles/systemd-musl-patches-${MUSL_PATCHSET}.tar.xz
-			https://dev.gentoo.org/~soap/distfiles/systemd-musl-patches-${MUSL_PATCHSET}.tar.xz
+			https://dev.gentoo.org/~floppym/dist/${MUSL_PATCHSET}.tar.gz
 	)"
 
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86"
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~loong ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86"
 
-	FIXUP_PATCH="${PN}-249-revert-systemd-messup.patch"
-	SRC_URI+=" https://dev.gentoo.org/~polynomial-c/${PN}/${FIXUP_PATCH}.xz"
+	FIXUP_PATCH="${PN}-251-revert-systemd-messup.patch"
+	SRC_URI+=" https://www.gentoofan.org/gentoo/dist/${FIXUP_PATCH}.xz"
 fi
 
 DESCRIPTION="Linux dynamic and persistent device naming support (aka userspace devfs)"
@@ -62,6 +60,7 @@ BDEPEND="
 	)
 "
 COMMON_DEPEND="
+	dev-libs/openssl:0=
 	>=sys-apps/util-linux-2.30[${MULTILIB_USEDEP}]
 	sys-libs/libcap:0=[${MULTILIB_USEDEP}]
 	virtual/libcrypt:=[${MULTILIB_USEDEP}]
@@ -83,10 +82,12 @@ RDEPEND="${COMMON_DEPEND}
 	acct-group/kvm
 	acct-group/lp
 	acct-group/render
+	acct-group/sgx
 	acct-group/tape
 	acct-group/video
 	!sys-apps/gentoo-systemd-integration
 	!sys-apps/systemd
+	!sys-apps/systemd-utils[udev]
 	!sys-apps/hwids[udev]
 "
 PDEPEND="
@@ -106,13 +107,13 @@ pkg_setup() {
 		local MINKV=2.6.39
 
 		if kernel_is -lt ${MINKV//./ } ; then
-			eerror "Your running kernel is too old to run this version of ${P}"
+			eerror "Your running kernel is too old to run this version of ${MY_P}"
 			eerror "You need to upgrade kernel at least to ${MINKV}"
 		fi
 
 		if kernel_is -lt 3 7 ; then
 			ewarn "Your running kernel is too old to have firmware loader and"
-			ewarn "this version of ${P} doesn't have userspace firmware loader"
+			ewarn "this version of ${MY_P} doesn't have userspace firmware loader"
 			ewarn "If you need firmware support, you need to upgrade kernel at least to 3.7"
 		fi
 	fi
@@ -125,7 +126,7 @@ src_prepare() {
 
 	local PATCHES=(
 	)
-	use elibc_musl && PATCHES+=( "${WORKDIR}"/musl-patches )
+	use elibc_musl && PATCHES+=( "${WORKDIR}/${MUSL_PATCHSET}" )
 
 	default
 
@@ -149,6 +150,7 @@ multilib_src_configure() {
 		-Dlibidn=false
 		-Dlibidn2=false
 		-Dlibiptc=false
+		-Dlogind=false
 		-Dp11kit=false
 		-Dseccomp=false
 		-Dlz4=false
@@ -159,6 +161,7 @@ multilib_src_configure() {
 		-Dsmack=false
 		-Dutmp=false
 	)
+
 	meson_src_configure
 }
 
@@ -287,6 +290,9 @@ multilib_src_install_all() {
 	insinto /lib/udev/rules.d
 	doins rules.d/*.rules
 	doins "${FILESDIR}"/40-gentoo.rules
+	# this file is provided by sys-auth/elogind
+	rm ${ED}/lib/udev/rules.d/70-power-switch.rules || die
+
 	insinto /lib/udev/hwdb.d
 	doins hwdb.d/*.hwdb
 

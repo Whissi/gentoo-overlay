@@ -1,14 +1,14 @@
 # Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
-inherit eutils flag-o-matic toolchain-funcs
+EAPI=7
+inherit toolchain-funcs
 
 MY_PN="djbdns"
 MY_P="${MY_PN}-${PV}"
 
 DESCRIPTION="Collection of djbdns tools (no server!)"
-HOMEPAGE="http://cr.yp.to/djbdns.html"
+HOMEPAGE="https://cr.yp.to/djbdns.html"
 IPV6_PATCH="test27"
 
 SRC_URI="http://cr.yp.to/djbdns/${MY_P}.tar.gz
@@ -35,15 +35,14 @@ src_unpack(){
 }
 
 src_prepare() {
-	epatch \
-		"${FILESDIR}/headtail.patch" \
-		"${FILESDIR}/dnsroots.patch" \
+	eapply -p2 "${FILESDIR}/headtail.patch"
+	eapply "${FILESDIR}/dnsroots.patch" \
 		"${FILESDIR}/dnstracesort.patch" \
 		"${FILESDIR}/string_length_255.patch" \
 		"${FILESDIR}/srv_record_support.patch"
 
 	# Fix CVE2009-0858
-	epatch "${FILESDIR}/CVE2009-0858_0001-check-response-domain-name-length.patch"
+	eapply "${FILESDIR}/CVE2009-0858_0001-check-response-domain-name-length.patch"
 
 	if use ipv6; then
 		elog 'At present dnstrace does NOT support IPv6. It will'\
@@ -53,10 +52,10 @@ src_prepare() {
 		cp -pR "${S}" "${S}-noipv6" || die
 
 		# The big ipv6 patch.
-		epatch "${WORKDIR}/${MY_P}-${IPV6_PATCH}.diff"
+		eapply "${WORKDIR}/${MY_P}-${IPV6_PATCH}.diff"
 
 		# Fix CVE2008-4392 (ipv6)
-		epatch \
+		eapply \
 			"${FILESDIR}/CVE2008-4392_0001-dnscache-merge-similar-outgoing-queries-ipv6-test25.patch" \
 			"${FILESDIR}/CVE2008-4392_0002-dnscache-cache-soa-records-ipv6.patch" \
 			"${FILESDIR}/makefile-parallel-test25.patch"
@@ -65,18 +64,18 @@ src_prepare() {
 	fi
 
 	# Fix CVE2008-4392 (no ipv6)
-	epatch \
+	eapply \
 		"${FILESDIR}/CVE2008-4392_0001-dnscache-merge-similar-outgoing-queries.patch" \
 		"${FILESDIR}/CVE2008-4392_0002-dnscache-cache-soa-records.patch"
 
 	# Later versions of the ipv6 patch include this, but even if
 	# USE=ipv6, we're in the ${S}-noipv6 directory at this point.
-	epatch "${FILESDIR}/${PV}-errno.patch"
+	eapply -p0 "${FILESDIR}/${PV}-errno.patch"
 
 	einfo "Removing unused man pages ..."
 	rm -f man/{}
 
-	epatch_user
+	eapply_user
 }
 
 src_compile() {

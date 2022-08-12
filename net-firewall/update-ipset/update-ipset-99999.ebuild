@@ -2,15 +2,12 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI="6"
-
-inherit eutils
+EAPI="7"
 
 if [[ ${PV} == 9999* ]] ; then
 	EGIT_REPO_URI="https://github.com/Whissi/${PN}.git"
 	inherit git-r3
 	SRC_URI=""
-	KEYWORDS=""
 else
 	SRC_URI="https://github.com/Whissi/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 	RESTRICT="mirror"

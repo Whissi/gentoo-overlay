@@ -4,7 +4,7 @@
 
 EAPI="7"
 
-inherit eutils linux-info linux-mod
+inherit linux-info linux-mod
 
 DESCRIPTION="Kernel module for Realtek 8111/8168 PCI-E NICs"
 HOMEPAGE="http://www.realtek.com.tw"

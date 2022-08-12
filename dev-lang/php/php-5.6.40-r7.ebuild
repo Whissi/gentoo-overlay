@@ -90,7 +90,6 @@ COMMON_DEPEND="
 		dev-db/mysql-connector-c:0=
 	)
 	nls? ( sys-devel/gettext )
-	oci8-instant-client? ( dev-db/oracle-instantclient-basic )
 	odbc? ( >=dev-db/unixODBC-1.8.13 )
 	postgres? ( dev-db/postgresql:* )
 	qdbm? ( dev-db/qdbm )
@@ -427,9 +426,6 @@ src_configure() {
 		$(use_with odbc unixODBC "${EPREFIX}/usr")
 		$(use_with iodbc iodbc "${EPREFIX}/usr")
 	)
-
-	# Oracle support
-	our_conf+=( $(use_with oci8-instant-client oci8) )
 
 	# PDO support
 	if use pdo ; then

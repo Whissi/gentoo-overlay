@@ -3,7 +3,7 @@
 
 EAPI=6
 
-inherit desktop gnome2-utils java-vm-2 prefix versionator
+inherit desktop pax-utils java-vm-2 prefix versionator
 
 KEYWORDS="-* amd64 x86"
 
