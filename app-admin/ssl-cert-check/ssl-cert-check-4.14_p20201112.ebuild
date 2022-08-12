@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="7"
@@ -15,11 +15,6 @@ else
 	SRC_URI="https://github.com/Matty9191/${PN}/archive/${MY_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
 	S="${WORKDIR}"/${PN}-${MY_COMMIT}
-
-	PATCHES=(
-		"${FILESDIR}"/${PN}-4.11-add-openssl-1-1-1-compat.patch
-		"${FILESDIR}"/${PN}-4.11-fix-TLSFLAGS.patch
-	)
 fi
 
 LICENSE="GPL-2"
