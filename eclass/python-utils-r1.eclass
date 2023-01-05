@@ -44,7 +44,7 @@ inherit multiprocessing toolchain-funcs
 _PYTHON_ALL_IMPLS=(
 	pypy3
 	python2_7
-	python3_{8..10}
+	python3_{8..11}
 )
 readonly _PYTHON_ALL_IMPLS
 
@@ -84,7 +84,7 @@ _python_verify_patterns() {
 	local impl pattern
 	for pattern; do
 		case ${pattern} in
-			-[23]|3.[89]|3.10)
+			-[23]|3.[89]|3.1[01])
 				continue
 				;;
 		esac
@@ -133,7 +133,7 @@ _python_set_impls() {
 			# please keep them in sync with _PYTHON_ALL_IMPLS
 			# and _PYTHON_HISTORICAL_IMPLS
 			case ${i} in
-				pypy3|python2_7|python3_[89]|python3_10)
+				pypy3|python2_7|python3_[89]|python3_1[01])
 					;;
 				jython2_7|pypy|pypy1_[89]|pypy2_0|python2_[5-6]|python3_[1-7])
 					obsolete+=( "${i}" )
@@ -246,7 +246,7 @@ _python_impl_matches() {
 				[[ ${impl} == python${pattern/./_} || ${impl} == pypy3 ]] &&
 					return 0
 				;;
-			3.9|3.10)
+			3.9|3.10|3.11)
 				[[ ${impl} == python${pattern/./_} ]] && return 0
 				;;
 			*)
@@ -462,6 +462,8 @@ _python_export() {
 						PYTHON_PKG_DEP=">=dev-lang/python-3.9.9-r1:3.9";;
 					python3.10)
 						PYTHON_PKG_DEP=">=dev-lang/python-3.10.0_p1-r1:3.10";;
+					python3.11)
+						PYTHON_PKG_DEP=">=dev-lang/python-3.11.1:3.11";;
 					python*)
 						PYTHON_PKG_DEP="dev-lang/python:${impl#python}";;
 					pypy)
