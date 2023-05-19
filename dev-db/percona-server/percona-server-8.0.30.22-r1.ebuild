@@ -1,4 +1,4 @@
-# Copyright 1999-2023 Gentoo Authors
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="8"
@@ -17,7 +17,7 @@ MY_MAJOR_PV=$(ver_cut 1-2)
 MY_RELEASE_NOTES_URI="https://www.percona.com/doc/percona-server/${MY_MAJOR_PV}/"
 
 # Patch version
-PATCH_SET="https://mirror.whissi.de/distfiles/percona-server/${PN}-8.0.31.23-patches-01.tar.xz"
+PATCH_SET="https://mirror.whissi.de/distfiles/percona-server/${PN}-8.0.30.22-patches-01.tar.xz"
 
 SRC_URI="https://www.percona.com/downloads/${MY_PN}-${MY_MAJOR_PV}/${MY_PN}-${MY_PV}/source/tarball/${PN}-${MY_PV}.tar.gz
 	https://dl.bintray.com/boostorg/release/${MY_BOOST_VERSION}/source/boost_$(ver_rs 1- _ ${MY_BOOST_VERSION}).tar.bz2
@@ -51,11 +51,11 @@ S="${WORKDIR}/mysql"
 # These are used for both runtime and compiletime
 # openldap < dep for bug #835647 (we need ldap_r)
 COMMON_DEPEND="
-	>=app-arch/lz4-1.9.4:=
+	>=app-arch/lz4-0_p131:=
 	app-arch/zstd:=
-	>=dev-libs/openssl-1.0.0:=
-	sys-libs/ncurses:=
-	>=sys-libs/zlib-1.2.13:=
+	sys-libs/ncurses:0=
+	>=sys-libs/zlib-1.2.3:0=
+	>=dev-libs/openssl-1.0.0:0=
 	server? (
 		dev-libs/icu:=
 		dev-libs/libevent:=[ssl,threads(+)]
@@ -67,14 +67,14 @@ COMMON_DEPEND="
 			dev-libs/cyrus-sasl
 			<net-nds/openldap-2.6:=
 		)
-		jemalloc? ( dev-libs/jemalloc:= )
+		jemalloc? ( dev-libs/jemalloc:0= )
 		kernel_linux? (
-			dev-libs/libaio:=
-			sys-process/procps:=
+			dev-libs/libaio:0=
+			sys-process/procps:0=
 		)
 		numa? ( sys-process/numactl )
-		pam? ( sys-libs/pam:= )
-		tcmalloc? ( dev-util/google-perftools:= )
+		pam? ( sys-libs/pam:0= )
+		tcmalloc? ( dev-util/google-perftools:0= )
 	)
 "
 DEPEND="${COMMON_DEPEND}
@@ -87,7 +87,7 @@ DEPEND="${COMMON_DEPEND}
 	)
 "
 RDEPEND="${COMMON_DEPEND}
-	!dev-db/mariadb !dev-db/mariadb-galera !dev-db/mysql !dev-db/mysql-cluster
+	!dev-db/mariadb !dev-db/mysql
 	!dev-db/percona-server:0
 	!dev-db/percona-server:5.7
 	selinux? ( sec-policy/selinux-mysql )
@@ -117,7 +117,7 @@ pkg_pretend() {
 		if use server ; then
 			CHECKREQS_DISK_BUILD="3G"
 
-			if has test ${FEATURES} ; then
+			if has test $FEATURES ; then
 				CHECKREQS_DISK_BUILD="9G"
 			fi
 
@@ -142,9 +142,8 @@ pkg_setup() {
 			fi
 
 			local aio_max_nr=$(sysctl -n fs.aio-max-nr 2>/dev/null)
-			if [[ -z "${aio_max_nr}" || ${aio_max_nr} -lt 250000 ]] ; then
-				die "FEATURES=test will require fs.aio-max-nr=250000 at minimum!"
-			fi
+			[[ -z "${aio_max_nr}" || ${aio_max_nr} -lt 250000 ]] \
+				&& die "FEATURES=test will require fs.aio-max-nr=250000 at minimum!"
 
 			if use latin1 ; then
 				# Upstream only supports tests with default charset
@@ -152,15 +151,17 @@ pkg_setup() {
 			fi
 		fi
 
-		if use kernel_linux && use numa ; then
-			linux-info_get_any_version
+		if use kernel_linux ; then
+			if use numa ; then
+				linux-info_get_any_version
 
-			local CONFIG_CHECK="~NUMA"
+				local CONFIG_CHECK="~NUMA"
 
-			local WARNING_NUMA="This package expects NUMA support in kernel which this system does not have at the moment;"
-			WARNING_NUMA+=" Either expect runtime errors, enable NUMA support in kernel or rebuild the package without NUMA support"
+				local WARNING_NUMA="This package expects NUMA support in kernel which this system does not have at the moment;"
+				WARNING_NUMA+=" Either expect runtime errors, enable NUMA support in kernel or rebuild the package without NUMA support"
 
-			check_extra_config
+				check_extra_config
+			fi
 		fi
 
 		use server && check-reqs_pkg_setup
@@ -208,10 +209,15 @@ src_configure() {
 	# Bug #114895, bug #110149
 	filter-flags "-O" "-O[01]"
 
+	append-cxxflags -felide-constructors
+
+	# bug #283926, with GCC4.4, this is required to get correct behavior.
+	append-flags -fno-strict-aliasing
+
 	CMAKE_BUILD_TYPE="RelWithDebInfo"
 
 	# debug hack wrt #497532
-	mycmakeargs=(
+	local mycmakeargs=(
 		-DCMAKE_C_FLAGS_RELWITHDEBINFO="$(usex debug '' '-DNDEBUG')"
 		-DCMAKE_CXX_FLAGS_RELWITHDEBINFO="$(usex debug '' '-DNDEBUG')"
 		-DMYSQL_DATADIR="${EPREFIX}/var/lib/mysql"
@@ -246,6 +252,13 @@ src_configure() {
 		-DWITH_BOOST="${WORKDIR}/boost_$(ver_rs 1- _ ${MY_BOOST_VERSION})"
 		-DWITH_ROUTER=$(usex router ON OFF)
 	)
+
+	if tc-ld-is-lld ; then
+		einfo "LD is set to LLD; Will use lld ..."
+		mycmakeargs+=( -DUSE_LD_LLD=ON )
+	else
+		mycmakeargs+=( -DUSE_LD_LLD=OFF )
+	fi
 
 	if is-flagq -fno-lto ; then
 		einfo "LTO disabled via {C,CXX,F,FC}FLAGS"
@@ -394,7 +407,7 @@ src_test() {
 	# Run mysql tests
 	pushd "${TESTDIR}" &>/dev/null || die
 
-	touch "${T}/disabled.def" || die
+	touch "${T}/disabled.def"
 
 	local -a disabled_tests
 	disabled_tests+=( "auth_sec.atomic_rename_user;103512;Depends on user running test" )
