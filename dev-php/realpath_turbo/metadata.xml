@@ -10,6 +10,7 @@
 		<name>PHP Project</name>
 	</maintainer>
 	<upstream>
+		<remote-id type="github">Whissi/realpath_turbo</remote-id>
 		<bugs-to>https://github.com/Whissi/realpath_turbo/issues</bugs-to>
 	</upstream>
 </pkgmetadata>
