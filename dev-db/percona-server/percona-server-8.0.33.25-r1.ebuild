@@ -59,7 +59,7 @@ COMMON_DEPEND="
 	server? (
 		dev-libs/icu:=
 		dev-libs/libevent:=[ssl,threads(+)]
-		>=dev-libs/protobuf-3.8:=
+		>=dev-libs/protobuf-3.8:0/32
 		net-libs/libtirpc:=
 		net-misc/curl:=
 		cjk? ( app-text/mecab:= )
