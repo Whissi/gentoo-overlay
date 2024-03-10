@@ -3,10 +3,11 @@
 <pkgmetadata>
 	<maintainer type="person">
 		<email>whissi@whissi.de</email>
-		<name>Thomas D.</name>
+		<name>Thomas Deutschmann</name>
 		<description>Primary Maintainer</description>
 	</maintainer>
 	<upstream>
 		<bugs-to>https://github.com/Whissi/ibfupdater/issues</bugs-to>
+		<remote-id type="github">Whissi/ibfupdater</remote-id>
 	</upstream>
 </pkgmetadata>

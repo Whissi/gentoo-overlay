@@ -1,7 +1,7 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="6"
+EAPI="8"
 
 if [[ ${PV} == 9999* ]] ; then
 	EGIT_REPO_URI="https://github.com/Whissi/${PN}.git"
@@ -16,9 +16,7 @@ HOMEPAGE="https://github.com/Whissi/ibfupdater"
 
 LICENSE="GPL-3"
 SLOT="0"
-IUSE=""
 
-DEPEND=""
 RDEPEND=">=app-shells/bash-4.2_p37
 	>=net-misc/curl-7.26.0
 	>=sys-apps/findutils-4.4.2
@@ -26,6 +24,8 @@ RDEPEND=">=app-shells/bash-4.2_p37
 	>=sys-apps/util-linux-2.21"
 
 DOCS=( README.md )
+
+PATCHES=( "${FILESDIR}"/ibfupdater-0.10.0-bash-5.2.patch )
 
 src_prepare() {
 	if [[ ${PV} == 9999* ]] ; then

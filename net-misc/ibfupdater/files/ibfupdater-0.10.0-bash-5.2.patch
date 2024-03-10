@@ -1,0 +1,11 @@
+--- old/ibfupdater
++++ new/ibfupdater
+@@ -1,4 +1,7 @@
+ #!/bin/bash
++
++shopt -s extglob
++
+ # Copyright 2013 Thomas D. <whissi@whissi.de>
+ #
+ # This program is free software: you can redistribute it and/or modify
+ 
