@@ -240,6 +240,8 @@ src_prepare() {
 src_configure() {
 	filter-lto # bug 855644
 
+	append-cflags $(test-flags-CC -Wno-error=implicit-function-declaration)
+
 	addpredict /usr/share/snmp/mibs/.index #nowarn
 	addpredict /var/lib/net-snmp/mib_indexes #nowarn
 
