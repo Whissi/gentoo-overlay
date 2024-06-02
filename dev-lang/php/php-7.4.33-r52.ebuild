@@ -146,10 +146,20 @@ PATCHES=(
 	"${FILESDIR}"/php-7.4.26-openssl3.patch
 	"${FILESDIR}"/php-iodbc-header-location.patch
 	"${FILESDIR}"/bug81656-gcc-11.patch
-	"${FILESDIR}"/php-7.4.33-CVE-2022-31631.patch
-	"${FILESDIR}"/php-7.4.33-CVE-2023-0567.patch
-	"${FILESDIR}"/php-7.4.33-CVE-2023-0568.patch
+	"${FILESDIR}"/php-bug81740.patch
+	"${FILESDIR}"/php-bug81744.patch
+	"${FILESDIR}"/php-bug81746.patch
+	"${FILESDIR}"/php-7.4.33-libxml212.patch
+	#"${FILESDIR}"/php-7.4.33-CVE-2022-31631.patch
+	#"${FILESDIR}"/php-7.4.33-CVE-2023-0567.patch
+	#"${FILESDIR}"/php-7.4.33-CVE-2023-0568.patch
 	"${FILESDIR}"/php-7.4.33-CVE-2023-0662.patch
+	"${FILESDIR}"/php-cve-2023-3247.patch
+	"${FILESDIR}"/php-cve-2023-3823.patch
+	"${FILESDIR}"/php-cve-2023-3824.patch
+	"${FILESDIR}"/php-cve-2024-2756.patch
+	"${FILESDIR}"/php-cve-2024-3096.patch
+	"${FILESDIR}"/php-7.4.33-gcc14.patch
 )
 
 php_install_ini() {
