@@ -160,6 +160,8 @@ PATCHES=(
 	"${FILESDIR}"/php-cve-2024-2756.patch
 	"${FILESDIR}"/php-cve-2024-3096.patch
 	"${FILESDIR}"/php-7.4.33-gcc14.patch
+	"${FILESDIR}"/php-cve-2024-5458.patch
+	"${FILESDIR}"/php-7.4.33-intl-icu-74+.patch
 )
 
 php_install_ini() {
