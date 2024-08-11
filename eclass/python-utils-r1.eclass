@@ -1446,5 +1446,39 @@ python_has_version() {
 	return 0
 }
 
+# @FUNCTION: _python_sanity_checks
+# @INTERNAL
+# @DESCRIPTION:
+# Perform additional environment sanity checks.
+_python_sanity_checks() {
+    debug-print-function ${FUNCNAME} "${@}"
+
+    [[ ${_PYTHON_SANITY_CHECKED} ]] && return
+
+    if [[ -v PYTHONPATH ]]; then
+	local x paths=()
+	mapfile -d ':' -t paths <<<${PYTHONPATH}
+
+	for x in "${paths[@]}"; do
+	    if [[ ${x} != /* ]]; then
+		eerror "Relative path found in PYTHONPATH:"
+		eerror
+		eerror "  PYTHONPATH=${PYTHONPATH@Q}"
+		eerror
+		eerror "This is guaranteed to cause random breakage.  Please make sure that"
+		eerror "your PYTHONPATH contains absolute paths only (and only if necessary)."
+		eerror "Note that empty values (including ':' at either end and an empty"
+		eerror "PYTHONPATH) count as the current directory.  If no PYTHONPATH"
+		eerror "is intended, it needs to be unset instead."
+		die "Relative paths in PYTHONPATH are forbidden: ${x@Q}"
+	    fi
+	done
+
+	elog "PYTHONPATH=${PYTHONPATH@Q}"
+    fi
+
+    _PYTHON_SANITY_CHECKED=1
+}
+
 _PYTHON_UTILS_R1=1
 fi
