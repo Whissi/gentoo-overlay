@@ -1,4 +1,4 @@
-# Copyright 1999-2022 Gentoo Authors
+# Copyright 1999-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: python-utils-r1.eclass
@@ -246,7 +246,7 @@ _python_impl_matches() {
 				[[ ${impl} == python${pattern/./_} || ${impl} == pypy3 ]] &&
 					return 0
 				;;
-			3.9|3.10|3.11|3.12)
+			3.9|3.10|3.11|3.12|3.13)
 				[[ ${impl} == python${pattern/./_} ]] && return 0
 				;;
 			*)
@@ -466,6 +466,8 @@ _python_export() {
 						PYTHON_PKG_DEP=">=dev-lang/python-3.11.1:3.11";;
 					python3.12)
 						PYTHON_PKG_DEP=">=dev-lang/python-3.12:3.12";;
+					python3.13)
+						PYTHON_PKG_DEP=">=dev-lang/python-3.13:3.13";;
 					python*)
 						PYTHON_PKG_DEP="dev-lang/python:${impl#python}";;
 					pypy)
