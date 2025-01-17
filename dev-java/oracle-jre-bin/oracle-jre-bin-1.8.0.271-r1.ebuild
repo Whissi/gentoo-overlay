@@ -1,20 +1,20 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=8
 
-inherit desktop gnome2-utils java-vm-2 prefix versionator
+inherit desktop gnome2-utils java-vm-2 prefix
 
 KEYWORDS="-* amd64 x86"
 
-if [[ "$(get_version_component_range 4)" == 0 ]] ; then
-	S_PV="$(get_version_component_range 1-3)"
+if [[ "$(ver_cut 4)" == 0 ]] ; then
+	S_PV="$(ver_cut 1-3)"
 else
-	MY_PV_EXT="u$(get_version_component_range 4)"
-	S_PV="$(get_version_component_range 1-4)"
+	MY_PV_EXT="u$(ver_cut 4)"
+	S_PV="$(ver_cut 1-4)"
 fi
 
-MY_PV="$(get_version_component_range 2)${MY_PV_EXT}"
+MY_PV="$(ver_cut 2)${MY_PV_EXT}"
 
 declare -A ARCH_FILES
 ARCH_FILES[amd64]="jre-${MY_PV}-linux-x64.tar.gz"
@@ -73,7 +73,7 @@ RDEPEND="!x64-macos? (
 
 DEPEND="app-arch/zip"
 
-S="${WORKDIR}/jre$(replace_version_separator 3 _  ${S_PV})"
+S="${WORKDIR}/jre$(ver_rs 3 _  ${S_PV})"
 
 pkg_nofetch() {
 	einfo "Please download ${ARCH_FILES[${ARCH}]} and move it to"
@@ -100,7 +100,7 @@ src_prepare() {
 
 src_install() {
 	local dest="/opt/${P}"
-	local ddest="${ED}${dest#/}"
+	local ddest="${ED}/${dest#/}"
 
 	# Create files used as storage for system preferences.
 	mkdir .systemPrefs || die
