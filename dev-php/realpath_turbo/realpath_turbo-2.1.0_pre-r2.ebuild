@@ -1,4 +1,4 @@
-# Copyright 1999-2022 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="8"
@@ -7,7 +7,7 @@ PHP_EXT_NAME="realpath_turbo"
 PHP_EXT_INI="yes"
 PHP_EXT_ZENDEXT="no"
 
-USE_PHP="php7-4 php8-0 php8-1 php8-2"
+USE_PHP="php7-4 php8-0 php8-1 php8-2 php8-3 php8-4"
 
 inherit php-ext-source-r3
 
