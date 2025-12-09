@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: python-utils-r1.eclass
@@ -44,7 +44,7 @@ inherit multiprocessing toolchain-funcs
 _PYTHON_ALL_IMPLS=(
 	pypy3
 	python2_7
-	python3_{8..13}
+	python3_{8..14}
 )
 readonly _PYTHON_ALL_IMPLS
 
@@ -133,7 +133,7 @@ _python_set_impls() {
 			# please keep them in sync with _PYTHON_ALL_IMPLS
 			# and _PYTHON_HISTORICAL_IMPLS
 			case ${i} in
-				pypy3|python2_7|python3_[89]|python3_1[0123])
+				pypy3|python2_7|python3_[89]|python3_1[01234])
 					;;
 				jython2_7|pypy|pypy1_[89]|pypy2_0|python2_[5-6]|python3_[1-7])
 					obsolete+=( "${i}" )
@@ -246,7 +246,7 @@ _python_impl_matches() {
 				[[ ${impl} == python${pattern/./_} || ${impl} == pypy3 ]] &&
 					return 0
 				;;
-			3.9|3.10|3.11|3.12|3.13)
+			3.9|3.10|3.11|3.12|3.13|3.14)
 				[[ ${impl} == python${pattern/./_} ]] && return 0
 				;;
 			*)
@@ -468,6 +468,8 @@ _python_export() {
 						PYTHON_PKG_DEP=">=dev-lang/python-3.12:3.12";;
 					python3.13)
 						PYTHON_PKG_DEP=">=dev-lang/python-3.13:3.13";;
+					python3.14)
+						PYTHON_PKG_DEP=">=dev-lang/python-3.14:3.14";;
 					python*)
 						PYTHON_PKG_DEP="dev-lang/python:${impl#python}";;
 					pypy)
