@@ -1,20 +1,22 @@
-# Copyright 1999-2022 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI="7"
+EAPI="8"
 
-inherit linux-info linux-mod
+inherit linux-mod-r1
 
 DESCRIPTION="Kernel module for Realtek 8111/8168 PCI-E NICs"
 HOMEPAGE="http://www.realtek.com.tw"
-SRC_URI="http://mirror.whissi.de/distfiles/${PN}/r8168-${PV}.tar.bz2"
+SRC_URI="https://mirror.whissi.de/distfiles/${PN}/r8168-${PV}.tar.bz2"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE=""
 DEPEND="virtual/linux-sources"
 RDEPEND=""
+
+modlist=( r8168 )
 
 S="${WORKDIR}"/r8168-${PV}
 
@@ -47,7 +49,7 @@ pkg_pretend() {
 }
 
 pkg_setup() {
-	linux-mod_pkg_setup
+	linux-mod-r1_pkg_setup
 }
 
 src_prepare() {
@@ -62,7 +64,7 @@ src_prepare() {
 }
 
 pkg_postinst() {
-	linux-mod_pkg_postinst
+	linux-mod-r1_pkg_postinst
 
 	if use kernel_linux && linux_config_exists ; then
 		if linux_chkconfig_module R8169 ; then
@@ -97,7 +99,7 @@ pkg_postinst() {
 }
 
 pkg_postrm() {
-	linux-mod_pkg_postrm
+	linux-mod-r1_pkg_postrm
 
 	if use kernel_linux && linux_config_exists ; then
 		if linux_chkconfig_module R8169 ; then
