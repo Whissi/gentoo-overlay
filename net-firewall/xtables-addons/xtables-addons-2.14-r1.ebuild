@@ -1,15 +1,15 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="7"
+EAPI="8"
 
 MODULES_OPTIONAL_USE=modules
 MODULES_OPTIONAL_USE_IUSE_DEFAULT=1
-inherit toolchain-funcs linux-info linux-mod
+inherit toolchain-funcs linux-mod-r1
 
 DESCRIPTION="iptables extensions not yet accepted in the main kernel"
-HOMEPAGE="http://xtables-addons.sourceforge.net/"
-SRC_URI="mirror://sourceforge/xtables-addons/${P}.tar.xz"
+HOMEPAGE="https://xtables-addons.sourceforge.net/"
+SRC_URI="https://downloads.sourceforge.net/xtables-addons/${P}.tar.xz"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -18,7 +18,7 @@ KEYWORDS="~amd64 ~x86"
 MODULES="quota2 psd pknock lscan length2 ipv4options ipp2p iface gradm geoip fuzzy condition tarpit sysrq logmark ipmark echo dnetmap dhcpmac delude chaos account"
 
 for mod in ${MODULES}; do
-	IUSE="${IUSE} xtables_addons_${mod}"
+	IUSE="${IUSE} modules xtables_addons_${mod}"
 done
 
 DEPEND=">=net-firewall/iptables-1.4.5"
@@ -59,7 +59,7 @@ pkg_setup()	{
 		check_modules_supported
 		CONFIG_CHECK="NF_CONNTRACK NF_CONNTRACK_MARK ~CONNECTOR"
 		ERROR_CONNECTOR="Please, enable CONFIG_CONNECTOR if you wish to receive userspace notifications from pknock through netlink/connector"
-		linux-mod_pkg_setup
+		linux-mod-r1_pkg_setup
 
 		if ! linux_chkconfig_present IPV6; then
 			SKIP_IPV6_MODULES="ip6table_rawpost"
@@ -177,12 +177,12 @@ src_configure() {
 
 src_compile() {
 	emake CFLAGS="${CFLAGS}" CC="$(tc-getCC)" V=1
-	use modules && BUILD_PARAMS="V=1" BUILD_TARGETS="modules" linux-mod_src_compile
+	use modules && BUILD_PARAMS="V=1" BUILD_TARGETS="modules" linux-mod-r1_src_compile
 }
 
 src_install() {
 	emake DESTDIR="${D}" install
-	use modules && linux-mod_src_install
+	use modules && linux-mod-r1_src_install
 	dodoc -r README doc/*
 	find "${ED}" -type f -name '*.la' -exec rm -rf '{}' '+'
 }
