@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2026 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
@@ -24,7 +24,8 @@ IUSE=""
 DOCS=( README.md )
 
 DEPEND=""
-RDEPEND=">=app-shells/bash-4.2_p37
+RDEPEND="app-alternatives/awk
+	>=app-shells/bash-4.2_p37
 	>=net-firewall/ipset-6.15
 	>=sys-apps/findutils-4.4.2
 	>=sys-apps/grep-2.9
